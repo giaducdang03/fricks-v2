@@ -1,0 +1,6 @@
+@Fricks_HostAddress = http://localhost:5286
+
+GET {{Fricks_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
