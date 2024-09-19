@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entites\Base\" />
-    <Folder Include="FluentAPI\" />
-    <Folder Include="Enum\" />
-    <Folder Include="Utils\" />
-    <Folder Include="Repositories\Interface\" />
-    <Folder Include="UnitOfWork\Interface\" />
+    <Compile Remove="Entites\**" />
+    <Compile Remove="FluentAPI\**" />
+    <Compile Remove="UnitOfWork\Interface\**" />
+    <EmbeddedResource Remove="Entites\**" />
+    <EmbeddedResource Remove="FluentAPI\**" />
+    <EmbeddedResource Remove="UnitOfWork\Interface\**" />
+    <None Remove="Entites\**" />
+    <None Remove="FluentAPI\**" />
+    <None Remove="UnitOfWork\Interface\**" />
   </ItemGroup>
 
   <ItemGroup>
