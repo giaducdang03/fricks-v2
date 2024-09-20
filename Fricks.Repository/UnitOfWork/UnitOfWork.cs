@@ -14,17 +14,16 @@ namespace Fricks.Repository.UnitOfWork
     {
         private readonly FricksContext _context;
         private IDbContextTransaction _transaction;
-        private IGenericRepository<User> _userRepository;
-
+        private IUserRepository _userRepository;
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
         }
-        public IGenericRepository<User> UsersRepository
+        public IUserRepository UsersRepository
         {
             get
             {
-                return _userRepository ??= new GenericRepository<User>(_context);
+                return _userRepository ??= new UserRepository(_context);
 
             }
         }
