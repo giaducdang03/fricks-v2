@@ -41,6 +41,8 @@ public partial class FricksContext : DbContext
 
     public virtual DbSet<Voucher> Vouchers { get; set; }
 
+    public virtual DbSet<Otp> Otps { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
@@ -219,6 +221,7 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.Address).HasMaxLength(250);
             entity.Property(e => e.Email).HasMaxLength(250);
             entity.Property(e => e.FullName).HasMaxLength(250);
+            entity.Property(e => e.UnsignFullName).HasMaxLength(250);
             entity.Property(e => e.GoogleId).HasMaxLength(500);
             entity.Property(e => e.PasswordHash).HasMaxLength(100);
             entity.Property(e => e.PhoneNumber)
@@ -243,6 +246,25 @@ public partial class FricksContext : DbContext
             entity.HasOne(d => d.Store).WithMany(p => p.Vouchers)
                 .HasForeignKey(d => d.StoreId)
                 .HasConstraintName("FK__Voucher__StoreId__6E01572D");
+        });
+
+        modelBuilder.Entity<Otp>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Otp");
+
+            entity.ToTable("Otp");
+
+            entity.Property(e => e.Email).HasMaxLength(250);
+
+            entity.Property(e => e.OtpCode).HasMaxLength(6);
+
+            entity.Property(e => e.ExpiryTime).HasColumnType("datetime2");
+
+            entity.Property(e => e.CreateDate)
+               .HasDefaultValueSql("(getdate())")
+               .HasColumnType("datetime2");
+
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime2");
         });
 
         OnModelCreatingPartial(modelBuilder);

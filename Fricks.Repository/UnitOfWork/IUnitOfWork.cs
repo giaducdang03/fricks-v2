@@ -10,7 +10,7 @@ namespace Fricks.Repository.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<User> UsersRepository { get; }
+        IUserRepository UsersRepository { get; }
         int Save();
         void Commit();
         void Rollback();
