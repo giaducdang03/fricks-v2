@@ -1,6 +1,9 @@
 ﻿using AspNetCoreRateLimit;
 using Fricks.Middlewares;
 using Fricks.Repository;
+using Fricks.Repository.UnitOfWork;
+using Fricks.Service.Services;
+using Fricks.Service.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
@@ -10,21 +13,19 @@ namespace Fricks
     {
         public static IServiceCollection AddWebAPIService(this IServiceCollection services)
         {
-            //Add Service
+            // add Service
 
-            //Add Middleware
+            // add DI
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService>();
+
+            // add Middleware
             services.AddExceptionHandler<ExceptionHandlerMiddleware>();
             services.AddSingleton<PerformanceMiddleware>();
             services.AddSingleton<Stopwatch>();
             services.AddProblemDetails();
 
-            //Add DbContext
-            services.AddDbContext<FricksDbContext>(options =>
-            {
-                options.UseSqlServer(Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION_STRING"));
-            });
-
-            //Add Brute Force setting
+            // add Brute Force setting
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
