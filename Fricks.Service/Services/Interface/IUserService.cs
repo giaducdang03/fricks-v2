@@ -12,5 +12,10 @@ namespace Fricks.Service.Services.Interface
         public Task<bool> RegisterAsync(SignUpModel model);
 
         public Task<AuthenModel> LoginWithEmailPassword(string email, string password);
+
+        public Task<AuthenModel> RefreshToken(string jwtToken);
+
+        public Task<bool> ChangePasswordAsync(string email, ChangePasswordModel changePasswordModel);
+
     }
 }

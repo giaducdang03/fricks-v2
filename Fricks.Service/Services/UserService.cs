@@ -7,6 +7,7 @@ using Fricks.Service.BusinessModel.AuthenModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,6 +28,31 @@ namespace Fricks.Service.Services
             _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
+
+        public async Task<bool> ChangePasswordAsync(string email, ChangePasswordModel changePasswordModel)
+        {
+            var user = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (user != null)
+            {
+                bool checkPassword = PasswordUtils.VerifyPassword(changePasswordModel.OldPassword, user.PasswordHash);
+                if (checkPassword)
+                {
+                    user.PasswordHash = PasswordUtils.HashPassword(changePasswordModel.NewPassword);
+                    _unitOfWork.UsersRepository.UpdateAsync(user);
+                    _unitOfWork.Save();
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("Mật khẩu cũ không đúng.");
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+        }
+
         public async Task<AuthenModel> LoginWithEmailPassword(string email, string password)
         {
             try
@@ -86,6 +112,54 @@ namespace Fricks.Service.Services
             catch
             {
                 throw;
+            }
+        }
+
+        public async Task<AuthenModel> RefreshToken(string jwtToken)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+            var handler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = authSigningKey,
+                ValidateIssuer = true,
+                ValidIssuer = _configuration["JWT:ValidIssuer"],
+                ValidateAudience = true,
+                ValidAudience = _configuration["JWT:ValidAudience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+            try
+            {
+                SecurityToken validatedToken;
+                var principal = handler.ValidateToken(jwtToken, validationParameters, out validatedToken);
+                var email = principal.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress").Value;
+                if (email != null)
+                {
+                    var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+                    if (existUser != null)
+                    {
+                        var accessToken = GenerateAccessToken(email, existUser);
+                        var refreshToken = GenerateRefreshToken(email);
+                        return new AuthenModel
+                        {
+                            HttpCode = 200,
+                            Message = "Refresh token successfully.",
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        };
+                    }
+                }
+                return new AuthenModel
+                {
+                    HttpCode = 401,
+                    Message = "Tài khoản không tồn tại."
+                };
+            }
+            catch
+            {
+                throw new Exception("Token không hợp lệ");
             }
         }
 
