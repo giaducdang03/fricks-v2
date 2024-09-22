@@ -30,6 +30,8 @@ builder.Services.AddAutoMapper(typeof(AutoMapperSetting).Assembly);
 // Add Dependency Injection
 builder.Services.AddWebAPIService();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Fricks API", Version = "v.10.24" });
