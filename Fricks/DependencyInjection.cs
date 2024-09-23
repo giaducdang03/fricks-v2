@@ -19,7 +19,9 @@ namespace Fricks
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
 
-            
+
+            services.AddScoped<IOtpService, OtpService>();
+            services.AddScoped<IMailService, MailService>();
             services.AddScoped<IClaimsService, ClaimsService>();
 
             // add Middleware

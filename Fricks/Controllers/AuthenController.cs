@@ -33,7 +33,7 @@ namespace Fricks.Controllers
                     var resp = new ResponseModel
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Đã tạo tài khoản thành công. Hãy thử đăng nhập."
+                        Message = "Mã OTP đã được gửi về email của bạn. Vui lòng xác thực để đăng nhập."
                     };
                     return Ok(resp);
                 }
@@ -121,6 +121,155 @@ namespace Fricks.Controllers
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Không thể đổi mật khẩu."
+                });
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("email-confirm")]
+        public async Task<IActionResult> ConfirmEmail(ConfirmOtpModel confirmOtpModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var result = await _userService.ConfirmEmail(confirmOtpModel);
+                    if (result.HttpCode == StatusCodes.Status200OK)
+                    {
+                        return Ok(result);
+                    }
+                    return Unauthorized(result);
+                }
+                return ValidationProblem(ModelState);
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> RequestResetPassword([FromBody] string email)
+        {
+            try
+            {
+                var result = await _userService.RequestResetPassword(email);
+                if (result)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Mã OTP đặt lại mật khẩu đã được gửi qua email."
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Đặt lại mật khẩu thất bại."
+                });
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("reset-password/confirm")]
+        public async Task<IActionResult> RequestResetPassword(ConfirmOtpModel confirmOtpModel)
+        {
+            try
+            {
+                var result = await _userService.ConfirmResetPassword(confirmOtpModel);
+                if (result)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Bạn có thể đặt lại mật khẩu ngay bây giờ."
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "OTP không hợp lệ. Hãy thử lại."
+                });
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("reset-password/new-password")]
+        public async Task<IActionResult> RequestResetPassword(ResetPasswordModel resetPasswordModel)
+        {
+            try
+            {
+                var result = await _userService.ExecuteResetPassword(resetPasswordModel);
+                if (result)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Đặt lại mật khẩu thành công."
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Đặt lại mật khẩu thất bại."
+                });
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpGet("current-user")]
+        [Authorize]
+        public async Task<IActionResult> GetLoginUserInfo()
+        {
+            try
+            {
+                var email = _claimsService.GetCurrentUserEmail;
+                var result = await _userService.GetLoginUserInformationAsync(email);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể lấy thông tin tài khoản."
                 });
             }
             catch (Exception ex)
