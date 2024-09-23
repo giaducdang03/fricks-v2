@@ -14,8 +14,10 @@ namespace Fricks.Repository.UnitOfWork
     {
         private readonly FricksContext _context;
         private IDbContextTransaction _transaction;
+        private IBrandRepository _brandRepository;
         private IUserRepository _userRepository;
         private IOtpRepository _otpRepository;
+        private ICategoryRepository _categoryRepository;
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
@@ -34,6 +36,22 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _otpRepository ??= new OtpRepository(_context);
+            }
+        }
+
+        public IBrandRepository BrandRepository 
+        {
+            get
+            {
+                return _brandRepository ??= new BrandRepository(_context);
+            }
+        }
+
+        public ICategoryRepository CategoryRepository
+        {
+            get
+            {
+                return _categoryRepository ??= new CategoryRepository(_context);
             }
         }
 

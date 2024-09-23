@@ -38,12 +38,12 @@ namespace Fricks.Repository.Repositories
 
         public async Task<List<TEntity>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.Where(x => !x.IsDeleted).ToListAsync();
         }
 
         public async Task<TEntity?> GetByIdAsync(int id)
         {
-            var result = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            var result = await _dbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
             return result;
         }
 

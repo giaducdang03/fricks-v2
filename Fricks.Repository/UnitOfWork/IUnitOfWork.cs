@@ -11,7 +11,9 @@ namespace Fricks.Repository.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository UsersRepository { get; }
+        IBrandRepository BrandRepository { get; }
         IOtpRepository OtpsRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
         int Save();
         void Commit();
         void Rollback();
