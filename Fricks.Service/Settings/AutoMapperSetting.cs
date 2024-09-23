@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.UserModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,8 @@ namespace Fricks.Service.Settings
         public AutoMapperSetting() 
         {
             //Add Automapper
+
+            CreateMap<UserModel, User>().ReverseMap();
         }
     }
 }
