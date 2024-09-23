@@ -282,5 +282,28 @@ namespace Fricks.Controllers
                 return BadRequest(resp);
             }
         }
+
+        [HttpPost("login-with-google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] string credential)
+        {
+            try
+            {
+                var result = await _userService.LoginWithGoogle(credential);
+                if (result.HttpCode == StatusCodes.Status200OK)
+                {
+                    return Ok(result);
+                }
+                return Unauthorized(result);
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
     }
 }

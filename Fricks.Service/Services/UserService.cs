@@ -8,10 +8,12 @@ using Fricks.Service.BusinessModel.AuthenModels;
 using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -27,7 +29,7 @@ namespace Fricks.Service.Services
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, IOtpService otpService, IConfiguration configuration, IMapper mapper) 
+        public UserService(IUnitOfWork unitOfWork, IOtpService otpService, IConfiguration configuration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _otpService = otpService;
@@ -202,6 +204,98 @@ namespace Fricks.Service.Services
             catch
             {
                 throw;
+            }
+        }
+
+        public async Task<AuthenModel> LoginWithGoogle(string credental)
+        {
+            string cliendId = _configuration["GoogleCredential:ClientId"];
+
+            if (string.IsNullOrEmpty(cliendId))
+            {
+                throw new Exception("ClientId is null");
+            }
+
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { cliendId }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
+            if (payload == null)
+            {
+                throw new Exception("Credental không hợp lệ.");
+            }
+
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(payload.Email);
+
+            if (existUser != null)
+            {
+
+                if (existUser.Role != RoleEnums.CUSTOMER.ToString())
+                {
+                    throw new Exception("Tài khoản của bạn không được phép đăng nhập với Google.");
+                }
+
+                if (existUser.Status == UserStatus.BANNED.ToString())
+                {
+                    throw new Exception("Tài khoản đã bị cấm.");
+                }
+                else
+                {
+                    // create accesstoken
+                    var accessToken = GenerateAccessToken(existUser.Email, existUser);
+                    var refreshToken = GenerateRefreshToken(existUser.Email);
+
+                    _unitOfWork.Save();
+
+                    return new AuthenModel()
+                    {
+                        HttpCode = 200,
+                        Message = "Đăng nhập với Google thành công.",
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    };
+                }
+            }
+            else
+            {
+                // create new account
+                try
+                {
+                    User newUser = new User()
+                    {
+                        Email = payload.Email,
+                        FullName = payload.Name,
+                        ConfirmEmail = true,
+                        UnsignFullName = StringUtils.ConvertToUnSign(payload.Name),
+                        Avatar = payload.Picture,
+                        Status = UserStatus.ACTIVE.ToString(),
+                        GoogleId = payload.JwtId,
+                        Role = RoleEnums.CUSTOMER.ToString()
+                    };
+
+                    await _unitOfWork.UsersRepository.AddAsync(newUser);
+
+                    // create accesstoken
+                    var accessToken = GenerateAccessToken(newUser.Email, newUser);
+                    var refreshToken = GenerateRefreshToken(newUser.Email);
+
+                    _unitOfWork.Save();
+
+                    return new AuthenModel()
+                    {
+                        HttpCode = 200,
+                        Message = "Đăng nhập với Google thành công.",
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    };
+                }
+                catch
+                {
+                    throw;
+                }
+
             }
         }
 
