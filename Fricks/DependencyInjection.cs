@@ -24,6 +24,8 @@ namespace Fricks
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IBrandService, BrandService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IFavoriteProductService, FavoriteProductService>();
+            services.AddScoped<IStoreService, StoreService>();
 
             // add Middleware
             services.AddExceptionHandler<ExceptionHandlerMiddleware>();

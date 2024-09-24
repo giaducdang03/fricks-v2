@@ -33,9 +33,6 @@ namespace Fricks.Service.Services
         public async Task<BrandModel> DeleteBrand(int id)
         {
             var brand = await _unitOfWork.BrandRepository.GetByIdAsync(id);
-            //Lấy danh sách các product đang có xem có đang của hãng này ko
-            //...
-            //
             if (brand == null)
             {
                 throw new Exception("Không tìm thấy hãng - Không thể xóa");

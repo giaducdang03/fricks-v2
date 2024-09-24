@@ -17,6 +17,9 @@ namespace Fricks.Repository.UnitOfWork
         private IBrandRepository _brandRepository;
         private IUserRepository _userRepository;
         private IOtpRepository _otpRepository;
+        private IFavoriteProductRepository _favoriteProductRepository;
+        private IStoreRepository _storeRepository;
+        private IProductRepository _productRepository;
         private ICategoryRepository _categoryRepository;
         public UnitOfWork(FricksContext context) 
         { 
@@ -52,6 +55,30 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _categoryRepository ??= new CategoryRepository(_context);
+            }
+        }
+
+        public IFavoriteProductRepository FavoriteProductRepository
+        {
+            get
+            {
+                return _favoriteProductRepository ??= new FavoriteProductRepository(_context);
+            }
+        }
+
+        public IProductRepository ProductRepository
+        {
+            get
+            {
+                return _productRepository ??= new ProductRepository(_context);
+            }
+        }
+
+        public IStoreRepository StoreRepository 
+        {
+            get
+            {
+                return _storeRepository ??= new StoreRepository(_context);
             }
         }
 
