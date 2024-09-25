@@ -22,8 +22,8 @@ namespace Fricks.Middlewares
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Server error",
+                Status = StatusCodes.Status400BadRequest,
+                Title = exception.Message,
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

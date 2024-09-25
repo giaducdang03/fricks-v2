@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,5 +16,8 @@ namespace Fricks.Repository.Entities
         public DateTime? UpdateDate { get; set; }
 
         public bool IsDeleted { get; set; } = false;
+
+        [Timestamp]
+        public byte[]? Version { get; set; }
     }
 }
