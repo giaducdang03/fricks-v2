@@ -1,4 +1,5 @@
-﻿using Fricks.Service.BusinessModel.AuthenModels;
+﻿using Fricks.Repository.Commons;
+using Fricks.Service.BusinessModel.AuthenModels;
 using Fricks.Service.BusinessModel.UserModels;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace Fricks.Service.Services.Interface
 {
     public interface IUserService
     {
+
+        // authen
+
         public Task<bool> RegisterAsync(SignUpModel model);
 
         public Task<AuthenModel> LoginWithEmailPassword(string email, string password);
@@ -29,6 +33,18 @@ namespace Fricks.Service.Services.Interface
         public Task<UserModel> GetLoginUserInformationAsync(string email);
 
         public Task<AuthenModel> LoginWithGoogle(string credental);
+        
+        // manager user
+
+        public Task<UserModel> GetUserByIdAsync(int id);
+
+        public Task<Pagination<UserModel>> GetUserPaginationAsync(PaginationParameter paginationParameter);
+
+        public Task<UserModel> CreateUserAsync(CreateUserModel model);
+
+        public Task<UserModel> UpdateUserAsync(UpdateUserModel model);
+
+        public Task<UserModel> DeleteUserAsync(int id, string currentEmail);
 
     }
 }

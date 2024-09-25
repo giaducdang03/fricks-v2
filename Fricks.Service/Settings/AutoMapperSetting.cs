@@ -16,6 +16,7 @@ namespace Fricks.Service.Settings
             //Add Automapper
 
             CreateMap<UserModel, User>().ReverseMap();
+            CreateMap<CreateUserModel, User>();
         }
     }
 }
