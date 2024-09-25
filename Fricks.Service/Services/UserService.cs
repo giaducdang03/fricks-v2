@@ -1,17 +1,22 @@
 ﻿using AutoMapper;
+using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.Repositories;
 using Fricks.Repository.Repositories.Interface;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.AuthenModels;
+using Fricks.Service.BusinessModel.EmailModels;
 using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
+using Fricks.Service.Utils.Email;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -24,13 +29,19 @@ namespace Fricks.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOtpService _otpService;
+        private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, IOtpService otpService, IConfiguration configuration, IMapper mapper) 
+        public UserService(IUnitOfWork unitOfWork, 
+            IOtpService otpService,
+            IMailService mailService,
+            IConfiguration configuration, 
+            IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _otpService = otpService;
+            _mailService = mailService;
             _configuration = configuration;
             _mapper = mapper;
         }
@@ -114,6 +125,83 @@ namespace Fricks.Service.Services
             return await _otpService.ValidateOtpAsync(confirmOtpModel.Email, confirmOtpModel.OtpCode);
         }
 
+        public async Task<UserModel> CreateUserAsync(CreateUserModel model)
+        {
+            try
+            {
+                User newUser = _mapper.Map<User>(model);
+                newUser.Status = UserStatus.ACTIVE.ToString();
+                newUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
+                newUser.Role = model.Role.ToString().ToUpper();
+
+                var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(model.Email);
+
+                if (existUser != null)
+                {
+                    throw new Exception("Tài khoản đã tồn tại.");
+                }
+
+                // generate password
+                string password = PasswordUtils.GeneratePassword();
+
+                // hash password
+                newUser.PasswordHash = PasswordUtils.HashPassword(password);
+
+                await _unitOfWork.UsersRepository.AddAsync(newUser);
+
+                // send email password
+                MailRequest passwordEmail = new MailRequest()
+                {
+                    ToEmail = model.Email,
+                    Subject = "Fricks Welcome",
+                    Body = EmailCreateAccount.EmailSendCreateAccount(model.Email, password)
+                };
+
+                await _mailService.SendEmailAsync(passwordEmail);
+
+                _unitOfWork.Save();
+                return _mapper.Map<UserModel>(newUser);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<UserModel> DeleteUserAsync(int id, string currentEmail)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetByIdAsync(id);
+            if (existUser != null)
+            {
+                // check current user
+                if (existUser.Email == currentEmail)
+                {
+                    throw new Exception("Tài khoản đang đăng nhập. Không thể xóa.");
+                }
+
+                // check confirm email
+                if (existUser.ConfirmEmail == true)
+                {
+                    existUser.Status = UserStatus.BANNED.ToString();
+
+                    _unitOfWork.UsersRepository.SoftDeleteAsync(existUser);
+                    _unitOfWork.Save();
+
+                    return _mapper.Map<UserModel>(existUser);
+                }
+                else
+                {
+                    _unitOfWork.UsersRepository.PermanentDeletedAsync(existUser);
+                    _unitOfWork.Save();
+                    return _mapper.Map<UserModel>(existUser);
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+        }
+
         public async Task<bool> ExecuteResetPassword(ResetPasswordModel resetPasswordModel)
         {
             var user = await _unitOfWork.UsersRepository.GetUserByEmail(resetPasswordModel.Email);
@@ -139,6 +227,26 @@ namespace Fricks.Service.Services
                 return userModel;
             }
             return null;
+        }
+
+        public async Task<UserModel> GetUserByIdAsync(int id)
+        {
+            var user = await _unitOfWork.UsersRepository.GetByIdAsync(id);
+            if (user != null)
+            {
+                return _mapper.Map<UserModel>(user);
+            }
+            return null;
+        }
+
+        public async Task<Pagination<UserModel>> GetUserPaginationAsync(PaginationParameter paginationParameter)
+        {
+            var users = await _unitOfWork.UsersRepository.ToPagination(paginationParameter);
+            var userModels = _mapper.Map<List<UserModel>>(users);
+            return new Pagination<UserModel>(userModels,
+                users.TotalCount,
+                users.CurrentPage,
+                users.PageSize);
         }
 
         public async Task<AuthenModel> LoginWithEmailPassword(string email, string password)
@@ -202,6 +310,98 @@ namespace Fricks.Service.Services
             catch
             {
                 throw;
+            }
+        }
+
+        public async Task<AuthenModel> LoginWithGoogle(string credental)
+        {
+            string cliendId = _configuration["GoogleCredential:ClientId"];
+
+            if (string.IsNullOrEmpty(cliendId))
+            {
+                throw new Exception("ClientId is null");
+            }
+
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { cliendId }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
+            if (payload == null)
+            {
+                throw new Exception("Credental không hợp lệ.");
+            }
+
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(payload.Email);
+
+            if (existUser != null)
+            {
+
+                if (existUser.Role != RoleEnums.CUSTOMER.ToString())
+                {
+                    throw new Exception("Tài khoản của bạn không được phép đăng nhập với Google.");
+                }
+
+                if (existUser.Status == UserStatus.BANNED.ToString())
+                {
+                    throw new Exception("Tài khoản đã bị cấm.");
+                }
+                else
+                {
+                    // create accesstoken
+                    var accessToken = GenerateAccessToken(existUser.Email, existUser);
+                    var refreshToken = GenerateRefreshToken(existUser.Email);
+
+                    _unitOfWork.Save();
+
+                    return new AuthenModel()
+                    {
+                        HttpCode = 200,
+                        Message = "Đăng nhập với Google thành công.",
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    };
+                }
+            }
+            else
+            {
+                // create new account
+                try
+                {
+                    User newUser = new User()
+                    {
+                        Email = payload.Email,
+                        FullName = payload.Name,
+                        ConfirmEmail = true,
+                        UnsignFullName = StringUtils.ConvertToUnSign(payload.Name),
+                        Avatar = payload.Picture,
+                        Status = UserStatus.ACTIVE.ToString(),
+                        GoogleId = payload.JwtId,
+                        Role = RoleEnums.CUSTOMER.ToString().ToUpper()
+                    };
+
+                    await _unitOfWork.UsersRepository.AddAsync(newUser);
+
+                    // create accesstoken
+                    var accessToken = GenerateAccessToken(newUser.Email, newUser);
+                    var refreshToken = GenerateRefreshToken(newUser.Email);
+
+                    _unitOfWork.Save();
+
+                    return new AuthenModel()
+                    {
+                        HttpCode = 200,
+                        Message = "Đăng nhập với Google thành công.",
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    };
+                }
+                catch
+                {
+                    throw;
+                }
+
             }
         }
 
@@ -312,9 +512,34 @@ namespace Fricks.Service.Services
             return false;
         }
 
+        public async Task<UserModel> UpdateUserAsync(UpdateUserModel model)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetByIdAsync(model.UserId);
+            if (existUser != null)
+            {
+                existUser.FullName = model.FullName;
+                existUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
+                existUser.PhoneNumber = model.PhoneNumber;
+                existUser.Address = model.Address;
+                if (model.Avatar != null)
+                {
+                    existUser.Avatar = model.Avatar;
+                }
+
+                _unitOfWork.UsersRepository.UpdateAsync(existUser);
+                _unitOfWork.Save();
+
+                return _mapper.Map<UserModel>(existUser);
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+        }
+
         private string GenerateAccessToken(string email, User user)
         {
-            var role = user.Role.ToString();
+            var role = user.Role.ToUpper();
 
             var authClaims = new List<Claim>();
 

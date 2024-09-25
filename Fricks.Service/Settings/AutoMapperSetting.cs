@@ -23,7 +23,8 @@ namespace Fricks.Service.Settings
         {
             //Add Automapper
             CreateMap<UserModel, User>().ReverseMap();
-
+            CreateMap<CreateUserModel, User>();
+            
             CreateMap<BrandModel, Brand>().ReverseMap();
             CreateMap<BrandProcessModel, Brand>().ReverseMap();
             CreateMap<Pagination<Brand>, Pagination<BrandModel>>().ConvertUsing<PaginationConverter<Brand, BrandModel>>();

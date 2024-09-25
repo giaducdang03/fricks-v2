@@ -8,8 +8,8 @@ namespace Fricks.Repository.Enum
 {
     public enum RoleEnums
     {
-        Admin,
-        Store,
-        Customer
+        ADMIN,
+        STORE,
+        CUSTOMER
     }
 }
