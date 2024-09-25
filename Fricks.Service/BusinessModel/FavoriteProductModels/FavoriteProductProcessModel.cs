@@ -1,4 +1,6 @@
 ﻿using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.ProductModels;
+using Fricks.Service.BusinessModel.UserModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,5 @@ namespace Fricks.Service.BusinessModel.FavoriteProductModels
         public int? UserId { get; set; }
 
         public int? ProductId { get; set; }
-
-        public Product? Product { get; set; }
-
-        public User? User { get; set; }
     }
 }

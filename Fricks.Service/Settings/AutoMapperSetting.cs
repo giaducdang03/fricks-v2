@@ -4,6 +4,9 @@ using Fricks.Repository.Entities;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
+using Fricks.Service.BusinessModel.ProductModels;
+using Fricks.Service.BusinessModel.ProductPriceModels;
+using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
 using System;
@@ -37,6 +40,18 @@ namespace Fricks.Service.Settings
             CreateMap<Store, StoreProcessModel>().ReverseMap();
             CreateMap<Store, StoreRegisterModel>().ReverseMap();
             CreateMap<Pagination<Store>, Pagination<StoreModel>>().ConvertUsing<PaginationConverter<Store, StoreModel>>();
+
+            CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductProcessModel>().ReverseMap();
+            CreateMap<Product, ProductRegisterModel>().ReverseMap();
+            CreateMap<Pagination<Product>, Pagination<ProductModel>>().ConvertUsing<PaginationConverter<Product, ProductModel>>();
+
+            CreateMap<ProductUnit, ProductUnitModel>().ReverseMap();
+            CreateMap<ProductUnit, ProductUnitProcessModel>().ReverseMap();
+
+            CreateMap<ProductPrice, ProductPriceModel>().ReverseMap();
+            CreateMap<ProductPrice, ProductPriceProcessModel>().ReverseMap();
+            CreateMap<ProductPrice, ProductPriceRegisterModel>().ReverseMap();
         }
     }
 

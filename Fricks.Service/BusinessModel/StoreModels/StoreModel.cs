@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.UserModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,6 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string? TaxCode { get; set; }
 
         public string? Image { get; set; }
-        public User? Manager { get; set; }
+        public UserModel? Manager { get; set; }
     }
 }

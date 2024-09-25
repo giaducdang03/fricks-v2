@@ -17,6 +17,8 @@ namespace Fricks.Repository.UnitOfWork
         IProductRepository ProductRepository { get; }
         IFavoriteProductRepository FavoriteProductRepository { get; }
         IStoreRepository StoreRepository { get; }
+        IProductUnitRepository ProductUnitRepository { get; }
+        IProductPriceRepository ProductPriceRepository { get; }
         int Save();
         void Commit();
         void Rollback();

@@ -21,6 +21,8 @@ namespace Fricks.Repository.UnitOfWork
         private IStoreRepository _storeRepository;
         private IProductRepository _productRepository;
         private ICategoryRepository _categoryRepository;
+        private IProductUnitRepository _productUnitRepository;
+        private IProductPriceRepository _productPriceRepository;
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
@@ -79,6 +81,22 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _storeRepository ??= new StoreRepository(_context);
+            }
+        }
+
+        public IProductUnitRepository ProductUnitRepository
+        {
+            get
+            {
+                return _productUnitRepository ??= new ProductUnitRepository(_context);
+            }
+        }
+
+        public IProductPriceRepository ProductPriceRepository
+        {
+            get
+            {
+                return _productPriceRepository ??= new ProductPriceRepository(_context);
             }
         }
 

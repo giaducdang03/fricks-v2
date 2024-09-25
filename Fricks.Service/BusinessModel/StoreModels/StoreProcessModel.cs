@@ -16,6 +16,5 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string? TaxCode { get; set; }
 
         public string? Image { get; set; }
-        public User? Manager { get; set; }
     }
 }

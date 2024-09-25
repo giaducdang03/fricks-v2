@@ -30,10 +30,38 @@ namespace Fricks.Repository.Repositories
             return result;
         }
 
+        public async Task<Pagination<Product>> GetProductByStoreIdPaging(Brand? brand, Category? category, int id, PaginationParameter paginationParameter)
+        {
+            var itemCount = await _context.Products.CountAsync();
+            var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category).Where(x => x.StoreId.Equals(id))
+                                    .Where(x => brand != null ? brand.Equals(x.Brand) : x.Brand != null 
+                                             && category != null ? category.Equals(x.Category) : x.Category != null)
+                                    .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+                                    .Take(paginationParameter.PageSize)
+                                    .AsNoTracking()
+                                    .ToListAsync();
+            var result = new Pagination<Product>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
+            return result;
+        }
+
         public async Task<Pagination<Product>> GetProductPaging(PaginationParameter paginationParameter)
         {
             var itemCount = await _context.Products.CountAsync();
             var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category).OrderDescending()
+                                    .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+                                    .Take(paginationParameter.PageSize)
+                                    .AsNoTracking()
+                                    .ToListAsync();
+            var result = new Pagination<Product>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
+            return result;
+        }
+
+        public async Task<Pagination<Product>> GetProductPaging(Brand? brand, Category? category, PaginationParameter paginationParameter)
+        {
+            var itemCount = await _context.Products.CountAsync();
+            var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category)
+                                    .Where(x => brand != null ? brand.Equals(x.Brand) : x.Brand != null
+                                             && category != null ? category.Equals(x.Category) : x.Category != null)
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
                                     .AsNoTracking()
