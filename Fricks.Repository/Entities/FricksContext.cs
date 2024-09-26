@@ -231,6 +231,7 @@ public partial class FricksContext : DbContext
                 .HasMaxLength(10)
                 .IsUnicode(false);
             entity.Property(e => e.Status).HasMaxLength(10);
+            entity.Property(e => e.Dob).HasColumnName("DOB");
         });
 
         modelBuilder.Entity<Voucher>(entity =>

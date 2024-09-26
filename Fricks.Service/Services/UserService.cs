@@ -6,6 +6,7 @@ using Fricks.Repository.Enum;
 using Fricks.Repository.Repositories;
 using Fricks.Repository.Repositories.Interface;
 using Fricks.Repository.UnitOfWork;
+using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.AuthenModels;
 using Fricks.Service.BusinessModel.EmailModels;
 using Fricks.Service.BusinessModel.UserModels;
@@ -156,6 +157,14 @@ namespace Fricks.Service.Services
                 newUser.Status = UserStatus.ACTIVE.ToString();
                 newUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
                 newUser.Role = model.Role.ToString().ToUpper();
+                newUser.Dob = model.Dob;
+
+                // check age
+                var userAge = CalculateAge(model.Dob);
+                if (userAge < 16)
+                {
+                    throw new Exception("Để tạo tài khoản cần đủ 16 tuổi");
+                }
 
                 var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(model.Email);
 
@@ -605,6 +614,18 @@ namespace Fricks.Service.Services
             };
             var refreshToken = GenerateJsonWebToken.CreateRefreshToken(claims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(refreshToken).ToString();
+        }
+
+        private static int CalculateAge(DateTime birthDate)
+        {
+            DateTime today = CommonUtils.GetCurrentTime();
+            int age = today.Year - birthDate.Year;
+
+            if (birthDate > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
         }
     }
 }
