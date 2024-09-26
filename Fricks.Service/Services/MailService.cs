@@ -24,7 +24,7 @@ namespace Fricks.Service.Services
         {
             // setup mail
             var email = new MimeMessage();
-            email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
             email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
             email.Subject = mailRequest.Subject;
             var builder = new BodyBuilder();

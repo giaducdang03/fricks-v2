@@ -504,12 +504,15 @@ namespace Fricks.Service.Services
                     _unitOfWork.Save();
                     return true;
                 }
+                else
+                {
+                    throw new Exception("Tài khoản chưa xác thực không thể đặt lại mật khẩu. Vui lòng liên hệ Admin.");
+                }
             }
             else
             {
                 throw new Exception("Tài khoản không tồn tại.");
             }
-            return false;
         }
 
         public async Task<UserModel> UpdateUserAsync(UpdateUserModel model)

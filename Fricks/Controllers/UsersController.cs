@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
 using Fricks.ViewModels.ResponseModels;
@@ -86,6 +87,74 @@ namespace Fricks.Controllers
                 return BadRequest(new ResponseModel
                 {
                     HttpCode = 400,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> CreateUserAsync(CreateUserModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var result = await _userService.CreateUserAsync(model);
+                    var resp = new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Tạo tài khoản thành công. Vui lòng kiểm tra email để đăng nhập vào Fricks."
+                    };
+                    return Ok(resp);
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserAsync(UpdateUserModel userModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var updateUser = await _userService.UpdateUserAsync(userModel);
+
+                    if (updateUser != null)
+                    {
+                        return Ok(new ResponseModel
+                        {
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = $"Cập nhật thông tin tài khoản {updateUser.Email} thành công."
+                        });
+                    }
+                    return NotFound(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Có lỗi trong quá trình cập nhật thông tin tài khoản."
+                    });
+
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
                 });
             }
