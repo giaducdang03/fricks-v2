@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Auth;
 using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
@@ -340,25 +341,18 @@ namespace Fricks.Service.Services
 
         public async Task<AuthenModel> LoginWithGoogle(string credental)
         {
-            string cliendId = _configuration["GoogleCredential:ClientId"];
+            FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(credental);
 
-            if (string.IsNullOrEmpty(cliendId))
+            string uid = decodedToken.Uid;
+
+            UserRecord userGoogle = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+            if (userGoogle == null)
             {
-                throw new Exception("ClientId is null");
+                throw new Exception("Token không hợp lệ");
             }
 
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
-            {
-                Audience = new List<string> { cliendId }
-            };
-
-            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
-            if (payload == null)
-            {
-                throw new Exception("Credental không hợp lệ.");
-            }
-
-            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(payload.Email);
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(userGoogle.Email);
 
             if (existUser != null)
             {
@@ -394,25 +388,24 @@ namespace Fricks.Service.Services
                 // create new account
                 try
                 {
-                    User newUser = new User()
+                    var newUser = new User
                     {
-                        Email = payload.Email,
-                        FullName = payload.Name,
-                        ConfirmEmail = true,
-                        UnsignFullName = StringUtils.ConvertToUnSign(payload.Name),
-                        Avatar = payload.Picture,
+                        Email = userGoogle.Email,
+                        ConfirmEmail = userGoogle.EmailVerified,
+                        FullName = userGoogle.DisplayName,
+                        UnsignFullName = StringUtils.ConvertToUnSign(userGoogle.DisplayName),
+                        Avatar = userGoogle.PhotoUrl,
                         Status = UserStatus.ACTIVE.ToString(),
-                        GoogleId = payload.JwtId,
+                        GoogleId = userGoogle.Uid,
                         Role = RoleEnums.CUSTOMER.ToString().ToUpper()
                     };
 
                     await _unitOfWork.UsersRepository.AddAsync(newUser);
+                    _unitOfWork.Save();
 
                     // create accesstoken
                     var accessToken = GenerateAccessToken(newUser.Email, newUser);
                     var refreshToken = GenerateRefreshToken(newUser.Email);
-
-                    _unitOfWork.Save();
 
                     return new AuthenModel()
                     {
