@@ -297,7 +297,9 @@ namespace Fricks.Service.Services
                         Message = "Tài khoản không tồn tại."
                     };
                 }
+
                 var verifyUser = PasswordUtils.VerifyPassword(password, existUser.PasswordHash);
+
                 if (verifyUser)
                 {
                     // check status user
@@ -321,6 +323,16 @@ namespace Fricks.Service.Services
                         {
                             HttpCode = 401,
                             Message = "Bạn phải xác nhận email trước khi đăng nhập vào hệ thống. OTP đã gửi qua email."
+                        };
+                    }
+
+                    // check google
+                    if (existUser.GoogleId != null)
+                    {
+                        return new AuthenModel
+                        {
+                            HttpCode = 401,
+                            Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc reset password để tiếp tục."
                         };
                     }
 
