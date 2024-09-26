@@ -33,6 +33,10 @@ namespace Fricks.Service.Services.Interface
         public Task<UserModel> GetLoginUserInformationAsync(string email);
 
         public Task<AuthenModel> LoginWithGoogle(string credental);
+
+        public Task<UserModel> ResendOtpConfirmAsync(string email);
+
+        public Task<bool> CancelEmailConfrimAsync(string email);
         
         // manager user
 
