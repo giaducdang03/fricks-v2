@@ -25,6 +25,10 @@ public partial class User : BaseEntity
 
     public string? PhoneNumber { get; set; }
 
+    public DateTime? Dob{ get; set; }
+
+    public int? Gender { get; set; }
+
     public string? Role { get; set; }
 
     public string? Status { get; set; }
