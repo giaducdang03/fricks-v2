@@ -14,8 +14,15 @@ namespace Fricks.Repository.UnitOfWork
     {
         private readonly FricksContext _context;
         private IDbContextTransaction _transaction;
+        private IBrandRepository _brandRepository;
         private IUserRepository _userRepository;
         private IOtpRepository _otpRepository;
+        private IFavoriteProductRepository _favoriteProductRepository;
+        private IStoreRepository _storeRepository;
+        private IProductRepository _productRepository;
+        private ICategoryRepository _categoryRepository;
+        private IProductUnitRepository _productUnitRepository;
+        private IProductPriceRepository _productPriceRepository;
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
@@ -34,6 +41,62 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _otpRepository ??= new OtpRepository(_context);
+            }
+        }
+
+        public IBrandRepository BrandRepository 
+        {
+            get
+            {
+                return _brandRepository ??= new BrandRepository(_context);
+            }
+        }
+
+        public ICategoryRepository CategoryRepository
+        {
+            get
+            {
+                return _categoryRepository ??= new CategoryRepository(_context);
+            }
+        }
+
+        public IFavoriteProductRepository FavoriteProductRepository
+        {
+            get
+            {
+                return _favoriteProductRepository ??= new FavoriteProductRepository(_context);
+            }
+        }
+
+        public IProductRepository ProductRepository
+        {
+            get
+            {
+                return _productRepository ??= new ProductRepository(_context);
+            }
+        }
+
+        public IStoreRepository StoreRepository 
+        {
+            get
+            {
+                return _storeRepository ??= new StoreRepository(_context);
+            }
+        }
+
+        public IProductUnitRepository ProductUnitRepository
+        {
+            get
+            {
+                return _productUnitRepository ??= new ProductUnitRepository(_context);
+            }
+        }
+
+        public IProductPriceRepository ProductPriceRepository
+        {
+            get
+            {
+                return _productPriceRepository ??= new ProductPriceRepository(_context);
             }
         }
 

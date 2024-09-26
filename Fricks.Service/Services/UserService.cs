@@ -46,6 +46,28 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> CancelEmailConfrimAsync(string email)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (existUser != null) 
+            { 
+                if (existUser.ConfirmEmail == false)
+                {
+                    _unitOfWork.UsersRepository.PermanentDeletedAsync(existUser);
+                    _unitOfWork.Save();
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("Tài khoản đã xác thực, không thể xóa.");
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+        }
+
         public async Task<bool> ChangePasswordAsync(string email, ChangePasswordModel changePasswordModel)
         {
             var user = await _unitOfWork.UsersRepository.GetUserByEmail(email);
@@ -236,7 +258,10 @@ namespace Fricks.Service.Services
             {
                 return _mapper.Map<UserModel>(user);
             }
-            return null;
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
         }
 
         public async Task<Pagination<UserModel>> GetUserPaginationAsync(PaginationParameter paginationParameter)
@@ -504,12 +529,38 @@ namespace Fricks.Service.Services
                     _unitOfWork.Save();
                     return true;
                 }
+                else
+                {
+                    throw new Exception("Tài khoản chưa xác thực không thể đặt lại mật khẩu. Vui lòng liên hệ Admin.");
+                }
             }
             else
             {
                 throw new Exception("Tài khoản không tồn tại.");
             }
-            return false;
+        }
+
+        public async Task<UserModel> ResendOtpConfirmAsync(string email)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (existUser != null)
+            {
+                if (existUser.ConfirmEmail == false)
+                {
+                    await _otpService.CreateOtpAsync(email, "confirm");
+                    _unitOfWork.Save();
+                    return _mapper.Map<UserModel>(existUser);
+                }
+                else
+                {
+                    throw new Exception("Tài khoản đã được xác thực.");
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+            
         }
 
         public async Task<UserModel> UpdateUserAsync(UpdateUserModel model)
