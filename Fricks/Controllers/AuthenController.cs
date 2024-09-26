@@ -134,7 +134,7 @@ namespace Fricks.Controllers
             }
         }
 
-        [HttpPost("email-confirm")]
+        [HttpPost("confirm/email")]
         public async Task<IActionResult> ConfirmEmail(ConfirmOtpModel confirmOtpModel)
         {
             try
@@ -294,6 +294,68 @@ namespace Fricks.Controllers
                     return Ok(result);
                 }
                 return Unauthorized(result);
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("confirm/resend-otp")]
+        public async Task<IActionResult> ResendOtp([FromBody] string email)
+        {
+            try
+            {
+                var result = await _userService.ResendOtpConfirmAsync(email);
+                if (result != null)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = $"Mã OTP đã được gửi về email {result.Email}"
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể gửi mã OTP"
+                });
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPost("confirm/cancel")]
+        public async Task<IActionResult> CancelEmailConfirm([FromBody] string email)
+        {
+            try
+            {
+                var result = await _userService.CancelEmailConfrimAsync(email);
+                if (result)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Đã hủy tạo tài khoản"
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể hủy tạo tài khoản"
+                });
             }
             catch (Exception ex)
             {
