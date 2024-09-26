@@ -1,8 +1,10 @@
 using AspNetCoreRateLimit;
+using FirebaseAdmin;
 using Fricks;
 using Fricks.Middlewares;
 using Fricks.Repository.Entities;
 using Fricks.Service.Settings;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -120,6 +122,12 @@ builder.Services.AddDbContext<FricksContext>(options =>
  options.UseSqlServer(connection));
 
 // ==================== NO EDIT OR REMOVE COMMENT =======================
+
+// setup firebase
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("exe201-9459a-firebase-adminsdk-bryk3-482b1ccba6.json")
+});
 
 var app = builder.Build();
 
