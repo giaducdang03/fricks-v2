@@ -315,7 +315,7 @@ namespace Fricks.Service.Services
                     if (existUser.ConfirmEmail == false)
                     {
                         // send otp email
-                        await _otpService.CreateOtpAsync(existUser.Email, "confirm");
+                        await _otpService.CreateOtpAsync(existUser.Email, "confirm", existUser.FullName);
 
                         _unitOfWork.Save();
 
@@ -332,7 +332,7 @@ namespace Fricks.Service.Services
                         return new AuthenModel
                         {
                             HttpCode = 401,
-                            Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc reset password để tiếp tục."
+                            Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc đặt lại mật khẩu để tiếp tục."
                         };
                     }
 
@@ -520,7 +520,7 @@ namespace Fricks.Service.Services
                 await _unitOfWork.UsersRepository.AddAsync(newUser);
 
                 // send otp email
-                await _otpService.CreateOtpAsync(newUser.Email, "confirm");
+                await _otpService.CreateOtpAsync(newUser.Email, "confirm", newUser.FullName);
 
                 _unitOfWork.Save();
                 return true;
@@ -539,7 +539,7 @@ namespace Fricks.Service.Services
             {
                 if (existUser.ConfirmEmail == true)
                 {
-                    await _otpService.CreateOtpAsync(email, "reset");
+                    await _otpService.CreateOtpAsync(email, "reset", existUser.FullName);
                     _unitOfWork.Save();
                     return true;
                 }
@@ -561,7 +561,7 @@ namespace Fricks.Service.Services
             {
                 if (existUser.ConfirmEmail == false)
                 {
-                    await _otpService.CreateOtpAsync(email, "confirm");
+                    await _otpService.CreateOtpAsync(email, "confirm", existUser.FullName);
                     _unitOfWork.Save();
                     return _mapper.Map<UserModel>(existUser);
                 }
