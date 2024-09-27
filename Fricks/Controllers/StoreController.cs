@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Fricks.Controllers
 {
-    [Route("api/store")]
+    [Route("api/stores")]
     [ApiController]
     public class StoreController : ControllerBase
     {
@@ -27,7 +27,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllStoreByManagerId")]
+        [HttpGet("get-all-store-by-manager-id")]
         public async Task<IActionResult> GetByManagerId(int userId, [FromQuery] PaginationParameter paginationParameter) 
         {
             try
@@ -47,7 +47,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllStore")]
+        [HttpGet("get-all-store")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -57,7 +57,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllStorePagin")]
+        [HttpGet("get-all-store-pagin")]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {
             try

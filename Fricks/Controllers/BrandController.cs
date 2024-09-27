@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Fricks.Controllers
 {
-    [Route("api/brand")]
+    [Route("api/brands")]
     [ApiController]
     public class BrandController : ControllerBase
     {
@@ -29,7 +29,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllBrand")]
+        [HttpGet("get-all-brand")]
         [Authorize]
         public async Task<IActionResult> GetAll()
         {
@@ -40,7 +40,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllBrandPagin")]
+        [HttpGet("get-all-brand-pagin")]
         [Authorize]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {

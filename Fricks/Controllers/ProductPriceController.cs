@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fricks.Controllers
 {
-    [Route("api/productPrice")]
+    [Route("api/product-prices")]
     [ApiController]
     public class ProductPriceController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllPrice")]
+        [HttpGet("get-all-price")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -35,7 +35,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllByProductId")]
+        [HttpGet("get-all-by-product-id")]
         public async Task<IActionResult> GetAllByProductId(int productId)
         {
             try

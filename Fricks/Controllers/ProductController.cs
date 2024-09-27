@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Fricks.Controllers
 {
-    [Route("api/product")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllProductPagin")]
+        [HttpGet("get-all-product-pagin")]
         public async Task<IActionResult> GetAllProduct([FromQuery] PaginationParameter paginationParameter,
                                                        int brandId, int categoryId)
         {
@@ -49,7 +49,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllProductAtStorePagin")]
+        [HttpGet("get-all-product-at-store-pagin")]
         public async Task<IActionResult> GetAllProductStore(int storeId, [FromQuery] PaginationParameter paginationParameter,
                                                             int brandId, int categoryId)
         {

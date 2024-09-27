@@ -9,7 +9,7 @@ namespace Fricks.Service.Services.Interface
 {
     public interface IOtpService
     {
-        public Task<Otp> CreateOtpAsync(string email, string type);
+        public Task<Otp> CreateOtpAsync(string email, string type, string fullName);
 
         public Task<bool> ValidateOtpAsync(string email, string otpCode);
     }

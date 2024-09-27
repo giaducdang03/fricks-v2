@@ -25,7 +25,7 @@ namespace Fricks.Service.Services
             _mailService = mailService;
         }
 
-        public async Task<Otp> CreateOtpAsync(string email, string type)
+        public async Task<Otp> CreateOtpAsync(string email, string type, string fullName)
         {
             // default ExpiryTime otp is 5 minutes
             Otp newOtp = new Otp()
@@ -38,7 +38,7 @@ namespace Fricks.Service.Services
 
             if (type == "confirm")
             {
-                bool checkSendMail = await SendOtpAsync(newOtp);
+                bool checkSendMail = await SendOtpAsync(newOtp, fullName);
                 if (checkSendMail)
                 {
                     return newOtp;
@@ -47,7 +47,7 @@ namespace Fricks.Service.Services
             }
             else
             {
-                bool checkSendMail = await SendOtpResetPasswordAsync(newOtp);
+                bool checkSendMail = await SendOtpResetPasswordAsync(newOtp, fullName);
                 if (checkSendMail)
                 {
                     return newOtp;
@@ -74,14 +74,14 @@ namespace Fricks.Service.Services
             return false;
         }
 
-        private async Task<bool> SendOtpAsync(Otp otp)
+        private async Task<bool> SendOtpAsync(Otp otp, string fullName)
         {
             // create new email
             MailRequest newEmail = new MailRequest()
             {
                 ToEmail = otp.Email,
-                Subject = "Fricks Confirmation Email",
-                Body = SendOTPTemplate.EmailSendOTP(otp.Email, otp.OtpCode)
+                Subject = "Xác thực tài khoản Fricks",
+                Body = SendOTPTemplate.EmailSendOTP(otp.Email, otp.OtpCode, fullName)
             };
 
             // send mail
@@ -89,14 +89,14 @@ namespace Fricks.Service.Services
             return true;
         }
 
-        private async Task<bool> SendOtpResetPasswordAsync(Otp otp)
+        private async Task<bool> SendOtpResetPasswordAsync(Otp otp, string fullName)
         {
             // create new email
             MailRequest newEmail = new MailRequest()
             {
                 ToEmail = otp.Email,
-                Subject = "Fricks Reset password",
-                Body = SendOTPTemplate.EmailSendOTPResetPassword(otp.Email, otp.OtpCode)
+                Subject = "Đặt lại mật khẩu Fricks",
+                Body = SendOTPTemplate.EmailSendOTPResetPassword(otp.Email, otp.OtpCode, fullName)
             };
 
             // send mail
