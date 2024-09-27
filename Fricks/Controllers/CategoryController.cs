@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Fricks.Controllers
 {
-    [Route("api/category")]
+    [Route("api/categories")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace Fricks.Controllers
             catch { throw; }
         }
 
-        [HttpGet("GetAllCategory")]
+        [HttpGet("get-all-category")]
         [Authorize]
         public async Task<IActionResult> GetAll()
         {
@@ -43,7 +43,7 @@ namespace Fricks.Controllers
             catch { throw; }
         }
 
-        [HttpGet("GetAllCategoryPagin")]
+        [HttpGet("get-all-category-pagin")]
         [Authorize]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {
