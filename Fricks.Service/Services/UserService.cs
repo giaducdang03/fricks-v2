@@ -298,61 +298,64 @@ namespace Fricks.Service.Services
                     };
                 }
 
-                var verifyUser = PasswordUtils.VerifyPassword(password, existUser.PasswordHash);
-
-                if (verifyUser)
+                // check google
+                if (existUser.GoogleId != null && existUser.PasswordHash == null)
                 {
-                    // check status user
-                    if (existUser.Status == UserStatus.BANNED.ToString() || existUser.IsDeleted == true)
+                    return new AuthenModel
                     {
-                        return new AuthenModel
-                        {
-                            HttpCode = 401,
-                            Message = "Tài khoản đã bị cấm."
-                        };
-                    }
+                        HttpCode = 401,
+                        Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc đặt lại mật khẩu để tiếp tục."
+                    };
+                }
+                else
+                {
+                    var verifyUser = PasswordUtils.VerifyPassword(password, existUser.PasswordHash);
 
-                    if (existUser.ConfirmEmail == false)
+                    if (verifyUser)
                     {
-                        // send otp email
-                        await _otpService.CreateOtpAsync(existUser.Email, "confirm", existUser.FullName);
+                        // check status user
+                        if (existUser.Status == UserStatus.BANNED.ToString() || existUser.IsDeleted == true)
+                        {
+                            return new AuthenModel
+                            {
+                                HttpCode = 401,
+                                Message = "Tài khoản đã bị cấm."
+                            };
+                        }
+
+                        if (existUser.ConfirmEmail == false)
+                        {
+                            // send otp email
+                            await _otpService.CreateOtpAsync(existUser.Email, "confirm", existUser.FullName);
+
+                            _unitOfWork.Save();
+
+                            return new AuthenModel
+                            {
+                                HttpCode = 401,
+                                Message = "Bạn phải xác nhận email trước khi đăng nhập vào hệ thống. OTP đã gửi qua email."
+                            };
+                        }
+
+                        var accessToken = GenerateAccessToken(email, existUser);
+                        var refreshToken = GenerateRefreshToken(email);
 
                         _unitOfWork.Save();
 
                         return new AuthenModel
                         {
-                            HttpCode = 401,
-                            Message = "Bạn phải xác nhận email trước khi đăng nhập vào hệ thống. OTP đã gửi qua email."
+                            HttpCode = 200,
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
                         };
                     }
-
-                    // check google
-                    if (existUser.GoogleId != null)
-                    {
-                        return new AuthenModel
-                        {
-                            HttpCode = 401,
-                            Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc đặt lại mật khẩu để tiếp tục."
-                        };
-                    }
-
-                    var accessToken = GenerateAccessToken(email, existUser);
-                    var refreshToken = GenerateRefreshToken(email);
-
-                    _unitOfWork.Save();
-
                     return new AuthenModel
                     {
-                        HttpCode = 200,
-                        AccessToken = accessToken,
-                        RefreshToken = refreshToken
+                        HttpCode = 401,
+                        Message = "Sai mật khẩu."
                     };
                 }
-                return new AuthenModel
-                {
-                    HttpCode = 401,
-                    Message = "Sai mật khẩu."
-                };
+                
             }
             catch
             {
