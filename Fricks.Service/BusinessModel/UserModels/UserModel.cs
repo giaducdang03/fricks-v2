@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fricks.Repository.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.UserModels
 {
-    public class UserModel
+    public class UserModel : BaseEntity
     {
-        public int? Id { get; set; }
         public string? Email { get; set; }
 
         public bool? ConfirmEmail { get; set; }
