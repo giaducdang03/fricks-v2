@@ -18,6 +18,6 @@ namespace Fricks.Service.BusinessModel.ProductPriceModels
 
         public int? Price { get; set; }
 
-        public virtual ProductUnitModel? Unit { get; set; }
+        public ProductUnitModel? Unit { get; set; }
     }
 }

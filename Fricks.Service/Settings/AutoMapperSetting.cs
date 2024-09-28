@@ -43,6 +43,8 @@ namespace Fricks.Service.Settings
             CreateMap<Pagination<Store>, Pagination<StoreModel>>().ConvertUsing<PaginationConverter<Store, StoreModel>>();
 
             CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductModel>()
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()));
             CreateMap<Product, ProductProcessModel>().ReverseMap();
             CreateMap<Product, ProductRegisterModel>().ReverseMap();
             CreateMap<Pagination<Product>, Pagination<ProductModel>>().ConvertUsing<PaginationConverter<Product, ProductModel>>();

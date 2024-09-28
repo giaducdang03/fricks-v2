@@ -49,16 +49,10 @@ namespace Fricks.Service.Services
             return _mapper.Map<List<FavoriteProductModel>>(listFavProduct);
         }
 
-        public async Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(PaginationParameter paginationParameter)
+        public async Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(int userId, PaginationParameter paginationParameter)
         {
-            var listFavProduct = await _unitOfWork.FavoriteProductRepository.GetFavoriteProductPaging(paginationParameter);
+            var listFavProduct = await _unitOfWork.FavoriteProductRepository.GetFavoriteProductPaging(userId, paginationParameter);
             return _mapper.Map<Pagination<FavoriteProductModel>>(listFavProduct);
-        }
-
-        public async Task<FavoriteProductModel> GetFavoriteProductById(int id)
-        {
-            var favProduct = await _unitOfWork.FavoriteProductRepository.GetByIdAsync(id);
-            return _mapper.Map<FavoriteProductModel>(favProduct);
         }
     }
 }

@@ -13,8 +13,7 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<FavoriteProductModel> AddFavoriteProduct(FavoriteProductProcessModel FavoriteProduct);
         public Task<FavoriteProductModel> DeleteFavoriteProduct(int id);
-        public Task<FavoriteProductModel> GetFavoriteProductById(int id);
         public Task<List<FavoriteProductModel>> GetAllFavoriteProduct();
-        public Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(PaginationParameter paginationParameter);
+        public Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(int userId, PaginationParameter paginationParameter);
     }
 }
