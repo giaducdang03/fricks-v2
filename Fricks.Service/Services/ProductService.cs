@@ -75,7 +75,7 @@ namespace Fricks.Service.Services
 
         public async Task<ProductModel> GetProductById(int id)
         {
-            var result = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+            var result = await _unitOfWork.ProductRepository.GetProductByIdAsync(id);
             return _mapper.Map<ProductModel>(result);
         }
 

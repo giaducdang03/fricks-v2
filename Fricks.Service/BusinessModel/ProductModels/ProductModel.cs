@@ -1,8 +1,10 @@
 ﻿using Fricks.Repository.Entities;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
+using Fricks.Service.BusinessModel.ProductPriceModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,5 +25,10 @@ namespace Fricks.Service.BusinessModel.ProductModels
         public int? SoldQuantity { get; set; }
         public BrandModel? Brand { get; set; }
         public CategoryModel? Category { get; set; }
+        public List<ProductPriceModel>? Price { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
+        public bool IsDeleted { get; set; } = false;
+        public byte[]? Version { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("get-all-product-pagin")]
+        [HttpGet]
         public async Task<IActionResult> GetAllProduct([FromQuery] PaginationParameter paginationParameter,
                                                        int brandId, int categoryId)
         {
@@ -49,7 +49,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("get-all-product-at-store-pagin")]
+        [HttpGet("get-all-store-pagin")]
         public async Task<IActionResult> GetAllProductStore(int storeId, [FromQuery] PaginationParameter paginationParameter,
                                                             int brandId, int categoryId)
         {
