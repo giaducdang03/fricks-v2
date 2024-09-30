@@ -186,7 +186,7 @@ namespace Fricks.Service.Services
                 {
                     ToEmail = model.Email,
                     Subject = "Fricks Welcome",
-                    Body = EmailCreateAccount.EmailSendCreateAccount(model.Email, password)
+                    Body = EmailCreateAccount.EmailSendCreateAccount(model.Email, password, model.FullName)
                 };
 
                 await _mailService.SendEmailAsync(passwordEmail);
