@@ -8,127 +8,123 @@ namespace Fricks.Service.Utils.Email
 {
     public class EmailCreateAccount
     {
-        public static string EmailSendCreateAccount(string email, string password)
+        public static string EmailSendCreateAccount(string email, string password, string fullName)
         {
-            #region style
-
-            string style =
-
-            @"<style>
-                body {
-                  font-family: Arial, sans-serif;
-                  margin: 0;
-                  padding: 0;
-                }
-                .container {
-                  width: 550px;
-                  margin: 0 auto;
-                  padding: 20px;
-                }
-                .header {
-                  display: flex;
-                  align-items: center;
-                  background-color: #f7f7f7;
-                }
-                .otp {
-                  border: #0098af solid 2px;
-                  padding: 8px;
-                  text-align: center;
-                  margin: auto 35%;
-                }
-                .otp span {
-                  color: #1cbcd4;
-                  font-weight: bold;
-                  font-size: 22px;
-                  letter-spacing: 3px;
-                }
-                .footer {
-                  background-color: #f7f7f7;
-                  padding: 3px;
-                }
-                .info {
-                  padding: 5px;
-                }
-                .info p {
-                  font-size: 13px;
-                }
-            </style>";
-            #endregion style
 
             #region body
 
             string body =
                 $@"
                 <!DOCTYPE html>
-                <html lang=""en"">
-                <head>
-                    <meta charset=""UTF-8"">
-                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                    <title>Create Account Email</title>
-                    {style}
-                </head>
-                <body>
-                    <div class=""container"">
-                      <div class=""header"">
-                        <div style=""padding: 15px; padding-bottom: 7px"">
+                <html lang=""vi"">
+                  <head>
+                    <meta charset=""UTF-8"" />
+                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+                    <title>Xác Thực Tài Khoản Fricks</title>
+                  </head>
+                  <body
+                    style=""
+                      font-family: 'Inter', sans-serif;
+                      background-color: #f4f4f4;
+                      padding: 20px;
+                      margin: 0;
+                    ""
+                  >
+                    <div
+                      style=""
+                        width: 600px;
+                        background-color: #24547c;
+                        margin: 0 auto;
+                        overflow: hidden;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                      ""
+                    >
+                      <div
+                        style=""
+                          background-color: #f4a02a;
+                          text-align: left;
+                          width: 600px;
+                          height: 80px;
+                          padding: 0 20px;
+                          display: table;
+                        ""
+                      >
+                        <div style=""display: table-cell; vertical-align: middle"">
                           <img
-                            src=""https://firebasestorage.googleapis.com/v0/b/swd392-d2c4e.appspot.com/o/FTravel%2FLogo_FTravel.png?alt=media&token=7cdfe76e-4911-43f9-8d0c-e5d037df3289""
-                            alt
-                            width=""100px""
+                            src=""https://firebasestorage.googleapis.com/v0/b/exe201-9459a.appspot.com/o/Fricks%2Fimage%204.png?alt=media&token=be7edf0a-968d-4a97-86aa-3527aff5bc30""
+                            alt=""Fricks logo""
+                            style=""height: 50px""
                           />
                         </div>
                       </div>
-                      <div class=""content"" style=""padding: 20px"">
-                        <div>
-                          <h3 style=""color: #1cbcd4; font-size: xx-large"">
-                            Tạo tài khoản thành công
-                          </h3>
-                          <p style=""font-size: 18px; color: gray"">
-                            Chúc mừng, bạn đã là thành viên của Fricks.
+
+                      <div
+                        style=""
+                          padding: 30px 50px;
+                          text-align: left;
+                          background-color: #fff;
+                          margin-top: 5px;
+                        ""
+                      >
+                        <h2 style=""color: #333"">
+                          Thông tin tài khoản
+                          <span style=""color: #f4a02a; font-weight: 700"">Fricks</span>
+                        </h2>
+                        <p>Xin chào, <strong>{fullName}</strong></p>
+                        <p>
+                          Cảm ơn bạn đã trở thành đối tác của Fricks. Đây là thông tin đăng nhập
+                          của bạn.
+                        </p>
+                        <div style=""margin-top: 35px;"">
+                          <p>
+                            Tài khoản: <span style=""font-style: italic; font-weight: 700; color: #24547c""
+                            >{email}</span>
+                          </p>
+                          <p>
+                            Mật khẩu: <span style=""font-style: italic; font-weight: 700; color: #24547c""
+                            >{password}</span>
                           </p>
                         </div>
-                        <div
+                        <p style=""font-size: 16px; font-style: italic; line-height: 22px; margin-top: 35px; color: red"">
+                          <strong style=""color: red"">*Lưu ý:</strong> Không cung cấp thông tin tài khoản cho người khác để tránh những thiệt hại không đáng có!
+                        </p>
+                      </div>
+
+                      <div
+                        style=""
+                          background-color: #24547c;
+                          color: #fff;
+                          padding: 20px;
+                          text-align: center;
+                          line-height: 25px;
+                        ""
+                      >
+                        <p
                           style=""
-                            display: flex;
-                            justify-content: center;
-                            flex-direction: column;
-                            align-items: center;
-                            padding: 20px;
+                            margin: 0 0 10px 0;
+                            color: orange;
+                            font-weight: 700;
+                            font-size: 17px;
                           ""
                         >
-                          <div style=""line-height: 30px"">
-                            <div style=""font-weight: 600"">
-                              <span>Tài khoản:</span>
-                              <span>{email}</span>
-                            </div>
-                            <div style=""font-weight: 600"">
-                              <span>Mật khẩu: </span><span>{password}</span>
-                            </div>
-                          </div>
-                        </div>
+                          Fricks - Vật liệu xây dựng chất lượng giá tốt
+                        </p>
+                        <a
+                          href=""mailto:fricks.customerservice@gmail.com?subject=Contact&body=Dear shop,%0D%0A%0D%0ATôi có vấn đề này...""
+                          style=""color: #ffffff; text-decoration: none; font-size: small""
+                        >
+                          fricks.customerservice@gmail.com
+                        </a>
 
-                        <div class=""note"">
-                          <p style=""font-size: 15px; font-style: italic; color: red"">
-                            * Lưu ý: Không cung cấp thông tin tài khoản cho người khác để tránh
-                            những thiệt hại không đáng có!
-                          </p>
-                        </div>
-                      </div>
-                      <div class=""footer"">
-                        <img
-                          src=""https://firebasestorage.googleapis.com/v0/b/swd392-d2c4e.appspot.com/o/FTravel%2FLogo_FTravel.png?alt=media&token=7cdfe76e-4911-43f9-8d0c-e5d037df3289""
-                          alt=""logo""
-                          width=""80px""
-                        />
-                        <div class=""info"">
-                          <p>Điện thoại: +84 988 889 898</p>
-                          <p>Email: fricks.customerservice@gmail.com</p>
-                          <p>Địa chỉ: Đại học FPT thành phố Hồ Chí Minh</p>
-                        </div>
+                        <p style=""font-size: small; margin: 5px 0"">0989.998.889</p>
+                        <p style=""font-size: small; margin: 0"">
+                          Đại học FPT thành phố Hồ Chí Minh
+                        </p>
                       </div>
                     </div>
-                </body>
+                  </body>
                 </html>
+
                 ";
             #endregion body
 
