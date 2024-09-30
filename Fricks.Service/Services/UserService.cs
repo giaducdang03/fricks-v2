@@ -505,7 +505,7 @@ namespace Fricks.Service.Services
                     FullName = model.FullName,
                     UnsignFullName = StringUtils.ConvertToUnSign(model.FullName),
                     PhoneNumber = model.PhoneNumber,
-                    Role = model.Role.ToString(),
+                    Role = RoleEnums.CUSTOMER.ToString(),
                     Status = UserStatus.ACTIVE.ToString(),
                     ConfirmEmail = false
                 };
