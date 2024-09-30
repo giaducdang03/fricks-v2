@@ -31,6 +31,6 @@ namespace Fricks.Service.BusinessModel.AuthenModels
         [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Số điện thoại phải có 10 số.")]
         public string PhoneNumber { get; set; } = "";
 
-        public RoleEnums Role { get; set; }
+        //public RoleEnums Role { get; set; }
     }
 }
