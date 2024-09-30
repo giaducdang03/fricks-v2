@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Fricks.Controllers
 {
-    [Route("api/favProduct")]
+    [Route("api/fav-products")]
     [ApiController]
     public class FavoriteProductController : ControllerBase
     {
@@ -17,17 +17,7 @@ namespace Fricks.Controllers
             _favoriteProductService = favoriteProductService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
-        {
-            try
-            {
-                var result = await _favoriteProductService.GetFavoriteProductById(id);
-                return Ok(result);
-            } catch { throw; }
-        }
-
-        [HttpGet("GetAllFavProduct")]
+        [HttpGet("Get-all-fav-product")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -37,12 +27,12 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("GetAllFavProductPagin")]
-        public async Task<IActionResult> GetAllPaging([FromQuery] PaginationParameter paginationParameter)
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetAllPaging(int userId, [FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var result = await _favoriteProductService.GetAllFavoriteProductPagination(paginationParameter);
+                var result = await _favoriteProductService.GetAllFavoriteProductPagination(userId, paginationParameter);
                 var metadata = new
                 {
                     result.TotalCount,

@@ -10,6 +10,6 @@ namespace Fricks.Repository.Repositories.Interface
 {
     public interface IFavoriteProductRepository : IGenericRepository<FavoriteProduct>
     {
-        public Task<Pagination<FavoriteProduct>> GetFavoriteProductPaging(PaginationParameter paginationParameter);
+        public Task<Pagination<FavoriteProduct>> GetFavoriteProductPaging(int userid, PaginationParameter paginationParameter);
     }
 }

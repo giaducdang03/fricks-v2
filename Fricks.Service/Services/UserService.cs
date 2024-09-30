@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Auth;
 using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.Repositories;
 using Fricks.Repository.Repositories.Interface;
 using Fricks.Repository.UnitOfWork;
+using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.AuthenModels;
 using Fricks.Service.BusinessModel.EmailModels;
 using Fricks.Service.BusinessModel.UserModels;
@@ -44,6 +46,28 @@ namespace Fricks.Service.Services
             _mailService = mailService;
             _configuration = configuration;
             _mapper = mapper;
+        }
+
+        public async Task<bool> CancelEmailConfrimAsync(string email)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (existUser != null) 
+            { 
+                if (existUser.ConfirmEmail == false)
+                {
+                    _unitOfWork.UsersRepository.PermanentDeletedAsync(existUser);
+                    _unitOfWork.Save();
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("Tài khoản đã xác thực, không thể xóa.");
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
         }
 
         public async Task<bool> ChangePasswordAsync(string email, ChangePasswordModel changePasswordModel)
@@ -133,6 +157,14 @@ namespace Fricks.Service.Services
                 newUser.Status = UserStatus.ACTIVE.ToString();
                 newUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
                 newUser.Role = model.Role.ToString().ToUpper();
+                newUser.Dob = model.Dob;
+
+                // check age
+                var userAge = CalculateAge(model.Dob);
+                if (userAge < 16)
+                {
+                    throw new Exception("Để tạo tài khoản cần đủ 16 tuổi");
+                }
 
                 var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(model.Email);
 
@@ -236,7 +268,10 @@ namespace Fricks.Service.Services
             {
                 return _mapper.Map<UserModel>(user);
             }
-            return null;
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
         }
 
         public async Task<Pagination<UserModel>> GetUserPaginationAsync(PaginationParameter paginationParameter)
@@ -262,50 +297,65 @@ namespace Fricks.Service.Services
                         Message = "Tài khoản không tồn tại."
                     };
                 }
-                var verifyUser = PasswordUtils.VerifyPassword(password, existUser.PasswordHash);
-                if (verifyUser)
-                {
-                    // check status user
-                    if (existUser.Status == UserStatus.BANNED.ToString() || existUser.IsDeleted == true)
-                    {
-                        return new AuthenModel
-                        {
-                            HttpCode = 401,
-                            Message = "Tài khoản đã bị cấm."
-                        };
-                    }
 
-                    if (existUser.ConfirmEmail == false)
+                // check google
+                if (existUser.GoogleId != null && existUser.PasswordHash == null)
+                {
+                    return new AuthenModel
                     {
-                        // send otp email
-                        await _otpService.CreateOtpAsync(existUser.Email, "confirm");
+                        HttpCode = 401,
+                        Message = "Tài khoản này đã được đăng nhập bằng Google. Hãy đăng nhập bằng Google hoặc đặt lại mật khẩu để tiếp tục."
+                    };
+                }
+                else
+                {
+                    var verifyUser = PasswordUtils.VerifyPassword(password, existUser.PasswordHash);
+
+                    if (verifyUser)
+                    {
+                        // check status user
+                        if (existUser.Status == UserStatus.BANNED.ToString() || existUser.IsDeleted == true)
+                        {
+                            return new AuthenModel
+                            {
+                                HttpCode = 401,
+                                Message = "Tài khoản đã bị cấm."
+                            };
+                        }
+
+                        if (existUser.ConfirmEmail == false)
+                        {
+                            // send otp email
+                            await _otpService.CreateOtpAsync(existUser.Email, "confirm", existUser.FullName);
+
+                            _unitOfWork.Save();
+
+                            return new AuthenModel
+                            {
+                                HttpCode = 401,
+                                Message = "Bạn phải xác nhận email trước khi đăng nhập vào hệ thống. OTP đã gửi qua email."
+                            };
+                        }
+
+                        var accessToken = GenerateAccessToken(email, existUser);
+                        var refreshToken = GenerateRefreshToken(email);
 
                         _unitOfWork.Save();
 
                         return new AuthenModel
                         {
-                            HttpCode = 401,
-                            Message = "Bạn phải xác nhận email trước khi đăng nhập vào hệ thống. OTP đã gửi qua email."
+                            HttpCode = 200,
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
                         };
                     }
-
-                    var accessToken = GenerateAccessToken(email, existUser);
-                    var refreshToken = GenerateRefreshToken(email);
-
-                    _unitOfWork.Save();
-
                     return new AuthenModel
                     {
-                        HttpCode = 200,
-                        AccessToken = accessToken,
-                        RefreshToken = refreshToken
+                        HttpCode = 401,
+                        Message = "Sai mật khẩu."
                     };
                 }
-                return new AuthenModel
-                {
-                    HttpCode = 401,
-                    Message = "Sai mật khẩu."
-                };
+                
             }
             catch
             {
@@ -315,25 +365,18 @@ namespace Fricks.Service.Services
 
         public async Task<AuthenModel> LoginWithGoogle(string credental)
         {
-            string cliendId = _configuration["GoogleCredential:ClientId"];
+            FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(credental);
 
-            if (string.IsNullOrEmpty(cliendId))
+            string uid = decodedToken.Uid;
+
+            UserRecord userGoogle = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+            if (userGoogle == null)
             {
-                throw new Exception("ClientId is null");
+                throw new Exception("Token không hợp lệ");
             }
 
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
-            {
-                Audience = new List<string> { cliendId }
-            };
-
-            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
-            if (payload == null)
-            {
-                throw new Exception("Credental không hợp lệ.");
-            }
-
-            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(payload.Email);
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(userGoogle.Email);
 
             if (existUser != null)
             {
@@ -369,25 +412,24 @@ namespace Fricks.Service.Services
                 // create new account
                 try
                 {
-                    User newUser = new User()
+                    var newUser = new User
                     {
-                        Email = payload.Email,
-                        FullName = payload.Name,
-                        ConfirmEmail = true,
-                        UnsignFullName = StringUtils.ConvertToUnSign(payload.Name),
-                        Avatar = payload.Picture,
+                        Email = userGoogle.Email,
+                        ConfirmEmail = userGoogle.EmailVerified,
+                        FullName = userGoogle.DisplayName,
+                        UnsignFullName = StringUtils.ConvertToUnSign(userGoogle.DisplayName),
+                        Avatar = userGoogle.PhotoUrl,
                         Status = UserStatus.ACTIVE.ToString(),
-                        GoogleId = payload.JwtId,
+                        GoogleId = userGoogle.Uid,
                         Role = RoleEnums.CUSTOMER.ToString().ToUpper()
                     };
 
                     await _unitOfWork.UsersRepository.AddAsync(newUser);
+                    _unitOfWork.Save();
 
                     // create accesstoken
                     var accessToken = GenerateAccessToken(newUser.Email, newUser);
                     var refreshToken = GenerateRefreshToken(newUser.Email);
-
-                    _unitOfWork.Save();
 
                     return new AuthenModel()
                     {
@@ -463,7 +505,7 @@ namespace Fricks.Service.Services
                     FullName = model.FullName,
                     UnsignFullName = StringUtils.ConvertToUnSign(model.FullName),
                     PhoneNumber = model.PhoneNumber,
-                    Role = model.Role.ToString(),
+                    Role = RoleEnums.CUSTOMER.ToString(),
                     Status = UserStatus.ACTIVE.ToString(),
                     ConfirmEmail = false
                 };
@@ -481,7 +523,7 @@ namespace Fricks.Service.Services
                 await _unitOfWork.UsersRepository.AddAsync(newUser);
 
                 // send otp email
-                await _otpService.CreateOtpAsync(newUser.Email, "confirm");
+                await _otpService.CreateOtpAsync(newUser.Email, "confirm", newUser.FullName);
 
                 _unitOfWork.Save();
                 return true;
@@ -500,7 +542,7 @@ namespace Fricks.Service.Services
             {
                 if (existUser.ConfirmEmail == true)
                 {
-                    await _otpService.CreateOtpAsync(email, "reset");
+                    await _otpService.CreateOtpAsync(email, "reset", existUser.FullName);
                     _unitOfWork.Save();
                     return true;
                 }
@@ -513,6 +555,29 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Tài khoản không tồn tại.");
             }
+        }
+
+        public async Task<UserModel> ResendOtpConfirmAsync(string email)
+        {
+            var existUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (existUser != null)
+            {
+                if (existUser.ConfirmEmail == false)
+                {
+                    await _otpService.CreateOtpAsync(email, "confirm", existUser.FullName);
+                    _unitOfWork.Save();
+                    return _mapper.Map<UserModel>(existUser);
+                }
+                else
+                {
+                    throw new Exception("Tài khoản đã được xác thực.");
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+            
         }
 
         public async Task<UserModel> UpdateUserAsync(UpdateUserModel model)
@@ -564,6 +629,18 @@ namespace Fricks.Service.Services
             };
             var refreshToken = GenerateJsonWebToken.CreateRefreshToken(claims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(refreshToken).ToString();
+        }
+
+        private static int CalculateAge(DateTime birthDate)
+        {
+            DateTime today = CommonUtils.GetCurrentTime();
+            int age = today.Year - birthDate.Year;
+
+            if (birthDate > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
         }
     }
 }

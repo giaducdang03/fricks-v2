@@ -18,10 +18,11 @@ namespace Fricks.Repository.Repositories
             _context = context;
         }
 
-        public async Task<Pagination<FavoriteProduct>> GetFavoriteProductPaging(PaginationParameter paginationParameter)
+        public async Task<Pagination<FavoriteProduct>> GetFavoriteProductPaging(int userid, PaginationParameter paginationParameter)
         {
             var itemCount = await _context.FavoriteProducts.CountAsync();
             var items = await _context.FavoriteProducts.Include(x => x.User).Include(x => x.Product)
+                                    .Where(x => x.UserId.Equals(userid))
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
                                     .AsNoTracking()
