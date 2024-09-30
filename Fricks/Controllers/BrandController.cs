@@ -30,7 +30,6 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("get-all-brand")]
-        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -41,7 +40,6 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("get-all-brand-pagin")]
-        [Authorize]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {
             try

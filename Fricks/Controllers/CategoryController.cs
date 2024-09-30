@@ -32,7 +32,6 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("get-all-category")]
-        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -44,7 +43,6 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("get-all-category-pagin")]
-        [Authorize]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {
             try
