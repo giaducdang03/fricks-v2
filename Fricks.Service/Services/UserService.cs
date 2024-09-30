@@ -158,6 +158,7 @@ namespace Fricks.Service.Services
                 newUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
                 newUser.Role = model.Role.ToString().ToUpper();
                 newUser.Dob = model.Dob;
+                newUser.ConfirmEmail = true;
 
                 // check age
                 var userAge = CalculateAge(model.Dob);
