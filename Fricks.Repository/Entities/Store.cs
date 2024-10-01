@@ -15,6 +15,10 @@ public partial class Store : BaseEntity
 
     public string? Image { get; set; }
 
+    public string? PhoneNumber { get; set; }
+
+    public string? Description { get; set; }
+
     public virtual User? Manager { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
