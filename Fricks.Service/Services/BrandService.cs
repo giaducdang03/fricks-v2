@@ -3,6 +3,7 @@ using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.BrandModels;
+using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,15 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy hãng - Không thể xóa");
             }
+
+            // check product
+            var products = await _unitOfWork.ProductRepository.GetAllAsync();
+            bool checkUsingProduct = products.Any(product => product.BrandId == brand.Id);
+            if (checkUsingProduct)
+            {
+                throw new Exception("Không thể xóa hãng do có sản phẩm đang dùng");
+            }
+
             _unitOfWork.BrandRepository.SoftDeleteAsync(brand);
             _unitOfWork.Save();
             return _mapper.Map<BrandModel>(brand);

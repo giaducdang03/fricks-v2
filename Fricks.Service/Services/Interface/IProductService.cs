@@ -12,7 +12,8 @@ namespace Fricks.Service.Services.Interface
 {
     public interface IProductService
     {
-        public Task<ProductModel> AddProduct(ProductRegisterModel product);
+        //public Task<ProductModel> AddProduct(ProductRegisterModel product);
+        public Task<ProductModel> AddProduct(CreateProductModel product);
         public Task<ProductModel> UpdateProduct(int id, ProductProcessModel product);
         public Task<ProductModel> DeleteProduct(int id);
         public Task<ProductModel> GetProductById(int id);

@@ -29,7 +29,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("get-all-brand")]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -60,7 +60,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, Store")]
+        [Authorize(Roles = "ADMIN, STORE")]
         public async Task<IActionResult> Add(BrandProcessModel model)
         {
             try
@@ -71,7 +71,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin, Store")]
+        [Authorize(Roles = "ADMIN, STORE")]
         public async Task<IActionResult> Update(int id, BrandProcessModel model)
         {
             try
@@ -82,7 +82,7 @@ namespace Fricks.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin, Store")]
+        [Authorize(Roles = "ADMIN, STORE")]
         public async Task<IActionResult> Delete(int id)
         {
             try
