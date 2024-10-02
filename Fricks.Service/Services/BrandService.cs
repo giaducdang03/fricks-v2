@@ -25,6 +25,14 @@ namespace Fricks.Service.Services
 
         public async Task<BrandModel> AddBrand(BrandProcessModel brand)
         {
+            // check duplicate
+            var existBrand = await _unitOfWork.BrandRepository.GetAllAsync();
+            var checkDuplicate = existBrand.FirstOrDefault(x => x.Name.ToLower() == brand.Name.ToLower());
+            if (checkDuplicate != null)
+            {
+                throw new Exception("Hãng đã tồn tại");
+            }
+
             var addBrand = _mapper.Map<Brand>(brand);
             var result = await _unitOfWork.BrandRepository.AddAsync(addBrand);
             _unitOfWork.Save();
@@ -77,6 +85,15 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy hãng - Không thể cập nhật");
             }
+
+            // check duplicate
+            var existBrand = await _unitOfWork.BrandRepository.GetAllAsync();
+            var checkDuplicate = existBrand.FirstOrDefault(x => x.Name.ToLower() == brandModel.Name.ToLower());
+            if (checkDuplicate != null)
+            {
+                throw new Exception("Hãng đã tồn tại");
+            }
+
             var updateBrand = _mapper.Map(brandModel, brand);
             _unitOfWork.BrandRepository.UpdateAsync(updateBrand);
             _unitOfWork.Save();
