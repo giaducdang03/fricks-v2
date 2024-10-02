@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
+using Fricks.Service.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,29 +22,102 @@ namespace Fricks.Service.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ProductModel> AddProduct(ProductRegisterModel product)
+
+        public async Task<ProductModel> AddProduct(CreateProductModel productModel)
         {
-            var brand = await _unitOfWork.BrandRepository.GetByIdAsync(product.BrandId);
+            var brand = await _unitOfWork.BrandRepository.GetByIdAsync(productModel.BrandId);
             if (brand == null)
             {
-                throw new Exception("Không tìm thấy hãng.");
-            }
-            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(product.CategoryId);
-            if (category == null)
-            {
-                throw new Exception("Không tìm thấy danh mục sản phẩm.");
-            }
-            var store = await _unitOfWork.StoreRepository.GetByIdAsync(product.StoreId);
-            if (store == null)
-            {
-                throw new Exception("Không tìm thấy cửa hàng.");
+                throw new Exception("Không tìm thấy thương hiệu");
             }
 
-            var addProduct = _mapper.Map<Product>(product);
-            var result = await _unitOfWork.ProductRepository.AddAsync(addProduct);
-            _unitOfWork.Save();
-            return _mapper.Map<ProductModel>(result);
+            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(productModel.CategoryId);
+            if (category == null)
+            {
+                throw new Exception("Không tìm thấy danh mục sản phẩm");
+            }
+
+            var store = await _unitOfWork.StoreRepository.GetByIdAsync(productModel.StoreId);
+            if (store == null)
+            {
+                throw new Exception("Không tìm thấy cửa hàng");
+            }
+
+            var newProduct = new Product
+            {
+                Sku = productModel.Sku,
+                BrandId = productModel.BrandId,
+                CategoryId = productModel.CategoryId,
+                Description = productModel.Description,
+                Image = productModel.Image,
+                Quantity = productModel.Quantity,
+                SoldQuantity = 0,
+                Name = productModel.Name,
+                UnsignName = StringUtils.ConvertToUnSign(productModel.Name)
+            };
+
+            var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
+
+            bool checkValidProductUnit = validProductUnits.All(item1 => productModel.ProductPrices.Any(item2 => item1.Id == item2.UnitId));
+
+            if (checkValidProductUnit)
+            {
+                var productPrice = new List<ProductPrice>();
+                if (productModel.ProductPrices.Count > 0)
+                {
+                    foreach (var price in productModel.ProductPrices)
+                    {
+                        var newPrice = new ProductPrice
+                        {
+                            UnitId = price.UnitId,
+                            Price = price.Price
+                        };
+                        productPrice.Add(newPrice);
+                    }
+
+                    newProduct.ProductPrices = productPrice;
+
+                    await _unitOfWork.ProductRepository.AddAsync(newProduct);
+                    _unitOfWork.Save();
+
+                    return _mapper.Map<ProductModel>(newProduct);
+                }
+                else
+                {
+                    throw new Exception("Giá không được để trống");
+                }
+
+            }
+            else
+            {
+                throw new Exception("Đơn vị tính sản phẩm không hợp lệ");
+            }
+
         }
+
+        //public async Task<ProductModel> AddProduct(ProductRegisterModel product)
+        //{
+        //    var brand = await _unitOfWork.BrandRepository.GetByIdAsync(product.BrandId);
+        //    if (brand == null)
+        //    {
+        //        throw new Exception("Không tìm thấy hãng.");
+        //    }
+        //    var category = await _unitOfWork.CategoryRepository.GetByIdAsync(product.CategoryId);
+        //    if (category == null)
+        //    {
+        //        throw new Exception("Không tìm thấy danh mục sản phẩm.");
+        //    }
+        //    var store = await _unitOfWork.StoreRepository.GetByIdAsync(product.StoreId);
+        //    if (store == null)
+        //    {
+        //        throw new Exception("Không tìm thấy cửa hàng.");
+        //    }
+
+        //    var addProduct = _mapper.Map<Product>(product);
+        //    var result = await _unitOfWork.ProductRepository.AddAsync(addProduct);
+        //    _unitOfWork.Save();
+        //    return _mapper.Map<ProductModel>(result);
+        //}
 
         public async Task<ProductModel> DeleteProduct(int id)
         {
