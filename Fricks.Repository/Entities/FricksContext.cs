@@ -197,6 +197,8 @@ public partial class FricksContext : DbContext
             entity.ToTable("ProductUnit");
 
             entity.Property(e => e.Name).HasMaxLength(100);
+
+            entity.Property(e => e.Code).HasMaxLength(4);
         });
 
         modelBuilder.Entity<Store>(entity =>
