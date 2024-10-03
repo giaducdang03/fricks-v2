@@ -53,7 +53,8 @@ namespace Fricks.Service.Services
                 Quantity = productModel.Quantity,
                 SoldQuantity = 0,
                 Name = productModel.Name,
-                UnsignName = StringUtils.ConvertToUnSign(productModel.Name)
+                UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
+                StoreId = productModel.StoreId
             };
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
