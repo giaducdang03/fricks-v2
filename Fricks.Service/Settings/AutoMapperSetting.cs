@@ -38,7 +38,7 @@ namespace Fricks.Service.Settings
             CreateMap<FavoriteProduct, FavoriteProductProcessModel>().ReverseMap();
             CreateMap<Pagination<FavoriteProduct>, Pagination<FavoriteProductModel>>().ConvertUsing<PaginationConverter<FavoriteProduct, FavoriteProductModel>>();
 
-            CreateMap<Store, StoreModel>().ReverseMap();
+            CreateMap<Store, StoreModel>().ForMember(dest => dest.ManagerEmail, otp => otp.MapFrom(src => src.Manager.Email));
             CreateMap<Store, StoreProcessModel>().ReverseMap();
             CreateMap<Store, StoreRegisterModel>().ReverseMap();
             CreateMap<Pagination<Store>, Pagination<StoreModel>>().ConvertUsing<PaginationConverter<Store, StoreModel>>();

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.StoreModels
 {
-    public class StoreModel
+    public class StoreModel : BaseEntity
     {
         public int? Id { get; set; }
 
@@ -26,6 +26,6 @@ namespace Fricks.Service.BusinessModel.StoreModels
 
         public string? Description { get; set; }
 
-        public UserModel? Manager { get; set; }
+        public string? ManagerEmail {  get; set; }
     }
 }
