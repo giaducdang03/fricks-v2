@@ -58,7 +58,7 @@ namespace Fricks.Service.Services
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
 
-            bool checkValidProductUnit = validProductUnits.All(item1 => productModel.ProductPrices.Any(item2 => item1.Id == item2.UnitId));
+            bool checkValidProductUnit = validProductUnits.All(item1 => productModel.ProductPrices.Any(item2 => item1.Code == item2.UnitCode));
 
             if (checkValidProductUnit)
             {
@@ -67,12 +67,16 @@ namespace Fricks.Service.Services
                 {
                     foreach (var price in productModel.ProductPrices)
                     {
-                        var newPrice = new ProductPrice
+                        var unitId = validProductUnits.FirstOrDefault(x => x.Code == price.UnitCode).Id;
+                        if (unitId != null)
                         {
-                            UnitId = price.UnitId,
-                            Price = price.Price
-                        };
-                        productPrice.Add(newPrice);
+                            var newPrice = new ProductPrice
+                            {
+                                UnitId = unitId,
+                                Price = price.Price
+                            };
+                            productPrice.Add(newPrice);
+                        }
                     }
 
                     newProduct.ProductPrices = productPrice;

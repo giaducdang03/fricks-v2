@@ -42,7 +42,7 @@ namespace Fricks.Service.BusinessModel.ProductModels
     public class CreateProductPriceModel
     {
         [Required]
-        public int UnitId { get; set; }
+        public string UnitCode { get; set; } = "";
         
         [Required]
         public int Price { get; set; }
