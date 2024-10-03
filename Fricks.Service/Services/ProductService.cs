@@ -58,7 +58,21 @@ namespace Fricks.Service.Services
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
 
-            bool checkValidProductUnit = validProductUnits.All(item1 => productModel.ProductPrices.Any(item2 => item1.Code == item2.UnitCode));
+            // check valid product unit
+            bool checkValidProductUnit = true;
+
+            var listAddPrice = new List<ProductPrice>();
+            foreach (var item in productModel.ProductPrices)
+            {
+                var productUnit = validProductUnits.FirstOrDefault(x => x.Code == item.UnitCode);
+                if (productUnit == null)
+                {
+                    checkValidProductUnit = false;
+                    break;
+                }
+            }
+
+            //bool checkValidProductUnit = validProductUnits.All(item1 => productModel.ProductPrices.Any(item2 => item1.Code == item2.UnitCode));
 
             if (checkValidProductUnit)
             {
