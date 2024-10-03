@@ -1,6 +1,7 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.Services.Interface;
+using Fricks.ViewModels.ResponseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("get-all-store-by-manager-id")]
+        [HttpGet("manager/{userId}")]
         public async Task<IActionResult> GetByManagerId(int userId, [FromQuery] PaginationParameter paginationParameter) 
         {
             try
@@ -44,20 +45,20 @@ namespace Fricks.Controllers
                 };
                 Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
                 return Ok(result);
-            } catch { throw; }
-        }
-
-        [HttpGet("get-all-store")]
-        public async Task<IActionResult> GetAll()
-        {
-            try
+            }
+            catch (Exception ex)
             {
-                var result = await _storeService.GetAllStore();
-                return Ok(result);
-            } catch { throw; }
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
         }
 
-        [HttpGet("get-all-store-pagin")]
+        [HttpGet]
         public async Task<IActionResult> GetAllPagin([FromQuery] PaginationParameter paginationParameter)
         {
             try
@@ -74,7 +75,17 @@ namespace Fricks.Controllers
                 };
                 Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
         }
 
         [HttpPost]
@@ -84,7 +95,17 @@ namespace Fricks.Controllers
             {
                 var result = await _storeService.AddStore(model);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
         }
 
         [HttpPut]
@@ -93,18 +114,46 @@ namespace Fricks.Controllers
             try
             {
                 var result = await _storeService.UpdateStore(id, model);
-                return Ok(result);
-            } catch { throw; }
+                return Ok(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = $"Cập nhật cửa hàng {result.Name} thành công."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var result = await _storeService.DeleteStore(id);
-                return Ok(result);
-            } catch { throw; }
+                return Ok(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = $"Xóa cừa hàng {result.Name} thành công."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
         }
     }
 }
