@@ -26,6 +26,13 @@ namespace Fricks.Service.Services
 
         public async Task<StoreModel> AddStore(StoreRegisterModel store)
         {
+            // check manager
+            var existStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(store.ManagerId);
+            if (existStore != null)
+            {
+                throw new Exception("Tài khoản này đã có cửa hàng vui lòng chọn tài khoản khác");
+            }
+
             var addStore = _mapper.Map<Store>(store);
             var result = await _unitOfWork.StoreRepository.AddAsync(addStore);
             _unitOfWork.Save();

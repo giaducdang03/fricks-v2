@@ -25,6 +25,13 @@ namespace Fricks.Repository.Repositories
                                           .Where(x => x.Id == id).FirstOrDefaultAsync();
         }
 
+        public async Task<Product> GetProductBySKUAsync(string sku)
+        {
+            return await _context.Products.Include(x => x.Brand).Include(x => x.Category)
+                                          .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                          .Where(x => x.Sku == sku).FirstOrDefaultAsync();
+        }
+
         public async Task<Pagination<Product>> GetProductByStoreIdPaging(int id, PaginationParameter paginationParameter)
         {
             var itemCount = await _context.Products.CountAsync();
