@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
@@ -23,8 +24,14 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<ProductModel> AddProduct(CreateProductModel productModel)
+        public async Task<ProductModel> AddProduct(CreateProductModel productModel, string email)
         {
+            var userLogin = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (userLogin == null)
+            {
+                throw new Exception("Tải khoản không tồn tại");
+            }
+
             var brand = await _unitOfWork.BrandRepository.GetByIdAsync(productModel.BrandId);
             if (brand == null)
             {
@@ -37,10 +44,32 @@ namespace Fricks.Service.Services
                 throw new Exception("Không tìm thấy danh mục sản phẩm");
             }
 
-            var store = await _unitOfWork.StoreRepository.GetByIdAsync(productModel.StoreId);
-            if (store == null)
+            // check store
+
+            Store store;
+
+            if (userLogin.Role.ToUpper() == RoleEnums.ADMIN.ToString())
             {
-                throw new Exception("Không tìm thấy cửa hàng");
+                store = await _unitOfWork.StoreRepository.GetByIdAsync(productModel.StoreId);
+                if (store == null)
+                {
+                    throw new Exception("Cửa hàng không tồn tại");
+                }
+            }
+            else
+            {
+                store = await _unitOfWork.StoreRepository.GetStoreByManagerId(userLogin.Id);
+                if (store == null)
+                {
+                    throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                }
+            }
+
+            // check product
+            var existProduct = await _unitOfWork.ProductRepository.GetProductBySKUAsync(productModel.Sku);
+            if (existProduct != null) 
+            {
+                throw new Exception("SKU không được trùng");
             }
 
             var newProduct = new Product
@@ -54,7 +83,7 @@ namespace Fricks.Service.Services
                 SoldQuantity = 0,
                 Name = productModel.Name,
                 UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
-                StoreId = productModel.StoreId
+                StoreId = store.Id,
             };
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
@@ -109,7 +138,7 @@ namespace Fricks.Service.Services
             }
             else
             {
-                throw new Exception("Đơn vị tính sản phẩm không hợp lệ");
+                throw new Exception("Đơn vị tính (ĐVT) sản phẩm không hợp lệ");
             }
 
         }
@@ -141,9 +170,9 @@ namespace Fricks.Service.Services
         public async Task<ProductModel> DeleteProduct(int id)
         {
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
-            if (product == null)
+            if (product == null || product.IsDeleted == true)
             {
-                throw new Exception("Không tìm thấy sản phẩm - khổng thể xóa");
+                throw new Exception("Sản phẩm không tồn tại");
             }
             _unitOfWork.ProductRepository.SoftDeleteAsync(product);
             _unitOfWork.Save();
@@ -177,17 +206,17 @@ namespace Fricks.Service.Services
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
             if (product == null)
             {
-                throw new Exception("Không tìm thấy sản phẩm - không thể cập nhật.");
+                throw new Exception("Sản phẩm không tồn tại");
             }
             var brand = await _unitOfWork.BrandRepository.GetByIdAsync(productModel.BrandId);
             if (brand == null)
             {
-                throw new Exception("Không tìm thấy hãng.");
+                throw new Exception("Không tìm thấy hãng");
             }
             var category = await _unitOfWork.CategoryRepository.GetByIdAsync(productModel.CategoryId);
             if (category == null)
             {
-                throw new Exception("Không tìm thấy danh mục sản phẩm.");
+                throw new Exception("Không tìm thấy danh mục sản phẩm");
             }
             var updateProduct = _mapper.Map(productModel, product);
             _unitOfWork.ProductRepository.UpdateAsync(updateProduct);

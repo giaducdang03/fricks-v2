@@ -17,9 +17,12 @@ namespace Fricks.Controllers
     public class ProductController : ControllerBase
     {
         private IProductService _productService;
-        public ProductController(IProductService productService)
+        private IClaimsService _claimsService;
+
+        public ProductController(IProductService productService, IClaimsService claimsService)
         {
             _productService = productService;
+            _claimsService = claimsService;
         }
 
         [HttpGet("{id}")]
@@ -91,9 +94,10 @@ namespace Fricks.Controllers
         {
             try
             {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
                 if (ModelState.IsValid)
                 {
-                    var result = await _productService.AddProduct(model);
+                    var result = await _productService.AddProduct(model, currentEmail);
                     if (result != null)
                     {
                         return Ok(result);
