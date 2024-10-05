@@ -63,7 +63,7 @@ namespace Fricks.Repository.Repositories
             return result;
         }
 
-        public async Task<Pagination<Product>> GetProductPaging(PaginationParameter paginationParameter, ProductFilter productFilter)
+        public async Task<Pagination<Product>> GetProductPagingAsync(PaginationParameter paginationParameter, ProductFilter productFilter)
         {
             var query = _context.Products.Include(x => x.Brand)
                                     .Include(x => x.Category)

@@ -17,10 +17,12 @@ namespace Fricks.Controllers
     public class PostsController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IClaimsService _claimsService;
 
-        public PostsController(IPostService postService)
+        public PostsController(IPostService postService, IClaimsService claimsService)
         {
             _postService = postService;
+            _claimsService = claimsService;
         }
 
         [HttpGet]
@@ -28,7 +30,8 @@ namespace Fricks.Controllers
         {
             try
             {
-                var result = await _postService.GetPostPaginationAsync(paginationParameter, postFilter);
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _postService.GetPostPaginationAsync(paginationParameter, postFilter, currentEmail);
                 if (result == null)
                 {
                     return NotFound(new ResponseModel()
