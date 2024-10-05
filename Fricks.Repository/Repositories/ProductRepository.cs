@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -62,10 +63,15 @@ namespace Fricks.Repository.Repositories
             return result;
         }
 
-        public async Task<Pagination<Product>> GetProductPaging(PaginationParameter paginationParameter)
+        public async Task<Pagination<Product>> GetProductPaging(PaginationParameter paginationParameter, ProductFilter productFilter)
         {
-            var itemCount = await _context.Products.CountAsync();
-            var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category)
+            var query = _context.Products.Where(x => x.IsDeleted == false).AsQueryable();
+
+            // apply filter
+            query = ApplyFiltering(query, productFilter);
+
+            var itemCount = await query.CountAsync();
+            var items = await query.Include(x => x.Brand).Include(x => x.Category)
                                     .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
@@ -88,6 +94,45 @@ namespace Fricks.Repository.Repositories
                                     .ToListAsync();
             var result = new Pagination<Product>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
             return result;
+        }
+
+        private IQueryable<Product> ApplyFiltering(IQueryable<Product> query, ProductFilter filter)
+        {
+
+            if (filter.CategoryId != null)
+            {
+                query = query.Where(s => s.CategoryId == filter.CategoryId);
+            }
+
+            if (filter.BrandId != null)
+            {
+                query = query.Where(s => s.BrandId == filter.BrandId);
+            }
+
+            if (filter.StoreId != null)
+            {
+                query = query.Where(s => s.StoreId == filter.StoreId);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Search))
+            {
+                query = query.Where(s => s.UnsignName.Contains(filter.Search) || s.Name.Contains(filter.Search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+            {
+                switch (filter.SortBy.ToLower())
+                {
+                    case "name":
+                        query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.UnsignName) : query.OrderBy(s => s.UnsignName);
+                        break;
+                    default:
+                        query = query.OrderBy(s => s.Id);
+                        break;
+                }
+            }
+
+            return query;
         }
     }
 }

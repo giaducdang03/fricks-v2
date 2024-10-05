@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
@@ -187,11 +188,11 @@ namespace Fricks.Service.Services
             return _mapper.Map<Pagination<ProductModel>>(result);
         }
 
-        public async Task<Pagination<ProductModel>> GetAllProductPagination(int brandId, int categoryId, PaginationParameter paginationParameter)
+        public async Task<Pagination<ProductModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter)
         {
-            var brand = await _unitOfWork.BrandRepository.GetByIdAsync(brandId);
-            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(categoryId);
-            var result = await _unitOfWork.ProductRepository.GetProductPaging(brand, category, paginationParameter);
+            //var brand = await _unitOfWork.BrandRepository.GetByIdAsync(brandId);
+            //var category = await _unitOfWork.CategoryRepository.GetByIdAsync(categoryId);
+            var result = await _unitOfWork.ProductRepository.GetProductPaging(paginationParameter, productFilter);
             return _mapper.Map<Pagination<ProductModel>>(result);
         }
 
