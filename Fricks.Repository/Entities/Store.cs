@@ -26,4 +26,6 @@ public partial class Store : BaseEntity
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     public virtual ICollection<Voucher> Vouchers { get; set; } = new List<Voucher>();
+
+    public virtual Wallet? Wallet { get; set; }
 }
