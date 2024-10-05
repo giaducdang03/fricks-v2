@@ -10,6 +10,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,8 @@ namespace Fricks.Service.Settings
 
             CreateMap<Post, PostModel>().ForMember(dest => dest.Product, otp => otp.MapFrom(src => src.Product));
             CreateMap<CreatePostModel, Post>();
+
+            CreateMap<ProductModel, ItemData>().ReverseMap();
         }
     }
 
