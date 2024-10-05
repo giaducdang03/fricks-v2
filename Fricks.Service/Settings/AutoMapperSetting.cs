@@ -10,6 +10,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,10 @@ namespace Fricks.Service.Settings
             CreateMap<CategoryProcessModel, Category>().ReverseMap();
             CreateMap<Pagination<Category>, Pagination<CategoryModel>>().ConvertUsing<PaginationConverter<Category, CategoryModel>>();
 
-            CreateMap<FavoriteProduct, FavoriteProductModel>().ReverseMap();
+            CreateMap<FavoriteProduct, FavoriteProductModel>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Product.Category.Name));
             CreateMap<FavoriteProduct, FavoriteProductProcessModel>().ReverseMap();
             CreateMap<Pagination<FavoriteProduct>, Pagination<FavoriteProductModel>>().ConvertUsing<PaginationConverter<FavoriteProduct, FavoriteProductModel>>();
 
@@ -59,6 +63,8 @@ namespace Fricks.Service.Settings
 
             CreateMap<Post, PostModel>().ForMember(dest => dest.Product, otp => otp.MapFrom(src => src.Product));
             CreateMap<CreatePostModel, Post>();
+
+            CreateMap<ProductModel, ItemData>().ReverseMap();
         }
     }
 

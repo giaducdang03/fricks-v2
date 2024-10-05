@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.FavoriteProductModels
 {
-    public class FavoriteProductModel
+    public class FavoriteProductModel : BaseEntity
     {
-        public int Id { get; set; }
         public int? UserId { get; set; }
         public int? ProductId { get; set; }
-        public ProductModel? Product { get; set; }
-        public UserModel? User { get; set; }
+        public string ProductName { get; set; } = "";
+        public string BrandName { get; set; } = "";
+        public string CategoryName { get; set; } = "";
+
+        //public ProductModel? Product { get; set; }
+        //public UserModel? User { get; set; }
     }
 }

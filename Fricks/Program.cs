@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,13 +24,26 @@ builder.Services.AddSwaggerGen();
 
 // Add Brute Force Settings
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+
 // Add Mail Settings
 builder.Services.Configure<MailSetting>(builder.Configuration.GetSection("MailSettings"));
+
 // Add PayOS Settings
-builder.Services.Configure<PayOSSetting>(builder.Configuration.GetSection("PayOSSettings"));
+using StreamReader reader = new("exe201-8080a-payos.json");
+var json = reader.ReadToEnd();
+PayOSSetting payos = JsonConvert.DeserializeObject<PayOSSetting>(json);
+builder.Services.Configure<PayOSSetting>(options =>
+{
+    options.ClientId = payos.ClientId;
+    options.ApiKey = payos.ApiKey;
+    options.ChecksumKey = payos.ChecksumKey;
+    builder.Configuration.GetSection("PayOSSettings").Bind(options);
+});
+
 // Add AutomMapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(AutoMapperSetting).Assembly);
+
 // Add Dependency Injection
 builder.Services.AddWebAPIService();
 

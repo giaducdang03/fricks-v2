@@ -1,38 +1,36 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
+using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
+using Fricks.ViewModels.ResponseModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Fricks.Controllers
 {
-    [Route("api/fav-products")]
+    [Route("api/favorites")]
     [ApiController]
     public class FavoriteProductController : ControllerBase
     {
         private IFavoriteProductService _favoriteProductService;
-        public FavoriteProductController(IFavoriteProductService favoriteProductService)
+        private IClaimsService _claimsService;
+
+        public FavoriteProductController(IFavoriteProductService favoriteProductService, IClaimsService claimsService)
         {
             _favoriteProductService = favoriteProductService;
+            _claimsService = claimsService;
         }
 
-        [HttpGet("Get-all-fav-product")]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<IActionResult> GetFavoriteProductUser([FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var result = await _favoriteProductService.GetAllFavoriteProduct();
-                return Ok(result);
-            } catch { throw; }
-        }
-
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetAllPaging(int userId, [FromQuery] PaginationParameter paginationParameter)
-        {
-            try
-            {
-                var result = await _favoriteProductService.GetAllFavoriteProductPagination(userId, paginationParameter);
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _favoriteProductService.GetUserFavoriteProductsPagination(currentEmail, paginationParameter);
                 var metadata = new
                 {
                     result.TotalCount,
@@ -44,27 +42,54 @@ namespace Fricks.Controllers
                 };
                 Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
         }
 
         [HttpPost]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Add(FavoriteProductProcessModel model)
         {
             try
             {
-                var result = await _favoriteProductService.AddFavoriteProduct(model);
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _favoriteProductService.AddFavoriteProduct(currentEmail, model);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
         }
 
         [HttpDelete]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var result = await _favoriteProductService.DeleteFavoriteProduct(id);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
         }
     }
 }
