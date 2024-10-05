@@ -70,6 +70,9 @@ namespace Fricks.Service.Settings
 
             CreateMap<Feedback, FeedbackModel>()
                 .ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
+            CreateMap<Pagination<Feedback>, Pagination<FeedbackModel>>().ConvertUsing<PaginationConverter<Feedback, FeedbackModel>>();
+
+            CreateMap<CreateFeedbackModel, Feedback>();
         }
     }
 
