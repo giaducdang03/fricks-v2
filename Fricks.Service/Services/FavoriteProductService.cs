@@ -23,10 +23,28 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<FavoriteProductModel> AddFavoriteProduct(FavoriteProductProcessModel favoriteProduct)
+        public async Task<FavoriteProductModel> AddFavoriteProduct(string email, FavoriteProductProcessModel favoriteProduct)
         {
-            var addFavProduct = _mapper.Map<FavoriteProduct>(favoriteProduct);
-            var result = await _unitOfWork.FavoriteProductRepository.AddAsync(addFavProduct);
+            var user = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (user == null)
+            {
+                throw new Exception("Tài khoản không tồn tại");
+            }
+
+            var existProduct = await _unitOfWork.ProductRepository.GetProductByIdAsync(favoriteProduct.ProductId);
+            if (existProduct == null)
+            {
+                throw new Exception("Sản phẩm không tồn tại");
+            }
+
+            var newFavProduct = new FavoriteProduct
+            {
+                ProductId = favoriteProduct.ProductId,
+                UserId = user.Id
+            };
+
+            var result = await _unitOfWork.FavoriteProductRepository.AddAsync(newFavProduct);
+
             _unitOfWork.Save();
             return _mapper.Map<FavoriteProductModel>(result);
         }
@@ -49,9 +67,14 @@ namespace Fricks.Service.Services
             return _mapper.Map<List<FavoriteProductModel>>(listFavProduct);
         }
 
-        public async Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(int userId, PaginationParameter paginationParameter)
+        public async Task<Pagination<FavoriteProductModel>> GetUserFavoriteProductsPagination(string email, PaginationParameter paginationParameter)
         {
-            var listFavProduct = await _unitOfWork.FavoriteProductRepository.GetFavoriteProductPaging(userId, paginationParameter);
+            var user = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (user == null)
+            {
+                throw new Exception("Tài khoản không tồn tại");
+            }
+            var listFavProduct = await _unitOfWork.FavoriteProductRepository.GetFavoriteProductPaging(user.Id, paginationParameter);
             return _mapper.Map<Pagination<FavoriteProductModel>>(listFavProduct);
         }
     }

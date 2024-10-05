@@ -11,9 +11,9 @@ namespace Fricks.Service.Services.Interface
 {
     public interface IFavoriteProductService
     {
-        public Task<FavoriteProductModel> AddFavoriteProduct(FavoriteProductProcessModel FavoriteProduct);
+        public Task<FavoriteProductModel> AddFavoriteProduct(string email, FavoriteProductProcessModel FavoriteProduct);
         public Task<FavoriteProductModel> DeleteFavoriteProduct(int id);
         public Task<List<FavoriteProductModel>> GetAllFavoriteProduct();
-        public Task<Pagination<FavoriteProductModel>> GetAllFavoriteProductPagination(int userId, PaginationParameter paginationParameter);
+        public Task<Pagination<FavoriteProductModel>> GetUserFavoriteProductsPagination(string email, PaginationParameter paginationParameter);
     }
 }
