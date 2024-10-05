@@ -14,9 +14,9 @@ namespace Fricks.Service.Services.Interface
         public Task<Pagination<FeedbackModel>> GetFeedbackProductPaginationAsync(int productId, PaginationParameter paginationParameter, 
             FeedbackFilter feedbackFilter);
         
-        public Task<FeedbackModel> CreateFeedbackAsync(CreateFeedbackModel createFeedbackModel);
+        public Task<FeedbackModel> CreateFeedbackAsync(CreateFeedbackModel createFeedbackModel, string currentEmail);
 
-        public Task<FeedbackModel> UpdateFeedbackAsync(UpdateFeedbackModel updateFeedbackModel);
+        public Task<FeedbackModel> UpdateFeedbackAsync(UpdateFeedbackModel updateFeedbackModel, string currentEmail);
 
         public Task<FeedbackModel> DeleteFeedbackAsync(int feedbackId, string email);
     }
