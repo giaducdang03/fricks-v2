@@ -41,7 +41,8 @@ namespace Fricks.Controllers
         {
             try
             {
-                var result = await _productService.GetAllProductPagination(paginationParameter, productFilter);
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _productService.GetAllProductPagination(paginationParameter, productFilter, currentEmail);
                 var metadata = new
                 {
                     result.TotalCount,

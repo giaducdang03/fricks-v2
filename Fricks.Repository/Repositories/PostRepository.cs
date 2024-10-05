@@ -27,7 +27,7 @@ namespace Fricks.Repository.Repositories
 
         public async Task<Pagination<Post>> GetPostPaging(PaginationParameter paginationParameter, PostFilter postFilter)
         {
-            var query = _context.Posts.Where(x => x.IsDeleted == false).AsQueryable();
+            var query = _context.Posts.Where(x => x.IsDeleted == false).Include(x => x.Product).AsQueryable();
 
             // apply filter
             query = ApplyFiltering(query, postFilter);
@@ -44,8 +44,12 @@ namespace Fricks.Repository.Repositories
 
         public IQueryable<Post> ApplyFiltering(IQueryable<Post> query, PostFilter filter)
         {
+            if (filter.StoreId != null && filter.StoreId > 0)
+            {
+                query = query.Where(s => s.Product.StoreId == filter.StoreId);
+            }
 
-            if (filter.ProductId != null)
+            if (filter.ProductId != null && filter.ProductId > 0)
             {
                 query = query.Where(s => s.ProductId == filter.ProductId);
             }

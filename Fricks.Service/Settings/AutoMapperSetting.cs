@@ -62,7 +62,8 @@ namespace Fricks.Service.Settings
             CreateMap<ProductPrice, ProductPriceProcessModel>().ReverseMap();
             CreateMap<ProductPrice, ProductPriceRegisterModel>().ReverseMap();
 
-            CreateMap<Post, PostModel>().ForMember(dest => dest.Product, otp => otp.MapFrom(src => src.Product));
+            CreateMap<Post, PostModel>().ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
+            CreateMap<Pagination<Post>, Pagination<PostModel>>().ConvertUsing<PaginationConverter<Post, PostModel>>();
             CreateMap<CreatePostModel, Post>();
 
             CreateMap<ProductModel, ItemData>().ReverseMap();
