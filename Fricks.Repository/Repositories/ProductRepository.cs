@@ -100,17 +100,17 @@ namespace Fricks.Repository.Repositories
         private IQueryable<Product> ApplyProductFiltering(IQueryable<Product> query, ProductFilter filter)
         {
 
-            if (filter.CategoryId != null)
+            if (filter.CategoryId != null && filter.CategoryId > 0)
             {
                 query = query.Where(s => s.CategoryId == filter.CategoryId);
             }
 
-            if (filter.BrandId != null)
+            if (filter.BrandId != null && filter.BrandId > 0)
             {
                 query = query.Where(s => s.BrandId == filter.BrandId);
             }
 
-            if (filter.StoreId != null)
+            if (filter.StoreId != null && filter.StoreId > 0)
             {
                 query = query.Where(s => s.StoreId == filter.StoreId);
             }
