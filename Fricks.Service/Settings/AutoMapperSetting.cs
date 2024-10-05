@@ -9,6 +9,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,8 @@ namespace Fricks.Service.Settings
             CreateMap<ProductPrice, ProductPriceModel>().ReverseMap();
             CreateMap<ProductPrice, ProductPriceProcessModel>().ReverseMap();
             CreateMap<ProductPrice, ProductPriceRegisterModel>().ReverseMap();
+
+            CreateMap<ProductModel, ItemData>().ReverseMap();
         }
     }
 
