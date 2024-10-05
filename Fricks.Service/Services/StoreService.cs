@@ -69,11 +69,17 @@ namespace Fricks.Service.Services
             return _mapper.Map<StoreModel>(result);
         }
 
-        public async Task<Pagination<StoreModel>> GetStoreByManagerId(PaginationParameter paginationParameter, int id)
+        public async Task<StoreModel> GetStoreByManagerId(int managerId)
         {
-            var result = await _unitOfWork.StoreRepository.GetStoreByManagerIdPaging(paginationParameter, id);
-            return _mapper.Map<Pagination<StoreModel>>(result);
+            var store = await _unitOfWork.StoreRepository.GetStoreByManagerId(managerId);
+            return _mapper.Map<StoreModel>(store);
         }
+
+        //public async Task<Pagination<StoreModel>> GetStoreByManagerId(PaginationParameter paginationParameter, int id)
+        //{
+        //    var result = await _unitOfWork.StoreRepository.GetStoreByManagerIdPaging(paginationParameter, id);
+        //    return _mapper.Map<Pagination<StoreModel>>(result);
+        //}
 
         public async Task<StoreModel> UpdateStore(int id, StoreProcessModel storeModel)
         {
