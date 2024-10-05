@@ -61,6 +61,8 @@ public partial class FricksContext : DbContext
             entity.ToTable("Category");
 
             entity.Property(e => e.Name).HasMaxLength(250);
+
+            entity.Property(e => e.Code).HasMaxLength(5);
         });
 
         modelBuilder.Entity<FavoriteProduct>(entity =>
@@ -195,6 +197,8 @@ public partial class FricksContext : DbContext
             entity.ToTable("ProductUnit");
 
             entity.Property(e => e.Name).HasMaxLength(100);
+
+            entity.Property(e => e.Code).HasMaxLength(4);
         });
 
         modelBuilder.Entity<Store>(entity =>
@@ -206,6 +210,7 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.Address).HasMaxLength(250);
             entity.Property(e => e.Name).HasMaxLength(250);
             entity.Property(e => e.TaxCode).HasMaxLength(13);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(10);
 
             entity.HasOne(d => d.Manager).WithMany(p => p.Stores)
                 .HasForeignKey(d => d.ManagerId)

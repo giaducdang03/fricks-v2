@@ -3,6 +3,7 @@ using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.BrandModels;
+using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,14 @@ namespace Fricks.Service.Services
 
         public async Task<BrandModel> AddBrand(BrandProcessModel brand)
         {
+            // check duplicate
+            var existBrand = await _unitOfWork.BrandRepository.GetAllAsync();
+            var checkDuplicate = existBrand.FirstOrDefault(x => x.Name.ToLower() == brand.Name.ToLower());
+            if (checkDuplicate != null)
+            {
+                throw new Exception("Hãng đã tồn tại");
+            }
+
             var addBrand = _mapper.Map<Brand>(brand);
             var result = await _unitOfWork.BrandRepository.AddAsync(addBrand);
             _unitOfWork.Save();
@@ -37,6 +46,15 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy hãng - Không thể xóa");
             }
+
+            // check product
+            var products = await _unitOfWork.ProductRepository.GetAllAsync();
+            bool checkUsingProduct = products.Any(product => product.BrandId == brand.Id);
+            if (checkUsingProduct)
+            {
+                throw new Exception("Không thể xóa hãng do có sản phẩm đang dùng");
+            }
+
             _unitOfWork.BrandRepository.SoftDeleteAsync(brand);
             _unitOfWork.Save();
             return _mapper.Map<BrandModel>(brand);
@@ -67,6 +85,15 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy hãng - Không thể cập nhật");
             }
+
+            // check duplicate
+            var existBrand = await _unitOfWork.BrandRepository.GetAllAsync();
+            var checkDuplicate = existBrand.FirstOrDefault(x => x.Name.ToLower() == brandModel.Name.ToLower());
+            if (checkDuplicate != null)
+            {
+                throw new Exception("Hãng đã tồn tại");
+            }
+
             var updateBrand = _mapper.Map(brandModel, brand);
             _unitOfWork.BrandRepository.UpdateAsync(updateBrand);
             _unitOfWork.Save();

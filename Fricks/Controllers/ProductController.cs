@@ -1,6 +1,10 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Service.BusinessModel.ProductModels;
+using Fricks.Service.BusinessModel.UserModels;
+using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
+using Fricks.ViewModels.ResponseModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -13,9 +17,12 @@ namespace Fricks.Controllers
     public class ProductController : ControllerBase
     {
         private IProductService _productService;
-        public ProductController(IProductService productService)
+        private IClaimsService _claimsService;
+
+        public ProductController(IProductService productService, IClaimsService claimsService)
         {
             _productService = productService;
+            _claimsService = claimsService;
         }
 
         [HttpGet("{id}")]
@@ -71,15 +78,49 @@ namespace Fricks.Controllers
             catch { throw; }
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Add(ProductRegisterModel model)
+        //{
+        //    try
+        //    {
+        //        var result = await _productService.AddProduct(model);
+        //        return Ok(result);
+        //    } catch { throw; }
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> Add(ProductRegisterModel model)
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> CreateUserAsync(CreateProductModel model)
         {
             try
             {
-                var result = await _productService.AddProduct(model);
-                return Ok(result);
-            } catch { throw; }
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                if (ModelState.IsValid)
+                {
+                    var result = await _productService.AddProduct(model, currentEmail);
+                    if (result != null)
+                    {
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        throw new Exception("Có lỗi trong quá trình tạo sản phẩm mới");
+                    }
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
         }
+
 
         [HttpPut]
         public async Task<IActionResult> Update (int id, ProductProcessModel model) 
