@@ -120,7 +120,7 @@ namespace Fricks.Repository.Repositories
                 query = query.Where(s => s.UnsignName.Contains(filter.Search) || s.Name.Contains(filter.Search));
             }
 
-            if (filter.MinPrice != null && filter.MaxPrice != null)
+            if (filter.MinPrice != 0 && filter.MaxPrice != 0 && filter.MinPrice < filter.MaxPrice)
             {
                 query = query.Where(s => s.ProductPrices.All(x => x.Price >= filter.MinPrice && x.Price <= filter.MaxPrice));
             }
