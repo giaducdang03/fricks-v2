@@ -35,7 +35,7 @@ builder.Services.Configure<PayOSSetting>(options =>
     options.ClientId = payos.ClientId;
     options.ApiKey = payos.ApiKey;
     options.ChecksumKey = payos.ChecksumKey;
-    builder.Configuration.GetSection("PayOSSettings");
+    builder.Configuration.GetSection("PayOSSettings").Bind(options);
 });
 // Add AutomMapper
 builder.Services.AddAutoMapper(typeof(Program));
