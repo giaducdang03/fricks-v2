@@ -22,6 +22,12 @@ namespace Fricks.Service.BusinessModel.StoreModels
         [Required]
         public string TaxCode { get; set; } = "";
 
+        [MaxLength(20)]
+        public string? BankCode { get; set; }
+
+        [MaxLength(20)]
+        public string? AccountNumber { get; set; }
+
         public string? Image { get; set; }
     }
 }
