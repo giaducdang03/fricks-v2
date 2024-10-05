@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services;
@@ -36,12 +37,11 @@ namespace Fricks.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProduct([FromQuery] PaginationParameter paginationParameter,
-                                                       int brandId, int categoryId)
+        public async Task<IActionResult> GetAllProduct([FromQuery] PaginationParameter paginationParameter, [FromQuery] ProductFilter productFilter)
         {
             try
             {
-                var result = await _productService.GetAllProductPagination(brandId, categoryId, paginationParameter);
+                var result = await _productService.GetAllProductPagination(paginationParameter, productFilter);
                 var metadata = new
                 {
                     result.TotalCount,
@@ -56,27 +56,27 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        [HttpGet("get-all-store-pagin")]
-        public async Task<IActionResult> GetAllProductStore(int storeId, [FromQuery] PaginationParameter paginationParameter,
-                                                            int brandId, int categoryId)
-        {
-            try
-            {
-                var result = await _productService.GetAllProductByStoreIdPagination(storeId, brandId, categoryId, paginationParameter);
-                var metadata = new
-                {
-                    result.TotalCount,
-                    result.PageSize,
-                    result.CurrentPage,
-                    result.TotalPages,
-                    result.HasNext,
-                    result.HasPrevious
-                };
-                Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-                return Ok(result);
-            }
-            catch { throw; }
-        }
+        //[HttpGet("get-all-store-pagin")]
+        //public async Task<IActionResult> GetAllProductStore(int storeId, [FromQuery] PaginationParameter paginationParameter,
+        //                                                    int brandId, int categoryId)
+        //{
+        //    try
+        //    {
+        //        var result = await _productService.GetAllProductByStoreIdPagination(storeId, brandId, categoryId, paginationParameter);
+        //        var metadata = new
+        //        {
+        //            result.TotalCount,
+        //            result.PageSize,
+        //            result.CurrentPage,
+        //            result.TotalPages,
+        //            result.HasNext,
+        //            result.HasPrevious
+        //        };
+        //        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+        //        return Ok(result);
+        //    }
+        //    catch { throw; }
+        //}
 
         //[HttpPost]
         //public async Task<IActionResult> Add(ProductRegisterModel model)
