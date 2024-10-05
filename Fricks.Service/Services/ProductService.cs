@@ -4,6 +4,7 @@ using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
+using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
@@ -118,7 +119,8 @@ namespace Fricks.Service.Services
                             var newPrice = new ProductPrice
                             {
                                 UnitId = unitId,
-                                Price = price.Price
+                                Price = price.Price,
+                                CreateDate = CommonUtils.GetCurrentTime()
                             };
                             productPrice.Add(newPrice);
                         }

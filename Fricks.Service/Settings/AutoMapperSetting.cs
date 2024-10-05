@@ -11,6 +11,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Fricks.Service.BusinessModel.WalletModels;
 using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,13 @@ namespace Fricks.Service.Settings
             CreateMap<Pagination<Feedback>, Pagination<FeedbackModel>>().ConvertUsing<PaginationConverter<Feedback, FeedbackModel>>();
 
             CreateMap<CreateFeedbackModel, Feedback>();
+
+            CreateMap<Wallet, WalletModel>()
+                .ForMember(dest => dest.StoreName, otp => otp.MapFrom(src => src.Store.Name));
+
+            CreateMap<Repository.Entities.Transaction, TransactionModel>();
+            CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
+                .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
         }
     }
 

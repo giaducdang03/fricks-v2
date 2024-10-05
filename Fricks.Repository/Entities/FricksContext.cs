@@ -43,6 +43,10 @@ public partial class FricksContext : DbContext
 
     public virtual DbSet<Otp> Otps { get; set; }
 
+    public virtual DbSet<Wallet> Wallets { get; set; }
+
+    public virtual DbSet<Transaction> Transactions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
@@ -211,6 +215,8 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(250);
             entity.Property(e => e.TaxCode).HasMaxLength(13);
             entity.Property(e => e.PhoneNumber).HasMaxLength(10);
+            entity.Property(e => e.BankCode).HasMaxLength(20);
+            entity.Property(e => e.AccountNumber).HasMaxLength(20);
 
             entity.HasOne(d => d.Manager).WithMany(p => p.Stores)
                 .HasForeignKey(d => d.ManagerId)
@@ -271,6 +277,45 @@ public partial class FricksContext : DbContext
                .HasColumnType("datetime2");
 
             entity.Property(e => e.UpdateDate).HasColumnType("datetime2");
+        });
+
+        modelBuilder.Entity<Wallet>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Wallet");
+
+            entity.ToTable("Wallet");
+
+            entity.Property(e => e.CreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime2");
+
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime2");
+
+            entity.HasOne(d => d.Store).WithOne(p => p.Wallet)
+                .HasForeignKey<Wallet>(d => d.StoreId)
+                .HasConstraintName("FK__Wallet__Store__114A936A");
+
+            entity.Property(e => e.Balance).HasColumnType("decimal(18,2)");
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Transaction");
+
+            entity.ToTable("Transaction");
+
+            entity.Property(e => e.CreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime2");
+
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.TransactionDate).HasColumnType("datetime2");
+            entity.Property(e => e.TransactionType).HasMaxLength(50);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime2");
+
+            entity.HasOne(d => d.Wallet).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.WalletId)
+                .HasConstraintName("FK__Transaction__Wallet");
         });
 
         OnModelCreatingPartial(modelBuilder);
