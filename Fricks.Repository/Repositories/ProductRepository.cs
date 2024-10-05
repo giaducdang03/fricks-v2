@@ -65,15 +65,16 @@ namespace Fricks.Repository.Repositories
 
         public async Task<Pagination<Product>> GetProductPaging(PaginationParameter paginationParameter, ProductFilter productFilter)
         {
-            var query = _context.Products.Where(x => x.IsDeleted == false).AsQueryable();
+            var query = _context.Products.Include(x => x.Brand)
+                                    .Include(x => x.Category)
+                                    .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                    .Where(x => x.IsDeleted == false).AsQueryable();
 
             // apply filter
-            query = ApplyFiltering(query, productFilter);
+            query = ApplyProductFiltering(query, productFilter);
 
             var itemCount = await query.CountAsync();
-            var items = await query.Include(x => x.Brand).Include(x => x.Category)
-                                    .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
-                                    .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+            var items = await query.Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
                                     .AsNoTracking()
                                     .ToListAsync();
@@ -96,7 +97,7 @@ namespace Fricks.Repository.Repositories
             return result;
         }
 
-        private IQueryable<Product> ApplyFiltering(IQueryable<Product> query, ProductFilter filter)
+        private IQueryable<Product> ApplyProductFiltering(IQueryable<Product> query, ProductFilter filter)
         {
 
             if (filter.CategoryId != null)
@@ -119,12 +120,20 @@ namespace Fricks.Repository.Repositories
                 query = query.Where(s => s.UnsignName.Contains(filter.Search) || s.Name.Contains(filter.Search));
             }
 
+            if (filter.MinPrice != null && filter.MaxPrice != null)
+            {
+                query = query.Where(s => s.ProductPrices.All(x => x.Price >= filter.MinPrice && x.Price <= filter.MaxPrice));
+            }
+
             if (!string.IsNullOrWhiteSpace(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
                 {
                     case "name":
                         query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.UnsignName) : query.OrderBy(s => s.UnsignName);
+                        break;
+                    case "date":
+                        query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.CreateDate) : query.OrderBy(s => s.CreateDate);
                         break;
                     default:
                         query = query.OrderBy(s => s.Id);
