@@ -34,6 +34,11 @@ namespace Fricks.Service.Services
             }
 
             var addStore = _mapper.Map<Store>(store);
+            addStore.Wallet = new Wallet
+            {
+                Balance = 0
+            };
+
             var result = await _unitOfWork.StoreRepository.AddAsync(addStore);
             _unitOfWork.Save();
             return _mapper.Map<StoreModel>(result);

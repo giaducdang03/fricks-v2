@@ -33,6 +33,7 @@ namespace Fricks
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IWalletService, WalletService>();
 
             // add Middleware
             services.AddExceptionHandler<ExceptionHandlerMiddleware>();
