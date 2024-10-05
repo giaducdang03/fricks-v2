@@ -19,6 +19,10 @@ public partial class Store : BaseEntity
 
     public string? Description { get; set; }
 
+    public string? BankCode { get; set; }
+
+    public string? AccountNumber { get; set; }
+
     public virtual User? Manager { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

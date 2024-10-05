@@ -215,6 +215,8 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(250);
             entity.Property(e => e.TaxCode).HasMaxLength(13);
             entity.Property(e => e.PhoneNumber).HasMaxLength(10);
+            entity.Property(e => e.BankCode).HasMaxLength(20);
+            entity.Property(e => e.AccountNumber).HasMaxLength(20);
 
             entity.HasOne(d => d.Manager).WithMany(p => p.Stores)
                 .HasForeignKey(d => d.ManagerId)
