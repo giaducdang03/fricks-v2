@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.ProductModels;
@@ -18,6 +19,6 @@ namespace Fricks.Service.Services.Interface
         public Task<ProductModel> DeleteProduct(int id);
         public Task<ProductModel> GetProductById(int id);
         public Task<Pagination<ProductModel>> GetAllProductByStoreIdPagination(int storeId, int brandId, int categoryId, PaginationParameter paginationParameter);
-        public Task<Pagination<ProductModel>> GetAllProductPagination(int brandId, int categoryId, PaginationParameter paginationParameter);
+        public Task<Pagination<ProductModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter);
     }
 }
