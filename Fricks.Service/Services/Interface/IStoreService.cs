@@ -14,7 +14,8 @@ namespace Fricks.Service.Services.Interface
         public Task<StoreModel> UpdateStore(int id, StoreProcessModel Store);
         public Task<StoreModel> DeleteStore(int id);
         public Task<StoreModel> GetStoreById(int id);
-        public Task<Pagination<StoreModel>> GetStoreByManagerId(PaginationParameter paginationParameter, int id);
+        //public Task<Pagination<StoreModel>> GetStoreByManagerId(PaginationParameter paginationParameter, int id);
+        public Task<StoreModel> GetStoreByManagerId(int managerId);
         public Task<List<StoreModel>> GetAllStore();
         public Task<Pagination<StoreModel>> GetAllStorePagination(PaginationParameter paginationParameter);
     }

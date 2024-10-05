@@ -2,6 +2,7 @@
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.Services.Interface;
 using Fricks.ViewModels.ResponseModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -25,26 +26,26 @@ namespace Fricks.Controllers
             {
                 var result = await _storeService.GetStoreById(id);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch { throw; }
         }
 
         [HttpGet("manager/{userId}")]
-        public async Task<IActionResult> GetByManagerId(int userId, [FromQuery] PaginationParameter paginationParameter) 
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> GetByManagerId(int userId)
         {
             try
             {
-                var result = await _storeService.GetStoreByManagerId(paginationParameter, userId);
-                var metadata = new
+                var result = await _storeService.GetStoreByManagerId(userId);
+                if (result != null)
                 {
-                    result.TotalCount,
-                    result.PageSize,
-                    result.CurrentPage,
-                    result.TotalPages,
-                    result.HasNext,
-                    result.HasPrevious
-                };
-                Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-                return Ok(result);
+                    return Ok(result);
+                }
+                return NotFound(new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status404NotFound,
+                    Message = "Tài khoản này chưa quản lí cửa hàng nào"
+                });
             }
             catch (Exception ex)
             {
@@ -89,6 +90,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Add(StoreRegisterModel model)
         {
             try
@@ -109,6 +111,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "ADMIN,STORE")]
         public async Task<IActionResult> Update(int id, StoreProcessModel model)
         {
             try
@@ -133,6 +136,7 @@ namespace Fricks.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             try
