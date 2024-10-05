@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
+using Fricks.Service.BusinessModel.FeedbackModels;
 using Fricks.Service.BusinessModel.PostModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.BusinessModel.ProductPriceModels;
@@ -61,10 +62,14 @@ namespace Fricks.Service.Settings
             CreateMap<ProductPrice, ProductPriceProcessModel>().ReverseMap();
             CreateMap<ProductPrice, ProductPriceRegisterModel>().ReverseMap();
 
-            CreateMap<Post, PostModel>().ForMember(dest => dest.Product, otp => otp.MapFrom(src => src.Product));
+            CreateMap<Post, PostModel>().ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
+            CreateMap<Pagination<Post>, Pagination<PostModel>>().ConvertUsing<PaginationConverter<Post, PostModel>>();
             CreateMap<CreatePostModel, Post>();
 
             CreateMap<ProductModel, ItemData>().ReverseMap();
+
+            CreateMap<Feedback, FeedbackModel>()
+                .ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
         }
     }
 

@@ -20,6 +20,6 @@ namespace Fricks.Service.Services.Interface
 
         public Task<PostModel> GetPostByIdAsync(int id);
 
-        public Task<Pagination<PostModel>> GetPostPaginationAsync(PaginationParameter paginationParameter, PostFilter postFilter);
+        public Task<Pagination<PostModel>> GetPostPaginationAsync(PaginationParameter paginationParameter, PostFilter postFilter, string currentEmail);
     }
 }

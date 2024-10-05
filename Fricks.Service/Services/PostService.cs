@@ -2,8 +2,10 @@
 using Fricks.Repository.Commons;
 using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.PostModels;
+using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services.Interface;
 using System;
@@ -60,14 +62,38 @@ namespace Fricks.Service.Services
             return null;
         }
 
-        public async Task<Pagination<PostModel>> GetPostPaginationAsync(PaginationParameter paginationParameter, PostFilter postFilter)
+        public async Task<Pagination<PostModel>> GetPostPaginationAsync(PaginationParameter paginationParameter, 
+            PostFilter postFilter, string currentEmail)
         {
-            var posts = await _unitOfWork.PostRepository.GetPostPaging(paginationParameter, postFilter);
-            var postModels = _mapper.Map<List<PostModel>>(posts);
-            return new Pagination<PostModel>(postModels,
-                posts.TotalCount,
-                posts.CurrentPage,
-                posts.PageSize);
+            if (currentEmail == null)
+            {
+                var posts = await _unitOfWork.PostRepository.GetPostPaging(paginationParameter, postFilter);
+                return _mapper.Map<Pagination<PostModel>>(posts);
+            }
+            else
+            {
+                var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(currentEmail);
+                if (currentUser == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
+                if (currentUser.Role.ToUpper() == RoleEnums.STORE.ToString().ToUpper())
+                {
+                    var currentStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(currentUser.Id);
+                    if (currentStore == null)
+                    {
+                        throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                    }
+                    postFilter.StoreId = currentStore.Id;
+                    var posts = await _unitOfWork.PostRepository.GetPostPaging(paginationParameter, postFilter);
+                    return _mapper.Map<Pagination<PostModel>>(posts);
+                }
+                else
+                {
+                    var posts = await _unitOfWork.PostRepository.GetPostPaging(paginationParameter, postFilter);
+                    return _mapper.Map<Pagination<PostModel>>(posts);
+                }
+            }
         }
 
         public async Task<PostModel> UpdatePostAsync(UpdatePostModel updatePostModel)
