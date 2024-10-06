@@ -81,6 +81,14 @@ namespace Fricks.Service.Settings
             CreateMap<Repository.Entities.Transaction, TransactionModel>();
             CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
                 .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
+
+            // product
+            CreateMap<Product, ProductListModel>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()));
+            CreateMap<Pagination<Product>, Pagination<ProductListModel>>().ConvertUsing<PaginationConverter<Product, ProductListModel>>();
         }
     }
 
