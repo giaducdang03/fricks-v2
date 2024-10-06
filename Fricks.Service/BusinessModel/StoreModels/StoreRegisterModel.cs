@@ -26,7 +26,11 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string? BankCode { get; set; }
 
         [MaxLength(20)]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Tài khoản ngân hàng chỉ có thể chứa số")]
         public string? AccountNumber { get; set; }
+
+        [MaxLength(100)]
+        public string? AccountName { get; set; }
 
         public string? Image { get; set; }
     }
