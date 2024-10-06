@@ -190,12 +190,12 @@ namespace Fricks.Service.Services
             return _mapper.Map<Pagination<ProductModel>>(result);
         }
 
-        public async Task<Pagination<ProductModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter, string currentEmail)
+        public async Task<Pagination<ProductListModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter, string currentEmail)
         {
             if (currentEmail == null)
             {
                 var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
-                return _mapper.Map<Pagination<ProductModel>>(result);
+                return _mapper.Map<Pagination<ProductListModel>>(result);
             }
             else
             {
@@ -213,12 +213,12 @@ namespace Fricks.Service.Services
                     }
                     productFilter.StoreId = currentStore.Id;
                     var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
-                    return _mapper.Map<Pagination<ProductModel>>(result);
+                    return _mapper.Map<Pagination<ProductListModel>>(result);
                 }
                 else
                 {
                     var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
-                    return _mapper.Map<Pagination<ProductModel>>(result);
+                    return _mapper.Map<Pagination<ProductListModel>>(result);
                 }
             }
         }
