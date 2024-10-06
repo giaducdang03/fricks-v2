@@ -15,5 +15,7 @@ namespace Fricks.Repository.Entities
         public virtual Store? Store { get; set; }
 
         public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+        public virtual ICollection<Withdraw> Withdraws { get; set; } = new List<Withdraw>();
     }
 }

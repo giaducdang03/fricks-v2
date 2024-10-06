@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fricks.Repository.Migrations
 {
     [DbContext(typeof(FricksContext))]
-    partial class FricksContextModelSnapshot : ModelSnapshot
+    [Migration("20241006060806_AddAccountNameStore")]
+    partial class AddAccountNameStore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -849,69 +852,6 @@ namespace Fricks.Repository.Migrations
                     b.ToTable("Wallet", (string)null);
                 });
 
-            modelBuilder.Entity("Fricks.Repository.Entities.Withdraw", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ConfirmBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("ConfirmDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("ImageTransfer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Requester")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("TransferDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("WalletId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id")
-                        .HasName("PK__Withdraw");
-
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("Withdraw", (string)null);
-                });
-
             modelBuilder.Entity("Fricks.Repository.Entities.FavoriteProduct", b =>
                 {
                     b.HasOne("Fricks.Repository.Entities.Product", "Product")
@@ -1073,18 +1013,6 @@ namespace Fricks.Repository.Migrations
                     b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("Fricks.Repository.Entities.Withdraw", b =>
-                {
-                    b.HasOne("Fricks.Repository.Entities.Wallet", "Wallet")
-                        .WithMany("Withdraws")
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK__Withdraw__Wallet");
-
-                    b.Navigation("Wallet");
-                });
-
             modelBuilder.Entity("Fricks.Repository.Entities.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -1146,8 +1074,6 @@ namespace Fricks.Repository.Migrations
             modelBuilder.Entity("Fricks.Repository.Entities.Wallet", b =>
                 {
                     b.Navigation("Transactions");
-
-                    b.Navigation("Withdraws");
                 });
 #pragma warning restore 612, 618
         }
