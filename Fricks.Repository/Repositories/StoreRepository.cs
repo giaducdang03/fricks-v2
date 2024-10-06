@@ -18,6 +18,11 @@ namespace Fricks.Repository.Repositories
             _context = context;
         }
 
+        public async Task<Store> GetStoreByIdAsync(int id)
+        {
+            return await _context.Stores.Include(x => x.Manager).FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
+        }
+
         public async Task<Store> GetStoreByManagerId(int managerId)
         {
             return await _context.Stores.FirstOrDefaultAsync(x => x.ManagerId == managerId && x.IsDeleted == false);

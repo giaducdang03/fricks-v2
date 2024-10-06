@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.StoreModels;
@@ -27,7 +28,15 @@ namespace Fricks.Service.Services
         public async Task<StoreModel> AddStore(StoreRegisterModel store)
         {
             // check manager
-            var existStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(store.ManagerId);
+            var storeManager = await _unitOfWork.UsersRepository.GetUserByEmail(store.ManagerEmail);
+            if (storeManager == null || 
+                storeManager.IsDeleted == true ||
+                storeManager.Role.ToString().ToUpper() != RoleEnums.STORE.ToString().ToUpper())
+            {
+                throw new Exception($"Tài khoản {store.ManagerEmail} không tồn tại hoặc không phải tài khoản cửa hàng");
+            }
+
+            var existStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(storeManager.Id);
             if (existStore != null)
             {
                 throw new Exception("Tài khoản này đã có cửa hàng vui lòng chọn tài khoản khác");
@@ -70,7 +79,7 @@ namespace Fricks.Service.Services
 
         public async Task<StoreModel> GetStoreById(int id)
         {
-            var result = await _unitOfWork.StoreRepository.GetByIdAsync(id);
+            var result = await _unitOfWork.StoreRepository.GetStoreByIdAsync(id);
             return _mapper.Map<StoreModel>(result);
         }
 
@@ -79,12 +88,6 @@ namespace Fricks.Service.Services
             var store = await _unitOfWork.StoreRepository.GetStoreByManagerId(managerId);
             return _mapper.Map<StoreModel>(store);
         }
-
-        //public async Task<Pagination<StoreModel>> GetStoreByManagerId(PaginationParameter paginationParameter, int id)
-        //{
-        //    var result = await _unitOfWork.StoreRepository.GetStoreByManagerIdPaging(paginationParameter, id);
-        //    return _mapper.Map<Pagination<StoreModel>>(result);
-        //}
 
         public async Task<StoreModel> UpdateStore(int id, StoreProcessModel storeModel)
         {

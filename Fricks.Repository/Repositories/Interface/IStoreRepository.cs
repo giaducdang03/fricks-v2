@@ -13,5 +13,6 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<Pagination<Store>> GetStorePaging(PaginationParameter paginationParameter);
         public Task<Pagination<Store>> GetStoreByManagerIdPaging(PaginationParameter paginationParameter, int id);
         public Task<Store> GetStoreByManagerId(int managerId);
+        public Task<Store> GetStoreByIdAsync(int id);
     }
 }
