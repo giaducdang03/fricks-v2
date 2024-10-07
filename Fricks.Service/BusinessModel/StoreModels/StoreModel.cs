@@ -10,8 +10,6 @@ namespace Fricks.Service.BusinessModel.StoreModels
 {
     public class StoreModel : BaseEntity
     {
-        public int? Id { get; set; }
-
         public int? ManagerId { get; set; }
 
         public string? Name { get; set; }
@@ -27,5 +25,11 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string? Description { get; set; }
 
         public string? ManagerEmail {  get; set; }
+
+        public string? BankCode { get; set; }
+
+        public string? AccountNumber { get; set; }
+
+        public string? AccountName { get; set; }
     }
 }

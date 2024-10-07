@@ -554,9 +554,21 @@ namespace Fricks.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccountName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("AccountNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Address")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("BankCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -599,6 +611,63 @@ namespace Fricks.Repository.Migrations
                     b.HasIndex("ManagerId");
 
                     b.ToTable("Store", (string)null);
+                });
+
+            modelBuilder.Entity("Fricks.Repository.Entities.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("WalletId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Transaction");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("Transaction", (string)null);
                 });
 
             modelBuilder.Entity("Fricks.Repository.Entities.User", b =>
@@ -743,6 +812,109 @@ namespace Fricks.Repository.Migrations
                     b.ToTable("Voucher", (string)null);
                 });
 
+            modelBuilder.Entity("Fricks.Repository.Entities.Wallet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Wallet");
+
+                    b.HasIndex("StoreId")
+                        .IsUnique()
+                        .HasFilter("[StoreId] IS NOT NULL");
+
+                    b.ToTable("Wallet", (string)null);
+                });
+
+            modelBuilder.Entity("Fricks.Repository.Entities.Withdraw", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ConfirmBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime>("ConfirmDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("ImageTransfer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Requester")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("WalletId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Withdraw");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("Withdraw", (string)null);
+                });
+
             modelBuilder.Entity("Fricks.Repository.Entities.FavoriteProduct", b =>
                 {
                     b.HasOne("Fricks.Repository.Entities.Product", "Product")
@@ -872,6 +1044,18 @@ namespace Fricks.Repository.Migrations
                     b.Navigation("Manager");
                 });
 
+            modelBuilder.Entity("Fricks.Repository.Entities.Transaction", b =>
+                {
+                    b.HasOne("Fricks.Repository.Entities.Wallet", "Wallet")
+                        .WithMany("Transactions")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Transaction__Wallet");
+
+                    b.Navigation("Wallet");
+                });
+
             modelBuilder.Entity("Fricks.Repository.Entities.Voucher", b =>
                 {
                     b.HasOne("Fricks.Repository.Entities.Store", "Store")
@@ -880,6 +1064,28 @@ namespace Fricks.Repository.Migrations
                         .HasConstraintName("FK__Voucher__StoreId__6E01572D");
 
                     b.Navigation("Store");
+                });
+
+            modelBuilder.Entity("Fricks.Repository.Entities.Wallet", b =>
+                {
+                    b.HasOne("Fricks.Repository.Entities.Store", "Store")
+                        .WithOne("Wallet")
+                        .HasForeignKey("Fricks.Repository.Entities.Wallet", "StoreId")
+                        .HasConstraintName("FK__Wallet__Store__114A936A");
+
+                    b.Navigation("Store");
+                });
+
+            modelBuilder.Entity("Fricks.Repository.Entities.Withdraw", b =>
+                {
+                    b.HasOne("Fricks.Repository.Entities.Wallet", "Wallet")
+                        .WithMany("Withdraws")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Withdraw__Wallet");
+
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("Fricks.Repository.Entities.Brand", b =>
@@ -922,6 +1128,8 @@ namespace Fricks.Repository.Migrations
                     b.Navigation("Products");
 
                     b.Navigation("Vouchers");
+
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("Fricks.Repository.Entities.User", b =>
@@ -936,6 +1144,13 @@ namespace Fricks.Repository.Migrations
             modelBuilder.Entity("Fricks.Repository.Entities.Voucher", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Fricks.Repository.Entities.Wallet", b =>
+                {
+                    b.Navigation("Transactions");
+
+                    b.Navigation("Withdraws");
                 });
 #pragma warning restore 612, 618
         }

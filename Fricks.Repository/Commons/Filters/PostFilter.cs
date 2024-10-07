@@ -11,5 +11,7 @@ namespace Fricks.Repository.Commons.Filters
         public string? Title { get; set; }
 
         public int? ProductId { get; set; }
+
+        public int? StoreId { get; set; }
     }
 }

@@ -32,6 +32,8 @@ namespace Fricks
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IOrderDetailService, OrderDetailService>();
             services.AddScoped<IOrderService, OrderService>();
 

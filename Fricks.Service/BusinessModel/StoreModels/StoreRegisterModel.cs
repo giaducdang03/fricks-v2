@@ -11,7 +11,7 @@ namespace Fricks.Service.BusinessModel.StoreModels
     public class StoreRegisterModel
     {
         [Required]
-        public int ManagerId { get; set; }
+        public string ManagerEmail { get; set; } = "";
 
         [Required]
         public string Name { get; set; } = "";
@@ -20,7 +20,25 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string Address { get; set; } = "";
 
         [Required]
+        [DataType(DataType.PhoneNumber, ErrorMessage = "Số điện thoại không hợp lệ.")]
+        [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Số điện thoại phải có 10 số.")]
+        public string PhoneNumber { get; set; } = "";
+
+        [Required]
         public string TaxCode { get; set; } = "";
+
+        [MaxLength(20)]
+        [Required]
+        public string? BankCode { get; set; }
+
+        [Required]
+        [MaxLength(20)]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Tài khoản ngân hàng chỉ có thể chứa số")]
+        public string? AccountNumber { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string? AccountName { get; set; }
 
         public string? Image { get; set; }
     }

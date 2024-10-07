@@ -19,6 +19,7 @@ namespace Fricks.Service.Services.Interface
         public Task<ProductModel> DeleteProduct(int id);
         public Task<ProductModel> GetProductById(int id);
         public Task<Pagination<ProductModel>> GetAllProductByStoreIdPagination(int storeId, int brandId, int categoryId, PaginationParameter paginationParameter);
-        public Task<Pagination<ProductModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter);
+        public Task<Pagination<ProductListModel>> GetAllProductPagination(PaginationParameter paginationParameter, 
+            ProductFilter productFilter, string currentEmail);
     }
 }

@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
+using Fricks.Service.BusinessModel.FeedbackModels;
 using Fricks.Service.BusinessModel.OrderDetailModels;
 using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.PostModels;
@@ -12,6 +13,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Fricks.Service.BusinessModel.WalletModels;
 using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
@@ -37,7 +39,10 @@ namespace Fricks.Service.Settings
             CreateMap<CategoryProcessModel, Category>().ReverseMap();
             CreateMap<Pagination<Category>, Pagination<CategoryModel>>().ConvertUsing<PaginationConverter<Category, CategoryModel>>();
 
-            CreateMap<FavoriteProduct, FavoriteProductModel>().ReverseMap();
+            CreateMap<FavoriteProduct, FavoriteProductModel>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Product.Category.Name));
             CreateMap<FavoriteProduct, FavoriteProductProcessModel>().ReverseMap();
             CreateMap<Pagination<FavoriteProduct>, Pagination<FavoriteProductModel>>().ConvertUsing<PaginationConverter<FavoriteProduct, FavoriteProductModel>>();
 
@@ -60,10 +65,35 @@ namespace Fricks.Service.Settings
             CreateMap<ProductPrice, ProductPriceProcessModel>().ReverseMap();
             CreateMap<ProductPrice, ProductPriceRegisterModel>().ReverseMap();
 
-            CreateMap<Post, PostModel>().ForMember(dest => dest.Product, otp => otp.MapFrom(src => src.Product));
+            CreateMap<Post, PostModel>().ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
+            CreateMap<Pagination<Post>, Pagination<PostModel>>().ConvertUsing<PaginationConverter<Post, PostModel>>();
             CreateMap<CreatePostModel, Post>();
 
             CreateMap<ProductModel, ItemData>().ReverseMap();
+
+            CreateMap<Feedback, FeedbackModel>()
+                .ForMember(dest => dest.ProductName, otp => otp.MapFrom(src => src.Product.Name));
+            CreateMap<Pagination<Feedback>, Pagination<FeedbackModel>>().ConvertUsing<PaginationConverter<Feedback, FeedbackModel>>();
+
+            CreateMap<CreateFeedbackModel, Feedback>();
+
+            // product
+            CreateMap<Product, ProductListModel>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()));
+            CreateMap<Pagination<Product>, Pagination<ProductListModel>>().ConvertUsing<PaginationConverter<Product, ProductListModel>>();
+
+            // wallet
+            CreateMap<Wallet, WalletModel>()
+                .ForMember(dest => dest.StoreName, otp => otp.MapFrom(src => src.Store.Name));
+
+            CreateMap<Repository.Entities.Transaction, TransactionModel>();
+            CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
+                .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
+
+            CreateMap<Withdraw, WithdrawModel>();
             
             CreateMap<OrderDetail, OrderDetailModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailProcessModel>()

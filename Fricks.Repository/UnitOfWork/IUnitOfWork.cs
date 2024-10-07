@@ -20,6 +20,11 @@ namespace Fricks.Repository.UnitOfWork
         IProductUnitRepository ProductUnitRepository { get; }
         IProductPriceRepository ProductPriceRepository { get; }
         IPostRepository PostRepository { get; }
+        IWalletRepository WalletRepository { get; }
+        ITransactionRepository TransactionRepository { get; }
+        IWithdrawRepository WithdrawRepository { get; }
+
+        IFeedbackRepository FeedbackRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
         IOrderRepository OrderRepository { get; }   
         int Save();

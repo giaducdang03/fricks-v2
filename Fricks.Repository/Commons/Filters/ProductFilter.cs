@@ -13,5 +13,9 @@ namespace Fricks.Repository.Commons.Filters
         public int? BrandId { get; set; }
 
         public int? CategoryId { get; set; }
+
+        public int? MinPrice { get; set; }
+
+        public int? MaxPrice { get; set; }
     }
 }

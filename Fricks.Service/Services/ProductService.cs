@@ -4,6 +4,7 @@ using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
+using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
@@ -68,7 +69,7 @@ namespace Fricks.Service.Services
 
             // check product
             var existProduct = await _unitOfWork.ProductRepository.GetProductBySKUAsync(productModel.Sku);
-            if (existProduct != null) 
+            if (existProduct != null)
             {
                 throw new Exception("SKU không được trùng");
             }
@@ -118,7 +119,8 @@ namespace Fricks.Service.Services
                             var newPrice = new ProductPrice
                             {
                                 UnitId = unitId,
-                                Price = price.Price
+                                Price = price.Price,
+                                CreateDate = CommonUtils.GetCurrentTime()
                             };
                             productPrice.Add(newPrice);
                         }
@@ -188,12 +190,37 @@ namespace Fricks.Service.Services
             return _mapper.Map<Pagination<ProductModel>>(result);
         }
 
-        public async Task<Pagination<ProductModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter)
+        public async Task<Pagination<ProductListModel>> GetAllProductPagination(PaginationParameter paginationParameter, ProductFilter productFilter, string currentEmail)
         {
-            //var brand = await _unitOfWork.BrandRepository.GetByIdAsync(brandId);
-            //var category = await _unitOfWork.CategoryRepository.GetByIdAsync(categoryId);
-            var result = await _unitOfWork.ProductRepository.GetProductPaging(paginationParameter, productFilter);
-            return _mapper.Map<Pagination<ProductModel>>(result);
+            if (currentEmail == null)
+            {
+                var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
+                return _mapper.Map<Pagination<ProductListModel>>(result);
+            }
+            else
+            {
+                var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(currentEmail);
+                if (currentUser == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
+                if (currentUser.Role.ToUpper() == RoleEnums.STORE.ToString().ToUpper())
+                {
+                    var currentStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(currentUser.Id);
+                    if (currentStore == null)
+                    {
+                        throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                    }
+                    productFilter.StoreId = currentStore.Id;
+                    var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
+                    return _mapper.Map<Pagination<ProductListModel>>(result);
+                }
+                else
+                {
+                    var result = await _unitOfWork.ProductRepository.GetProductPagingAsync(paginationParameter, productFilter);
+                    return _mapper.Map<Pagination<ProductListModel>>(result);
+                }
+            }
         }
 
         public async Task<ProductModel> GetProductById(int id)

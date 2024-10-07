@@ -26,6 +26,11 @@ namespace Fricks.Repository.UnitOfWork
         private IOrderDetailRepository _orderDetailRepository;
         private IOrderRepository _orderRepository;
         private IPostRepository _postRepository;
+        private IFeedbackRepository _feedbackRepository;
+        private IWalletRepository _walletRepository;
+        private ITransactionRepository _transactionRepository;
+        private IWithdrawRepository _withdrawRepository;
+
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
@@ -108,6 +113,38 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _postRepository ??= new PostRepository(_context);
+            }
+        }
+
+        public IFeedbackRepository FeedbackRepository
+        {
+            get
+            {
+                return _feedbackRepository ??= new FeedbackRepository(_context);
+            }
+        }
+
+        public IWalletRepository WalletRepository
+        {
+            get
+            {
+                return _walletRepository ??= new WalletRepository(_context);
+            }
+        }
+
+        public ITransactionRepository TransactionRepository
+        {
+            get
+            {
+                return _transactionRepository ??= new TransactionRepository(_context);
+            }
+        }
+
+        public IWithdrawRepository WithdrawRepository
+        {
+            get
+            {
+                return _withdrawRepository ??= new WithdrawRepository(_context);
             }
         }
 
