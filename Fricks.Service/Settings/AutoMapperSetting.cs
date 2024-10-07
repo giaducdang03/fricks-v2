@@ -68,6 +68,7 @@ namespace Fricks.Service.Settings
             CreateMap<OrderDetail, OrderDetailModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailProcessModel>()
                 .ForMember(dest => dest.ProductName, opt => opt.Ignore());
+            CreateMap<OrderDetailProcessModel, OrderDetail>();
 
             CreateMap<Order, OrderModel>().ReverseMap();
             CreateMap<Order, OrderProcessModel>().ReverseMap();
