@@ -11,7 +11,7 @@ namespace Fricks.Service.BusinessModel.OrderModels
     {
         public int Id { get; set; }
 
-        public long OrderCode { get; set; }
+        public string? Code { get; set; }
 
         public int? ShipFee { get; set; }
 

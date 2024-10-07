@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Fricks.Repository.Enum
 {
-    public enum PaymentStatus
+    public enum PaymentMethod
     {
-        PENDING,
-        PAID,
-        FAILED,
-        PARTIAL,
-        FULL
+        VIETQR, COD
     }
 }

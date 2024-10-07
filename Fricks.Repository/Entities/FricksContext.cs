@@ -105,7 +105,7 @@ public partial class FricksContext : DbContext
 
             entity.ToTable("Order");
 
-            entity.Property(e => e.Code).HasMaxLength(1);
+            entity.Property(e => e.Code).HasMaxLength(60);
             entity.Property(e => e.CustomerAddress).HasMaxLength(250);
             entity.Property(e => e.CustomerEmail).HasMaxLength(250);
             entity.Property(e => e.CustomerName).HasMaxLength(250);

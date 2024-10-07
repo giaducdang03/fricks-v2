@@ -63,6 +63,12 @@ namespace Fricks.Repository.Repositories
             return result;
         }
 
+        public async Task<List<Product>> GetAllProductsAsync()
+        {
+            return await _context.Products.Include(x => x.Brand).Include(x => x.Category)
+                                          .Include(x => x.ProductPrices).ThenInclude(x => x.Unit).ToListAsync();
+        }
+
         public async Task<Pagination<Product>> GetProductPagingAsync(PaginationParameter paginationParameter, ProductFilter productFilter)
         {
             var query = _context.Products.Include(x => x.Store)

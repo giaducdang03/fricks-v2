@@ -7,8 +7,6 @@ public partial class Order : BaseEntity
 {
     public string? Code { get; set; }
 
-    public long OrderCode { get; set; }
-
     public int? ShipFee { get; set; }
 
     public int? Discount { get; set; }

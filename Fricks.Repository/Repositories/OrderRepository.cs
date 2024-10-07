@@ -29,5 +29,10 @@ namespace Fricks.Repository.Repositories
             var result = new Pagination<Order>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
             return result;
         }
+
+        public async Task<Order> GetOrderById(int id)
+        {
+            return await _context.Orders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Settings;
-using Fricks.Service.Utils;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
@@ -61,7 +61,7 @@ namespace Fricks.Service.Services
             PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
             var listProduct = _mapper.Map<List<ItemData>>(order.OrderDetails);
             PaymentData paymentData = new PaymentData(
-                order.OrderCode,
+                order.Id,
                 totalPrice,
                 $"Thanh toán đơn hàng",
                 listProduct,

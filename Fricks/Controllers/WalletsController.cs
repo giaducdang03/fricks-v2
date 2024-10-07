@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace Fricks.Controllers
 {
@@ -46,7 +47,7 @@ namespace Fricks.Controllers
 
                 return BadRequest(new ResponseModel
                 {
-                    HttpCode = 400,
+                    HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
                 });
             }
