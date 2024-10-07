@@ -1,4 +1,6 @@
 ﻿using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.OrderDetailModels;
+using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Net.payOS.Types;
 using System;
@@ -13,5 +15,6 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice);
         public Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice, Order order);
+        public Task<CreatePaymentResult> CreatePaymentLinkOrder(int totalPrice, Order order);
     }
 }

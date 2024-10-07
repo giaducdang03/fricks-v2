@@ -7,29 +7,17 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.OrderModels
 {
-    public class OrderModel
+    public class OrderProcessModel
     {
-        public int Id { get; set; }
-
-        public long OrderCode { get; set; }
-
         public int? ShipFee { get; set; }
 
         public int? Discount { get; set; }
 
-        public int? Total { get; set; }
+        public int Total { get; set; }
 
-        public string? Status { get; set; }
+        public string? PaymentMethod { get; set; } //Dựa vào cái này để chọn flow thanh toán
 
-        public string? PaymentStatus { get; set; }
-
-        public DateTime? PaymentDate { get; set; }
-
-        public DateTime? CreatedDate { get; set; }
-
-        public string? PaymentMethod { get; set; }
-
-        public int? UserId { get; set; }
+        public int? UserId { get; set; } //Truyền khách hàng mua dô
 
         public string? CustomerName { get; set; }
 
@@ -39,10 +27,10 @@ namespace Fricks.Service.BusinessModel.OrderModels
 
         public string? CustomerPhone { get; set; }
 
-        public int? StoreId { get; set; }
+        public int? StoreId { get; set; } //Truyền store dô
 
         public int? VoucherId { get; set; }
-        
-        public List<OrderDetailModel>? OrderDetails { get; set; }
+
+        public List<OrderDetailProcessModel>? OrderDetails { get; set; }
     }
 }

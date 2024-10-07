@@ -1,4 +1,6 @@
-﻿using Fricks.Repository.Entities;
+﻿using AutoMapper;
+using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Settings;
@@ -18,9 +20,11 @@ namespace Fricks.Service.Services
     public class PaymentService : IPaymentService
     {
         private readonly PayOSSetting _payOSSetting;
-        public PaymentService(IOptions<PayOSSetting> payOSSetting)
+        private readonly IMapper _mapper;
+        public PaymentService(IOptions<PayOSSetting> payOSSetting, IMapper mapper)
         {
             _payOSSetting = payOSSetting.Value;
+            _mapper = mapper;
         }
         public async Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice)
         {
@@ -44,6 +48,22 @@ namespace Fricks.Service.Services
                 (new Random()).NextInt64(0, GetRangeLong()),
                 totalPrice,
                 $"Thanh toán đơn hàng {order.Code}",
+                listProduct,
+                _payOSSetting.ReturnUrl,
+                _payOSSetting.CancelUrl
+            );
+
+            return await payOs.createPaymentLink(paymentData);
+        }
+
+        public async Task<CreatePaymentResult> CreatePaymentLinkOrder(int totalPrice, Order order)
+        {
+            PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
+            var listProduct = _mapper.Map<List<ItemData>>(order.OrderDetails);
+            PaymentData paymentData = new PaymentData(
+                order.OrderCode,
+                totalPrice,
+                $"Thanh toán đơn hàng",
                 listProduct,
                 _payOSSetting.ReturnUrl,
                 _payOSSetting.CancelUrl
