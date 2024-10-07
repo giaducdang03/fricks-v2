@@ -27,6 +27,7 @@ namespace Fricks.Repository.UnitOfWork
         private IFeedbackRepository _feedbackRepository;
         private IWalletRepository _walletRepository;
         private ITransactionRepository _transactionRepository;
+        private IWithdrawRepository _withdrawRepository;
 
         public UnitOfWork(FricksContext context) 
         { 
@@ -134,6 +135,14 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _transactionRepository ??= new TransactionRepository(_context);
+            }
+        }
+
+        public IWithdrawRepository WithdrawRepository
+        {
+            get
+            {
+                return _withdrawRepository ??= new WithdrawRepository(_context);
             }
         }
 

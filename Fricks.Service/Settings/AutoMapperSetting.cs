@@ -75,13 +75,6 @@ namespace Fricks.Service.Settings
 
             CreateMap<CreateFeedbackModel, Feedback>();
 
-            CreateMap<Wallet, WalletModel>()
-                .ForMember(dest => dest.StoreName, otp => otp.MapFrom(src => src.Store.Name));
-
-            CreateMap<Repository.Entities.Transaction, TransactionModel>();
-            CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
-                .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
-
             // product
             CreateMap<Product, ProductListModel>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
@@ -89,6 +82,16 @@ namespace Fricks.Service.Settings
                 .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()));
             CreateMap<Pagination<Product>, Pagination<ProductListModel>>().ConvertUsing<PaginationConverter<Product, ProductListModel>>();
+
+            // wallet
+            CreateMap<Wallet, WalletModel>()
+                .ForMember(dest => dest.StoreName, otp => otp.MapFrom(src => src.Store.Name));
+
+            CreateMap<Repository.Entities.Transaction, TransactionModel>();
+            CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
+                .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
+
+            CreateMap<Withdraw, WithdrawModel>();
         }
     }
 

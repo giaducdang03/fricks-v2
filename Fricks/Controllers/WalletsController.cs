@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Service.BusinessModel.WalletModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
 using Fricks.ViewModels.ResponseModels;
@@ -87,6 +88,83 @@ namespace Fricks.Controllers
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
                 });
+            }
+        }
+
+        [HttpPost("withdraw/request")]
+        [Authorize(Roles = "STORE")]
+        public async Task<IActionResult> RequestWithdrawStore(CreateWithdrawModel createWithdrawModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var currentEmail = _claimsService.GetCurrentUserEmail;
+                    var result = await _walletService.RequestWithdrawStoreAsync(createWithdrawModel, currentEmail);
+                    return Ok(result);
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPut("withdraw/confirm")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> ConfirmWithdrawStore(UpdateWithdrawModel withdrawModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var currentEmail = _claimsService.GetCurrentUserEmail;
+                    var result = await _walletService.ConfirmWithdrawStoreAsync(withdrawModel, currentEmail);
+                    return Ok(result);
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+        [HttpPut("withdraw/process")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> ProcessWithdrawStore(UpdateWithdrawModel withdrawModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var result = await _walletService.ProcessWithdrawStoreAsync(withdrawModel);
+                    return Ok(result);
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
             }
         }
 
