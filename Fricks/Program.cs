@@ -112,10 +112,10 @@ builder.Services.AddCors(options =>
 
 // ===================== FOR LOCAL DB =======================
 
-builder.Services.AddDbContext<FricksContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FricksLocal"));
-});
+//builder.Services.AddDbContext<FricksContext>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("FricksLocal"));
+//});
 
 // ==========================================================
 
@@ -123,18 +123,18 @@ builder.Services.AddDbContext<FricksContext>(options =>
 
 // ===================== FOR AZURE DB =======================
 
-//var connection = String.Empty;
-//if (builder.Environment.IsDevelopment())
-//{
-//    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-//}
-//else
-//{
-//    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
-//}
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+}
+else
+{
+    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+}
 
-//builder.Services.AddDbContext<FricksContext>(options =>
-// options.UseSqlServer(connection));
+builder.Services.AddDbContext<FricksContext>(options =>
+ options.UseSqlServer(connection));
 
 // ==================== NO EDIT OR REMOVE COMMENT =======================
 
