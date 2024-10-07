@@ -22,6 +22,7 @@ namespace Fricks.Repository.UnitOfWork
         IPostRepository PostRepository { get; }
         IWalletRepository WalletRepository { get; }
         ITransactionRepository TransactionRepository { get; }
+        IWithdrawRepository WithdrawRepository { get; }
 
         IFeedbackRepository FeedbackRepository { get; }
         int Save();
