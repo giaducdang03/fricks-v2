@@ -1,5 +1,6 @@
 ﻿using Fricks.Repository.Entities;
 using Fricks.Service.BusinessModel.ProductModels;
+using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.UserModels;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Fricks.Service.BusinessModel.FavoriteProductModels
         public string BrandName { get; set; } = "";
         public string CategoryName { get; set; } = "";
         public string StoreName { get; set; } = "";
+        public virtual ICollection<ProductPriceModel> ProductPrices { get; set; } = new List<ProductPriceModel>();
 
         //public ProductModel? Product { get; set; }
         //public UserModel? User { get; set; }
