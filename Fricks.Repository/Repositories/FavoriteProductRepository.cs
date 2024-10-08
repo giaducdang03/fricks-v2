@@ -25,6 +25,7 @@ namespace Fricks.Repository.Repositories
                                         .Include(x => x.Product)
                                         .Include(x => x.Product.Brand)
                                         .Include(x => x.Product.Category)
+                                        .Include(x => x.Product.Store)
                                     .Where(x => x.UserId.Equals(userid))
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)

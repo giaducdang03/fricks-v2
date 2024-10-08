@@ -16,6 +16,7 @@ namespace Fricks.Service.BusinessModel.FavoriteProductModels
         public string ProductName { get; set; } = "";
         public string BrandName { get; set; } = "";
         public string CategoryName { get; set; } = "";
+        public string StoreName { get; set; } = "";
 
         //public ProductModel? Product { get; set; }
         //public UserModel? User { get; set; }
