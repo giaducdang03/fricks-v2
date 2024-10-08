@@ -5,7 +5,7 @@ using Net.payOS.Types;
 
 namespace Fricks.Controllers
 {
-    [Route("api/payment")]
+    [Route("api/payments")]
     [ApiController]
     public class PaymentController : ControllerBase
     {

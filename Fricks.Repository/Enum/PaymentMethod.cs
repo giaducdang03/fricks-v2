@@ -8,6 +8,8 @@ namespace Fricks.Repository.Enum
 {
     public enum PaymentMethod
     {
-        VIETQR, COD
+        VIETQR, 
+        VNPAY, 
+        COD
     }
 }

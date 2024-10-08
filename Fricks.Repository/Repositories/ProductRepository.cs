@@ -65,7 +65,7 @@ namespace Fricks.Repository.Repositories
 
         public async Task<List<Product>> GetAllProductsAsync()
         {
-            return await _context.Products.Include(x => x.Brand).Include(x => x.Category)
+            return await _context.Products.Include(x => x.Brand).Include(x => x.Category).Include(x => x.Store)
                                           .Include(x => x.ProductPrices).ThenInclude(x => x.Unit).ToListAsync();
         }
 

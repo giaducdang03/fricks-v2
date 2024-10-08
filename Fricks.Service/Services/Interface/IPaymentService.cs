@@ -2,6 +2,7 @@
 using Fricks.Service.BusinessModel.OrderDetailModels;
 using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.ProductModels;
+using Microsoft.AspNetCore.Http;
 using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice);
         public Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice, Order order);
-        public Task<CreatePaymentResult> CreatePaymentLinkOrder(int totalPrice, Order order);
+        public Task<CreatePaymentResult> CreatePayOsLinkOrder(int totalPrice, Order order);
+        public CreatePaymentResult CreateVnpayLinkOrder(Order order, HttpContext httpContext);
     }
 }

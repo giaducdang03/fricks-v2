@@ -21,15 +21,15 @@ namespace Fricks.Controllers
             _claimsService = claimsService;
         }
 
-        [HttpPost("create")]
+        [HttpPost("calculate")]
         [Authorize(Roles = "CUSTOMER")]
-        public async Task<IActionResult> CreateOrderAsync(CreateOrderModel model)
+        public async Task<IActionResult> CalculateOrderAsync(CreateOrderModel model)
         {
             try
             {
                 var currentEmail = _claimsService.GetCurrentUserEmail;
                 model.CustomerEmail = currentEmail;
-                var result = await _orderService.CreateOrderAsync(model);
+                var result = await _orderService.CalculateOrderAsync(model);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -43,19 +43,19 @@ namespace Fricks.Controllers
             }
         }
 
-        [HttpPost("confirm")]
+        [HttpPost("payment")]
         [Authorize(Roles = "CUSTOMER")]
-        public async Task<IActionResult> ConfirmOrderAsync(ConfirmOrderModel orderModel)
+        public async Task<IActionResult> PaymentOrderAsync(PaymentOrderModel orderModel)
         {
             try
             {
                 var currentEmail = _claimsService.GetCurrentUserEmail;
-                var result = await _orderService.ConfirmOrderAsync(orderModel, currentEmail);
+                orderModel.CustomerEmail = currentEmail;
+                var result = await _orderService.RequestPaymentOrderAsync(orderModel, HttpContext);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-
                 return BadRequest(new ResponseModel
                 {
                     HttpCode = StatusCodes.Status400BadRequest,

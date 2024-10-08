@@ -14,18 +14,7 @@ namespace Fricks.Service.BusinessModel.OrderModels
         [JsonIgnore]
         public string CustomerEmail { get; set; } = "";
 
-        public string? CustomerName { get; set; }
-
-        [Display(Name = "Phone Number")]
-        [DataType(DataType.PhoneNumber, ErrorMessage = "Số điện thoại không hợp lệ.")]
-        [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Số điện thoại phải có 10 số.")]
-        public string? CustomerPhone { get; set; }
-
-        public string? CustomerAddress { get; set; }
-
         public int? ShipFee { get; set; }
-
-        public PaymentMethod PaymentMethod { get; set; } = 0;
 
         public string? VoucherCode { get; set; }
 
