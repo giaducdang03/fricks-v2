@@ -42,6 +42,52 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> ConfirmPayOSPayment(PayOSResponseModel payOSResponse)
+        {
+            if(payOSResponse == null)
+            {
+                throw new Exception("Có lỗi trong quá trình thanh toán");
+            }
+            // get order id
+            int orderId = 0;
+            _ = int.TryParse(payOSResponse.orderCode, out orderId);
+            PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
+            PaymentLinkInformation paymentLinkInformation = await payOs.getPaymentLinkInformation(orderId);
+            //Cái payOS có vụ thanh toán thiếu ::)))))))
+            //Lý do nó đéo gửi hết data về 1 lượt là vậy á
+            if (paymentLinkInformation.transactions.Count == 1) //Nếu khách hàng thanh toán 1 lần full
+            {
+                bool flag = false;
+                //Do là giao dịch chuyển khoản nên PayOS ko có track ngân hàng đầu vào, ko lấy đc bank
+                foreach (var transaction in paymentLinkInformation.transactions)
+                {
+                    var paymentConfirm = new ConfirmPaymentModel
+                    {
+                        TransactionNo = transaction.reference,
+                        PaymentStatus = payOSResponse.code == "00" ? PaymentStatus.PAID : PaymentStatus.FAILED,
+                    };
+                    flag = await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                }
+                return flag;
+            }
+            else
+            {
+                bool flag = false;
+                //Lúc ck, nếu chuyển thiếu nó sẽ ko redirect về mà vẫn ở trang thanh toán, chỉ cập nhật số tiền còn thiếu
+                foreach (var transaction in paymentLinkInformation.transactions)
+                {
+                    var paymentConfirm = new ConfirmPaymentModel
+                    {
+                        TransactionNo = transaction.reference,
+                        PaymentStatus = PaymentStatus.PARTIAL
+                    };
+                    //Tao bí rồi ::)))
+                    flag = true;
+                }
+                return flag;
+            }
+        }
+
         public async Task<bool> ConfirmVnpayPayment(VnPayModel vnPayResponse)
         {
             // get info transaction
