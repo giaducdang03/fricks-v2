@@ -11,5 +11,7 @@ namespace Fricks.Repository.Repositories.Interface
     public interface IFavoriteProductRepository : IGenericRepository<FavoriteProduct>
     {
         public Task<Pagination<FavoriteProduct>> GetFavoriteProductPaging(int userid, PaginationParameter paginationParameter);
+
+        public Task<List<FavoriteProduct>> GetUserFavoriteProductList(int userid);
     }
 }

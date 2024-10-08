@@ -49,6 +49,24 @@ namespace Fricks.Service.Services
             return _mapper.Map<FavoriteProductModel>(result);
         }
 
+        public async Task<bool> DeleteAllUserFavoriteProduct(string email)
+        {
+            var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (currentUser == null)
+            {
+                throw new Exception("Tài khoản không tồn tại");
+            }
+
+            var favProducts = await _unitOfWork.FavoriteProductRepository.GetUserFavoriteProductList(currentUser.Id);
+            if (favProducts.Count > 0)
+            {
+                _unitOfWork.FavoriteProductRepository.PermanentDeletedListAsync(favProducts);
+                _unitOfWork.Save();
+                return true;
+            }
+            return false;
+        }
+
         public async Task<FavoriteProductModel> DeleteFavoriteProduct(int id)
         {
             var favProduct = await _unitOfWork.FavoriteProductRepository.GetByIdAsync(id);

@@ -33,5 +33,11 @@ namespace Fricks.Repository.Repositories
             var result = new Pagination<FavoriteProduct>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
             return result;
         }
+
+        public async Task<List<FavoriteProduct>> GetUserFavoriteProductList(int userid)
+        {
+            return await _context.FavoriteProducts.Include(x => x.User)
+                .Include(x => x.Product).Include(x => x.Product.Brand).Include(x => x.Product.Category).Where(x => x.UserId == userid).ToListAsync();
+        }
     }
 }
