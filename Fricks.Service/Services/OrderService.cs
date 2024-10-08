@@ -6,6 +6,7 @@ using Fricks.Repository.UnitOfWork;
 using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.OrderDetailModels;
 using Fricks.Service.BusinessModel.OrderModels;
+using Fricks.Service.BusinessModel.PaymentModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Utils;
@@ -64,6 +65,7 @@ namespace Fricks.Service.Services
             if (newOrder != null)
             {
                 await _unitOfWork.OrderRepository.AddAsync(newOrder);
+                _unitOfWork.Save();
 
                 CreatePaymentResult payment = null;
 
@@ -75,8 +77,6 @@ namespace Fricks.Service.Services
                 {
                     payment = _paymentService.CreateVnpayLinkOrder(newOrder, httpContext);
                 }
-
-                _unitOfWork.Save();
 
                 return payment;
             }

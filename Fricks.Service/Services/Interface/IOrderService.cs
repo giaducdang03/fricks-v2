@@ -1,5 +1,6 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Service.BusinessModel.OrderModels;
+using Fricks.Service.BusinessModel.PaymentModels;
 using Microsoft.AspNetCore.Http;
 using Net.payOS.Types;
 using System;
