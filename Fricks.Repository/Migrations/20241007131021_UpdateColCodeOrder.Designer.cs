@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fricks.Repository.Migrations
 {
     [DbContext(typeof(FricksContext))]
-    partial class FricksContextModelSnapshot : ModelSnapshot
+    [Migration("20241007131021_UpdateColCodeOrder")]
+    partial class UpdateColCodeOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,19 +185,14 @@ namespace Fricks.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BankCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BankTranNo")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Code")
                         .HasMaxLength(60)
                         .HasColumnType("nvarchar(60)");
 
                     b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerAddress")
@@ -242,10 +240,6 @@ namespace Fricks.Repository.Migrations
 
                     b.Property<int?>("Total")
                         .HasColumnType("int");
-
-                    b.Property<string>("TransactionNo")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");

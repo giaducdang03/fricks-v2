@@ -105,7 +105,7 @@ public partial class FricksContext : DbContext
 
             entity.ToTable("Order");
 
-            entity.Property(e => e.Code).HasMaxLength(1);
+            entity.Property(e => e.Code).HasMaxLength(60);
             entity.Property(e => e.CustomerAddress).HasMaxLength(250);
             entity.Property(e => e.CustomerEmail).HasMaxLength(250);
             entity.Property(e => e.CustomerName).HasMaxLength(250);
@@ -113,6 +113,10 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.PaymentMethod).HasMaxLength(10);
             entity.Property(e => e.PaymentStatus).HasMaxLength(10);
             entity.Property(e => e.Status).HasMaxLength(20);
+
+            entity.Property(e => e.BankCode).HasMaxLength(50);
+            entity.Property(e => e.BankTranNo).HasMaxLength(100);
+            entity.Property(e => e.TransactionNo).HasMaxLength(100);
 
             entity.HasOne(d => d.Store).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.StoreId)

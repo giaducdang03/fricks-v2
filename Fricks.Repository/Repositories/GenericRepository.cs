@@ -86,6 +86,7 @@ namespace Fricks.Repository.Repositories
 
         public void UpdateAsync(TEntity entity)
         {
+            entity.UpdateDate = CommonUtils.GetCurrentTime();
             _dbSet.Update(entity);
         }
     }
