@@ -5,6 +5,8 @@ using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
 using Fricks.Service.BusinessModel.FeedbackModels;
+using Fricks.Service.BusinessModel.OrderDetailModels;
+using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.PostModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.BusinessModel.ProductPriceModels;
@@ -92,6 +94,19 @@ namespace Fricks.Service.Settings
                 .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
 
             CreateMap<Withdraw, WithdrawModel>();
+            
+            CreateMap<OrderDetail, OrderDetailModel>().ReverseMap();
+            CreateMap<OrderDetail, OrderDetailProcessModel>()
+                .ForMember(dest => dest.ProductName, opt => opt.Ignore());
+            CreateMap<OrderDetailProcessModel, OrderDetail>();
+
+            CreateMap<Order, OrderModel>().ReverseMap();
+            CreateMap<Order, OrderProcessModel>().ReverseMap();
+
+            CreateMap<OrderDetailProcessModel, ItemData>()
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.ProductName))
+                .ForMember(dest => dest.price, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.quantity, opt => opt.MapFrom(src => src.Quantity)); ;
         }
     }
 

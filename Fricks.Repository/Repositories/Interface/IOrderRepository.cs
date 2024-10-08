@@ -11,5 +11,7 @@ namespace Fricks.Repository.Repositories.Interface
     public interface IOrderRepository : IGenericRepository<Order>
     {
         public Task<Pagination<Order>> GetByUserId(int userId, PaginationParameter paginationParameter);
+
+        public Task<Order> GetOrderById(int id);
     }
 }

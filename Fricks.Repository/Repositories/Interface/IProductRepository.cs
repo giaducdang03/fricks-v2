@@ -18,5 +18,7 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<Pagination<Product>> GetProductByStoreIdPaging(Brand? brand, Category? category, int id, PaginationParameter paginationParameter);
 
         public Task<Product> GetProductBySKUAsync(string sku);
+
+        public Task<List<Product>> GetAllProductsAsync();
     }
 }

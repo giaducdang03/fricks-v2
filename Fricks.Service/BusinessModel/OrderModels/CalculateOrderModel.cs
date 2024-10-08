@@ -1,5 +1,4 @@
-﻿using Fricks.Repository.Entities;
-using Fricks.Service.BusinessModel.OrderDetailModels;
+﻿using Fricks.Service.BusinessModel.OrderDetailModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.OrderModels
 {
-    public class OrderModel : BaseEntity
+    public class CalculateOrderModel
     {
-        public string? Code { get; set; }
 
         public int? ShipFee { get; set; }
 
@@ -19,12 +17,6 @@ namespace Fricks.Service.BusinessModel.OrderModels
         public int? Total { get; set; }
 
         public string? Status { get; set; }
-
-        public string? PaymentStatus { get; set; }
-
-        public DateTime? PaymentDate { get; set; }
-
-        public string? PaymentMethod { get; set; }
 
         public int? UserId { get; set; }
 
@@ -39,7 +31,7 @@ namespace Fricks.Service.BusinessModel.OrderModels
         public int? StoreId { get; set; }
 
         public int? VoucherId { get; set; }
-        
-        public List<OrderDetailModel>? OrderDetails { get; set; }
+
+        public List<CalculateOrderDetailModel>? OrderDetails { get; set; }
     }
 }

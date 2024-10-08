@@ -28,6 +28,9 @@ builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection(
 // Add Mail Settings
 builder.Services.Configure<MailSetting>(builder.Configuration.GetSection("MailSettings"));
 
+// Add Vnpay Settings
+builder.Services.Configure<VnpaySetting>(builder.Configuration.GetSection("Vnpay"));
+
 // Add PayOS Settings
 using StreamReader reader = new("exe201-8080a-payos.json");
 var json = reader.ReadToEnd();

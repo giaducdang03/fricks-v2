@@ -19,9 +19,13 @@ public partial class Order : BaseEntity
 
     public DateTime? PaymentDate { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
-
     public string? PaymentMethod { get; set; }
+
+    public string? BankTranNo { get; set; }
+
+    public string? BankCode { get; set; }
+
+    public string? TransactionNo { get; set; }
 
     public int? UserId { get; set; }
 

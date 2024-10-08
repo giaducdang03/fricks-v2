@@ -1,27 +1,102 @@
-﻿using Fricks.Repository.Entities;
+﻿using AutoMapper;
+using Fricks.Repository.Entities;
+using Fricks.Repository.Utils;
+using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.Services.Interface;
 using Fricks.Service.Settings;
-using Fricks.Service.Utils;
+using Fricks.Service.Utils.Vnpay;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
+using Fricks.Service.BusinessModel.PaymentModels;
+using System.Reflection;
+using Fricks.Repository.Enum;
+using Fricks.Repository.UnitOfWork;
 
 namespace Fricks.Service.Services
 {
     public class PaymentService : IPaymentService
     {
         private readonly PayOSSetting _payOSSetting;
-        public PaymentService(IOptions<PayOSSetting> payOSSetting)
+        private readonly VnpaySetting _vnpaySetting;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public PaymentService(IOptions<PayOSSetting> payOSSetting, IMapper mapper, 
+            IOptions<VnpaySetting> vnpaySetting, 
+            IUnitOfWork unitOfWork)
         {
             _payOSSetting = payOSSetting.Value;
+            _vnpaySetting = vnpaySetting.Value;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
+
+        public async Task<bool> ConfirmVnpayPayment(VnPayModel vnPayResponse)
+        {
+            // get info transaction
+            if (vnPayResponse != null)
+            {
+                // check signature
+                var vnpay = new VnPayLibrary();
+
+                // get all data from vnpay model
+                foreach (PropertyInfo prop in vnPayResponse.GetType().GetProperties())
+                {
+                    string name = prop.Name;
+                    object value = prop.GetValue(vnPayResponse, null);
+                    string valueStr = value?.ToString() ?? string.Empty;
+                    vnpay.AddResponseData(name, valueStr);
+                }
+
+                // get order id
+                int orderId = 0;
+                _ = int.TryParse(vnPayResponse.vnp_TxnRef, out orderId);
+
+                var vnpayHashSecret = _vnpaySetting.HashSecret;
+                bool validateSignature = vnpay.ValidateSignature(vnPayResponse.vnp_SecureHash, vnpayHashSecret);
+                if (validateSignature)
+                {
+                    if (vnPayResponse.vnp_TransactionStatus == "00")
+                    {
+                        var paymentConfirm = new ConfirmPaymentModel
+                        {
+                            BankCode = vnPayResponse.vnp_BankCode,
+                            BankTranNo = vnPayResponse.vnp_BankTranNo,
+                            TransactionNo = vnPayResponse.vnp_TransactionNo,
+                            PaymentStatus = PaymentStatus.PAID
+                        };
+
+                        return await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                    }
+                    else
+                    {
+                        var paymentConfirm = new ConfirmPaymentModel
+                        {
+                            BankCode = vnPayResponse.vnp_BankCode,
+                            BankTranNo = vnPayResponse.vnp_BankTranNo,
+                            TransactionNo = vnPayResponse.vnp_TransactionNo,
+                            PaymentStatus = PaymentStatus.FAILED
+                        };
+
+                        return await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                    }
+                }
+                throw new Exception("Chữ ký không hợp lệ");
+            }
+            throw new Exception("Có lỗi trong quá trình thanh toán");
+        }
+
         public async Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice)
         {
             PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
@@ -50,6 +125,130 @@ namespace Fricks.Service.Services
             );
 
             return await payOs.createPaymentLink(paymentData);
+        }
+
+        public async Task<CreatePaymentResult> CreatePayOsLinkOrder(int totalPrice, Order order)
+        {
+            PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
+            var listProduct = _mapper.Map<List<ItemData>>(order.OrderDetails);
+            PaymentData paymentData = new PaymentData(
+                order.Id,
+                totalPrice,
+                $"Thanh toán đơn hàng",
+                listProduct,
+                _payOSSetting.ReturnUrl,
+                _payOSSetting.CancelUrl
+            );
+
+            return await payOs.createPaymentLink(paymentData);
+        }
+
+        public CreatePaymentResult CreateVnpayLinkOrder(Order order, HttpContext httpContext)
+        {
+            // create URL payment
+
+            DateTime timeNow = DateTime.UtcNow.AddHours(7);
+
+            int paymentPrice = order.Total.Value;
+
+            var ipAddress = VnPayUtils.GetIpAddress(httpContext);
+
+            var pay = new VnPayLibrary();
+
+            pay.AddRequestData("vnp_Version", _vnpaySetting.Version);
+            pay.AddRequestData("vnp_Command", _vnpaySetting.Command);
+            pay.AddRequestData("vnp_TmnCode", _vnpaySetting.TmnCode);
+            pay.AddRequestData("vnp_Amount", ((int)paymentPrice * 100).ToString());
+            pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
+            pay.AddRequestData("vnp_CurrCode", _vnpaySetting.CurrCode);
+            pay.AddRequestData("vnp_IpAddr", ipAddress);
+            pay.AddRequestData("vnp_Locale", _vnpaySetting.Locale);
+            pay.AddRequestData("vnp_OrderInfo", $"Thanh toan cho don hang {order.Code}");
+            pay.AddRequestData("vnp_OrderType", "250000");
+            pay.AddRequestData("vnp_TxnRef", order.Id.ToString());
+
+            // check server running
+            if (ipAddress == "::1")
+            {
+                pay.AddRequestData("vnp_ReturnUrl", _vnpaySetting.UrlReturnLocal);
+            }
+            else
+            {
+                pay.AddRequestData("vnp_ReturnUrl", _vnpaySetting.UrlReturnAzure);
+            }
+
+            var paymentUrl = pay.CreateRequestUrl(_vnpaySetting.BaseUrl, _vnpaySetting.HashSecret);
+
+            var createPaymentResult = new CreatePaymentResult("", "VNPAY", order.Total.Value, $"Thanh toan cho don hang {order.Code}", order.Id, "VND", "", "", paymentUrl, "");
+
+            return createPaymentResult;
+        }
+
+        private async Task<bool> ConfirmPaymentOrderAsync(int orderId, ConfirmPaymentModel confirmPayment)
+        {
+            var order = await _unitOfWork.OrderRepository.GetOrderById(orderId);
+            if (order != null)
+            {
+                if (order.Status == OrderStatus.PENDING.ToString()
+                    && order.PaymentStatus == PaymentStatus.PENDING.ToString())
+                {
+                    var storeWallet = await _unitOfWork.WalletRepository.GetWalletStoreAsync(order.StoreId.Value);
+                    if (storeWallet == null)
+                    {
+                        throw new Exception("Không tìm thấy ví của cửa hàng");
+                    }
+
+                    // calculate commission
+                    // default 5% on order
+                    double commission = order.Total.Value * 0.05;
+                    double transactionAmount = order.Total.Value - commission;
+
+                    if (confirmPayment.PaymentStatus == PaymentStatus.PAID)
+                    {
+                        // create transaction
+                        var newTransaction = new Repository.Entities.Transaction
+                        {
+                            WalletId = storeWallet.Id,
+                            TransactionType = TransactionType.IN.ToString(),
+                            Amount = (int)transactionAmount,
+                            Description = $"Thanh toán cho đơn hàng {order.Code}",
+                            Status = TransactionStatus.SUCCESS.ToString()
+                        };
+
+                        // update store wallet
+                        storeWallet.Balance += (decimal)transactionAmount;
+                        _unitOfWork.WalletRepository.UpdateAsync(storeWallet);
+
+                        // update order
+                        order.Status = OrderStatus.SUCCESS.ToString();
+                        order.PaymentStatus = PaymentStatus.PAID.ToString();
+                        order.TransactionNo = confirmPayment.TransactionNo;
+                        order.BankTranNo = confirmPayment.BankTranNo;
+                        order.BankCode = confirmPayment.BankCode;
+                        order.PaymentDate = CommonUtils.GetCurrentTime();
+
+                        await _unitOfWork.TransactionRepository.AddAsync(newTransaction);
+                        _unitOfWork.OrderRepository.UpdateAsync(order);
+                        _unitOfWork.Save();
+
+                        return true;
+                    }
+                    else
+                    {
+                        // update order
+                        order.Status = OrderStatus.ERROR.ToString();
+                        order.PaymentStatus = PaymentStatus.FAILED.ToString();
+                        order.PaymentDate = CommonUtils.GetCurrentTime();
+
+                        _unitOfWork.OrderRepository.UpdateAsync(order);
+                        _unitOfWork.Save();
+
+                        return false;
+                    }
+                }
+                throw new Exception("Không thể cập nhật trạng thái đơn hàng");
+            }
+            throw new Exception("Đơn hàng không tồn tại");
         }
 
         private long GetRangeLong()
