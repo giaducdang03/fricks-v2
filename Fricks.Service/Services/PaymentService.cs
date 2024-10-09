@@ -247,6 +247,29 @@ namespace Fricks.Service.Services
                         storeWallet.Balance += (decimal)transactionAmount;
                         _unitOfWork.WalletRepository.UpdateAsync(storeWallet);
 
+                        // update product stock
+                        var orderDetails = order.OrderDetails;
+                        List<Product> updateProducts = new List<Product>();
+
+                        foreach (var item in orderDetails)
+                        {
+                            var product = await _unitOfWork.ProductRepository.GetByIdAsync(item.ProductId.Value);
+                            if (product != null)
+                            {
+                                if (product.Quantity >= item.Quantity)
+                                {
+                                    product.SoldQuantity += item.Quantity;
+                                    product.Quantity -= item.Quantity;
+                                    updateProducts.Add(product);
+                                }
+                            }
+                        }
+
+                        if (updateProducts.Count > 0)
+                        {
+                            _unitOfWork.ProductRepository.UpdateRangeProductAsync(updateProducts);
+                        }
+
                         // update order
                         order.Status = OrderStatus.SUCCESS.ToString();
                         order.PaymentStatus = PaymentStatus.PAID.ToString();
