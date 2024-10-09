@@ -60,5 +60,38 @@ namespace Fricks.Controllers
                 });
             }
         }
+
+        [HttpGet("payos")]
+        public async Task<IActionResult> ConfirmPaymentPayOS([FromQuery] PayOSResponseModel payOSResponseModel)
+        {
+            try
+            {
+                var result = await _paymentService.ConfirmPayOSPayment(payOSResponseModel);
+                if (result)
+                {
+                    var response =new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Thanh toán đơn hàng thành công"
+                    };
+                    return Ok(response);
+                    //var urlPara = response.ToUrlParameters();
+                    //return Redirect("https://feventopia.vercel.app/payment?" + urlPara);
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Thanh toán đơn hàng thất bại"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }

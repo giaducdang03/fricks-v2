@@ -42,6 +42,34 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> ConfirmPayOSPayment(PayOSResponseModel payOSResponse)
+        {
+            if(payOSResponse == null)
+            {
+                throw new Exception("Có lỗi trong quá trình thanh toán");
+            }
+            // get order id
+            int orderId = 0;
+            _ = int.TryParse(payOSResponse.orderCode, out orderId);
+            PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
+            PaymentLinkInformation paymentLinkInformation = await payOs.getPaymentLinkInformation(orderId);
+            //Cái payOS có vụ thanh toán thiếu ::)))))))
+            //Lý do nó đéo gửi hết data về 1 lượt là vậy á
+            bool flag = false;
+            //Do là giao dịch chuyển khoản nên PayOS ko có track ngân hàng đầu vào, ko lấy đc bank
+            foreach (var transaction in paymentLinkInformation.transactions)
+            {
+                var paymentConfirm = new ConfirmPaymentModel
+                {
+                    TransactionNo = transaction.reference,
+                    PaymentStatus = payOSResponse.code == "00" ? PaymentStatus.PAID : PaymentStatus.FAILED,
+                };
+                flag = await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                break; //Chỉ lưu giao dịch đầu tiên, BR làm ơn cho full
+            }
+            return flag;
+        }
+
         public async Task<bool> ConfirmVnpayPayment(VnPayModel vnPayResponse)
         {
             // get info transaction
@@ -218,6 +246,29 @@ namespace Fricks.Service.Services
                         // update store wallet
                         storeWallet.Balance += (decimal)transactionAmount;
                         _unitOfWork.WalletRepository.UpdateAsync(storeWallet);
+
+                        // update product stock
+                        var orderDetails = order.OrderDetails;
+                        List<Product> updateProducts = new List<Product>();
+
+                        foreach (var item in orderDetails)
+                        {
+                            var product = await _unitOfWork.ProductRepository.GetByIdAsync(item.ProductId.Value);
+                            if (product != null)
+                            {
+                                if (product.Quantity >= item.Quantity)
+                                {
+                                    product.SoldQuantity += item.Quantity;
+                                    product.Quantity -= item.Quantity;
+                                    updateProducts.Add(product);
+                                }
+                            }
+                        }
+
+                        if (updateProducts.Count > 0)
+                        {
+                            _unitOfWork.ProductRepository.UpdateRangeProductAsync(updateProducts);
+                        }
 
                         // update order
                         order.Status = OrderStatus.SUCCESS.ToString();

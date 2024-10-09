@@ -1,13 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 
-namespace Fricks.ViewModels.ResponseModels
+namespace Fricks.Service.BusinessModel.PaymentModels
 {
-    public class ResponseModel
+    public class PayOSResponseModel
     {
-        public int HttpCode { get; set; } = 200;
-        public string Message { get; set; } = "";
-
+        public string code { get; set; } = string.Empty;    
+        public string id { get; set; } = string.Empty;
+        public bool cancel { get; set; }
+        public string status { get; set; } = string.Empty;
+        public string orderCode { get; set; } = string.Empty;
         public string ToUrlParameters()
         {
             var properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);

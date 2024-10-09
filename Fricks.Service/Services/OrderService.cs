@@ -284,6 +284,23 @@ namespace Fricks.Service.Services
                     throw new Exception("Sản phẩm hoặc đơn vị tính không tồn tại");
                 }
 
+                // check quantity stock product
+                bool isInStockQuantity = true;
+                foreach (var item in orderModel.ProductOrders)
+                {
+                    var productInStock = dbProduct.FirstOrDefault(x => x.Id == item.ProductId && x.Quantity >= item.Quantity);
+                    if (productInStock == null)
+                    {
+                        isInStockQuantity = false;
+                        break;
+                    }
+                }
+
+                if (!isInStockQuantity)
+                {
+                    throw new Exception("Không đủ số lượng sản phẩm trong kho");
+                }
+
                 var orderedProducts = dbProduct.Where(p => orderModel.ProductOrders.Any(o => o.ProductId == p.Id));
 
                 // check store

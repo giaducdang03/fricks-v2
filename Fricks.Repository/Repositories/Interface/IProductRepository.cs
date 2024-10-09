@@ -22,5 +22,6 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<List<Product>> GetAllProductsAsync();
 
         public void UpdateProductAsync(Product updateProduct);
+        public void UpdateRangeProductAsync(List<Product> updateProducts);
     }
 }
