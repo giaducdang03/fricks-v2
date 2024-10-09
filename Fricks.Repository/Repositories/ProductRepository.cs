@@ -1,6 +1,7 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Migrations;
 using Fricks.Repository.Repositories.Interface;
 using Fricks.Repository.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -166,6 +167,23 @@ namespace Fricks.Repository.Repositories
             }
             updateProduct.UpdateDate = CommonUtils.GetCurrentTime();
             _dbSet.Update(updateProduct);
+        }
+
+        public void UpdateRangeProductAsync(List<Product> updateProducts)
+        {
+            foreach (var updateProduct in updateProducts)
+            {
+                if (updateProduct.Quantity > 0)
+                {
+                    updateProduct.IsAvailable = true;
+                }
+                else
+                {
+                    updateProduct.IsAvailable = false;
+                }
+                updateProduct.UpdateDate = CommonUtils.GetCurrentTime();
+            }
+            _dbSet.UpdateRange(updateProducts);
         }
     }
 }
