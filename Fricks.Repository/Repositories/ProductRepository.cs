@@ -2,6 +2,7 @@
 using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Repositories.Interface;
+using Fricks.Repository.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,11 @@ namespace Fricks.Repository.Repositories
     public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         private FricksContext _context;
+        private readonly DbSet<Product> _dbSet;
         public ProductRepository(FricksContext context) : base(context)
         {
             _context = context;
+            _dbSet = context.Set<Product>();
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)
@@ -149,6 +152,20 @@ namespace Fricks.Repository.Repositories
             }
 
             return query;
+        }
+
+        public void UpdateProductAsync(Product updateProduct)
+        {
+            if (updateProduct.Quantity > 0)
+            {
+                updateProduct.IsAvailable = true;
+            }
+            else
+            {
+                updateProduct.IsAvailable = false;
+            }
+            updateProduct.UpdateDate = CommonUtils.GetCurrentTime();
+            _dbSet.Update(updateProduct);
         }
     }
 }

@@ -20,5 +20,7 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<Product> GetProductBySKUAsync(string sku);
 
         public Task<List<Product>> GetAllProductsAsync();
+
+        public void UpdateProductAsync(Product updateProduct);
     }
 }
