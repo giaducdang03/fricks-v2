@@ -43,6 +43,8 @@ namespace Fricks.Service.Services
             }
 
             var addStore = _mapper.Map<Store>(store);
+            addStore.ManagerId = storeManager.Id;
+            addStore.Manager = null;
             addStore.Wallet = new Wallet
             {
                 Balance = 0
