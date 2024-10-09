@@ -68,15 +68,27 @@ namespace Fricks.Service.Services
             }
 
             // check product
-            var existProduct = await _unitOfWork.ProductRepository.GetProductBySKUAsync(productModel.Sku);
-            if (existProduct != null)
+            //var existProduct = await _unitOfWork.ProductRepository.GetProductBySKUAsync(productModel.Sku);
+            //if (existProduct != null)
+            //{
+            //    throw new Exception("SKU không được trùng");
+            //}
+
+            // gen sku
+            string storeIdString = store.Id.ToString("D2");
+            var productSku = $"ST{storeIdString}_0001";
+
+            var lastStoreProduct = await _unitOfWork.ProductRepository.GetLastStoreProductAsync(store.Id);
+            if (lastStoreProduct != null)
             {
-                throw new Exception("SKU không được trùng");
+                var skuParts = lastStoreProduct.Sku.Split('_');
+                var skuNumber = int.Parse(skuParts[1]) + 1;
+                productSku = $"{skuParts[0]}_{skuNumber:D4}";
             }
 
             var newProduct = new Product
             {
-                Sku = productModel.Sku,
+                Sku = productSku,
                 BrandId = productModel.BrandId,
                 CategoryId = productModel.CategoryId,
                 Description = productModel.Description,
