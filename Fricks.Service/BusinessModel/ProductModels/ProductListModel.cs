@@ -21,6 +21,7 @@ namespace Fricks.Service.BusinessModel.ProductModels
         public string? Description { get; set; }
         public int? Quantity { get; set; }
         public int? SoldQuantity { get; set; }
+        public bool? IsAvaiable { get; set; }
         public List<ProductPriceModel>? Price { get; set; }
     }
 }

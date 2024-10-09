@@ -23,6 +23,7 @@ namespace Fricks.Service.BusinessModel.ProductModels
         public int? Quantity { get; set; }
         public int? StoreId { get; set; }
         public int? SoldQuantity { get; set; }
+        public bool? IsAvaiable { get; set; }
         public BrandModel? Brand { get; set; }
         public CategoryModel? Category { get; set; }
         public List<ProductPriceModel>? Price { get; set; }

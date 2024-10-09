@@ -25,6 +25,8 @@ public partial class Product : BaseEntity
 
     public int? SoldQuantity { get; set; }
 
+    public bool? IsAvailable { get; set; } = true;
+
     public virtual Brand? Brand { get; set; }
 
     public virtual Category? Category { get; set; }

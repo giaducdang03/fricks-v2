@@ -86,6 +86,7 @@ namespace Fricks.Service.Services
                 Name = productModel.Name,
                 UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
                 StoreId = store.Id,
+                IsAvailable = true,
             };
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
