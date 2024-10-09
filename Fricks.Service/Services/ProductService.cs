@@ -86,6 +86,7 @@ namespace Fricks.Service.Services
                 Name = productModel.Name,
                 UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
                 StoreId = store.Id,
+                IsAvailable = true,
             };
 
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
@@ -247,7 +248,7 @@ namespace Fricks.Service.Services
                 throw new Exception("Không tìm thấy danh mục sản phẩm");
             }
             var updateProduct = _mapper.Map(productModel, product);
-            _unitOfWork.ProductRepository.UpdateAsync(updateProduct);
+            _unitOfWork.ProductRepository.UpdateProductAsync(updateProduct);
             _unitOfWork.Save();
             return _mapper.Map<ProductModel>(updateProduct);
         }

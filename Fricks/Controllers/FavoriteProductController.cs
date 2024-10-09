@@ -73,7 +73,7 @@ namespace Fricks.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -81,6 +81,38 @@ namespace Fricks.Controllers
             {
                 var result = await _favoriteProductService.DeleteFavoriteProduct(id);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("all")]
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> DeleteAll()
+        {
+            try
+            {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _favoriteProductService.DeleteAllUserFavoriteProduct(currentEmail);
+                if (result)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Đã xóa danh sách sản phẩm yêu thích"
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Có lỗi trong quá trình xóa"
+                });
             }
             catch (Exception ex)
             {
