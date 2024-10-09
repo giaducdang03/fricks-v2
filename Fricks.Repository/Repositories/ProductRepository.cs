@@ -146,6 +146,9 @@ namespace Fricks.Repository.Repositories
                     case "date":
                         query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.CreateDate) : query.OrderBy(s => s.CreateDate);
                         break;
+                    case "sku":
+                        query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.Sku) : query.OrderBy(s => s.Sku);
+                        break;
                     default:
                         query = query.OrderBy(s => s.Id);
                         break;
@@ -184,6 +187,11 @@ namespace Fricks.Repository.Repositories
                 updateProduct.UpdateDate = CommonUtils.GetCurrentTime();
             }
             _dbSet.UpdateRange(updateProducts);
+        }
+
+        public async Task<Product> GetLastStoreProductAsync(int storeId)
+        {
+            return await _context.Products.OrderBy(x => x.Sku).LastOrDefaultAsync(x => x.StoreId == storeId);
         }
     }
 }
