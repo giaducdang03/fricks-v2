@@ -23,5 +23,6 @@ namespace Fricks.Repository.Repositories.Interface
 
         public void UpdateProductAsync(Product updateProduct);
         public void UpdateRangeProductAsync(List<Product> updateProducts);
+        public Task<Product> GetLastStoreProductAsync(int storeId);
     }
 }
