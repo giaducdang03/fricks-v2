@@ -32,7 +32,7 @@ namespace Fricks.Repository.Repositories
 
         public async Task<Order> GetOrderById(int id)
         {
-            return await _context.Orders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }
