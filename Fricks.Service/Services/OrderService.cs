@@ -54,34 +54,41 @@ namespace Fricks.Service.Services
 
         public async Task<CreatePaymentResult> RequestPaymentOrderAsync(PaymentOrderModel orderModel, HttpContext httpContext)
         {
-            var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(orderModel.CustomerEmail);
-            if (currentUser == null)
+            try
             {
-                throw new Exception("Tài khoản không tồn tại");
-            }
-
-            var newOrder = await CalculatePriceOrder(orderModel, currentUser);
-
-            if (newOrder != null)
-            {
-                await _unitOfWork.OrderRepository.AddAsync(newOrder);
-                _unitOfWork.Save();
-
-                CreatePaymentResult payment = null;
-
-                if (newOrder.PaymentMethod == PaymentMethod.VIETQR.ToString())
+                var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(orderModel.CustomerEmail);
+                if (currentUser == null)
                 {
-                    payment = await _paymentService.CreatePayOsLinkOrder(newOrder.Total.Value, newOrder);
-                }
-                else if (newOrder.PaymentMethod == PaymentMethod.VNPAY.ToString())
-                {
-                    payment = _paymentService.CreateVnpayLinkOrder(newOrder, httpContext);
+                    throw new Exception("Tài khoản không tồn tại");
                 }
 
-                return payment;
-            }
-            return null;
+                var newOrder = await CalculatePriceOrder(orderModel, currentUser);
 
+                if (newOrder != null)
+                {
+                    await _unitOfWork.OrderRepository.AddAsync(newOrder);
+                    _unitOfWork.Save();
+
+                    CreatePaymentResult payment = null;
+
+                    if (newOrder.PaymentMethod == PaymentMethod.VIETQR.ToString())
+                    {
+                        payment = await _paymentService.CreatePayOsLinkOrder(newOrder.Total.Value, newOrder);
+                    }
+                    else if (newOrder.PaymentMethod == PaymentMethod.VNPAY.ToString())
+                    {
+                        payment = _paymentService.CreateVnpayLinkOrder(newOrder, httpContext);
+                    }
+
+                    return payment;
+                }
+                return null;
+            }
+            catch
+            {
+                throw;
+            }
+            
 
         }
 

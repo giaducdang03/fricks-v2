@@ -157,18 +157,42 @@ namespace Fricks.Service.Services
 
         public async Task<CreatePaymentResult> CreatePayOsLinkOrder(int totalPrice, Order order)
         {
-            PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
-            var listProduct = _mapper.Map<List<ItemData>>(order.OrderDetails);
-            PaymentData paymentData = new PaymentData(
-                order.Id,
-                totalPrice,
-                $"Thanh toán đơn hàng",
-                listProduct,
-                _payOSSetting.ReturnUrl,
-                _payOSSetting.CancelUrl
-            );
+            try
+            {
+                PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
+                var insertedOrder = await _unitOfWork.OrderRepository.GetOrderById(order.Id);
+                if (insertedOrder == null)
+                {
+                    throw new Exception("Có lỗi trong quá trình tạo đơn hàng");
+                }
 
-            return await payOs.createPaymentLink(paymentData);
+                List<ItemData> listProducts = new List<ItemData>();
+                foreach (var item in insertedOrder.OrderDetails)
+                {
+                    var itemData = new ItemData(item.Product.Name, item.Quantity.Value, item.Price.Value);
+                    listProducts.Add(itemData);
+                }
+
+                PaymentData paymentData = new PaymentData(
+                    order.Id,
+                    totalPrice,
+                    $"Thanh toán đơn hàng",
+                    listProducts,
+                    _payOSSetting.ReturnUrl,
+                    _payOSSetting.CancelUrl
+                );
+
+                return await payOs.createPaymentLink(paymentData);
+            }
+            catch
+            {
+                var insertedOrder = await _unitOfWork.OrderRepository.GetOrderById(order.Id);
+                if (insertedOrder != null)
+                {
+                    _unitOfWork.OrderRepository.PermanentDeletedAsync(insertedOrder);
+                }
+                throw;
+            }
         }
 
         public CreatePaymentResult CreateVnpayLinkOrder(Order order, HttpContext httpContext)
