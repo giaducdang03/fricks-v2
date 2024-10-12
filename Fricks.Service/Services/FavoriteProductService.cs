@@ -23,7 +23,7 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<FavoriteProductModel> AddFavoriteProduct(string email, FavoriteProductProcessModel favoriteProduct)
+        public async Task<FavoriteProductModelAdd> AddFavoriteProduct(string email, FavoriteProductProcessModel favoriteProduct)
         {
             var user = await _unitOfWork.UsersRepository.GetUserByEmail(email);
             if (user == null)
@@ -37,6 +37,14 @@ namespace Fricks.Service.Services
                 throw new Exception("Sản phẩm không tồn tại");
             }
 
+            // check list favorite
+            var listFavorites = await _unitOfWork.FavoriteProductRepository.GetUserFavoriteProductList(user.Id);
+            var checkExistFavorite = listFavorites.FirstOrDefault(x => x.ProductId == favoriteProduct.ProductId);
+            if (checkExistFavorite != null)
+            {
+                throw new Exception("Sản phẩm này đã tồn tại trong danh sách yêu thích");
+            }
+
             var newFavProduct = new FavoriteProduct
             {
                 ProductId = favoriteProduct.ProductId,
@@ -46,7 +54,13 @@ namespace Fricks.Service.Services
             var result = await _unitOfWork.FavoriteProductRepository.AddAsync(newFavProduct);
 
             _unitOfWork.Save();
-            return _mapper.Map<FavoriteProductModel>(result);
+            var favProductModel = _mapper.Map<FavoriteProductModelAdd>(result);
+
+            // get list fav
+            listFavorites = await _unitOfWork.FavoriteProductRepository.GetUserFavoriteProductList(user.Id);
+            favProductModel.TotalFavoriteProduct = listFavorites.Count;
+
+            return favProductModel;
         }
 
         public async Task<bool> DeleteAllUserFavoriteProduct(string email)
