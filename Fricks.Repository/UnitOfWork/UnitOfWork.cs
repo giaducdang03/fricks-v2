@@ -34,7 +34,7 @@ namespace Fricks.Repository.UnitOfWork
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
-            _transaction = _context.Database.BeginTransaction();
+            //_transaction = _context.Database.BeginTransaction();
         }
         public IUserRepository UsersRepository
         {
