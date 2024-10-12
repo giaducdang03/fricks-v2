@@ -39,6 +39,8 @@ namespace Fricks.Service.Settings
             CreateMap<CategoryProcessModel, Category>().ReverseMap();
             CreateMap<Pagination<Category>, Pagination<CategoryModel>>().ConvertUsing<PaginationConverter<Category, CategoryModel>>();
 
+            // favorite product
+
             CreateMap<FavoriteProduct, FavoriteProductModel>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
@@ -48,6 +50,15 @@ namespace Fricks.Service.Settings
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Product.Image));
             CreateMap<FavoriteProduct, FavoriteProductProcessModel>().ReverseMap();
             CreateMap<Pagination<FavoriteProduct>, Pagination<FavoriteProductModel>>().ConvertUsing<PaginationConverter<FavoriteProduct, FavoriteProductModel>>();
+
+            CreateMap<FavoriteProduct, FavoriteProductModelAdd>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Product.Category.Name))
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Product.Store.Name))
+                .ForMember(dest => dest.ProductPrices, opt => opt.MapFrom(src => src.Product.ProductPrices.ToList()))
+                .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Product.Image))
+                .ForMember(dest => dest.TotalFavoriteProduct, opt => opt.Ignore());
 
             CreateMap<Store, StoreModel>().ForMember(dest => dest.ManagerEmail, otp => otp.MapFrom(src => src.Manager.Email));
             CreateMap<Store, StoreProcessModel>().ReverseMap();
