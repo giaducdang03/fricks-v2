@@ -57,16 +57,12 @@ namespace Fricks.Service.Services
             //Lý do nó đéo gửi hết data về 1 lượt là vậy á
             bool flag = false;
             //Do là giao dịch chuyển khoản nên PayOS ko có track ngân hàng đầu vào, ko lấy đc bank
-            foreach (var transaction in paymentLinkInformation.transactions)
+            var paymentConfirm = new ConfirmPaymentModel
             {
-                var paymentConfirm = new ConfirmPaymentModel
-                {
-                    TransactionNo = transaction.reference,
-                    PaymentStatus = payOSResponse.code == "00" ? PaymentStatus.PAID : PaymentStatus.FAILED,
-                };
-                flag = await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
-                break; //Chỉ lưu giao dịch đầu tiên, BR làm ơn cho full
-            }
+                TransactionNo = payOSResponse.id,
+                PaymentStatus = payOSResponse.code == "00" ? PaymentStatus.PAID : PaymentStatus.FAILED,
+            };
+            flag = await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
             return flag;
         }
 
@@ -178,8 +174,8 @@ namespace Fricks.Service.Services
                     totalPrice,
                     $"Thanh toán đơn hàng",
                     listProducts,
-                    _payOSSetting.ReturnUrl,
-                    _payOSSetting.CancelUrl
+                    _payOSSetting.CancelUrl,
+                    _payOSSetting.ReturnUrl
                 );
 
                 return await payOs.createPaymentLink(paymentData);
@@ -320,6 +316,12 @@ namespace Fricks.Service.Services
 
                         return false;
                     }
+                }
+                // payos call api two times
+                else if (order.Status == OrderStatus.SUCCESS.ToString()
+                    && order.PaymentStatus == PaymentStatus.PAID.ToString() && confirmPayment.PaymentStatus == PaymentStatus.PAID)
+                {
+                    return true;
                 }
                 throw new Exception("Không thể cập nhật trạng thái đơn hàng");
             }
