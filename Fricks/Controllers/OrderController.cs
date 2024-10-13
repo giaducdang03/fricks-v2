@@ -1,9 +1,13 @@
-﻿using Fricks.Service.BusinessModel.OrderModels;
+﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
+using Fricks.Service.BusinessModel.OrderModels;
+using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
 using Fricks.ViewModels.ResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.WebSockets;
 
 namespace Fricks.Controllers
@@ -64,40 +68,8 @@ namespace Fricks.Controllers
             }
         }
 
-        //[HttpPost("cancel")]
-        //[Authorize(Roles = "CUSTOMER")]
-        //public async Task<IActionResult> CancelOrderAsync(ConfirmOrderModel confirmOrder)
-        //{
-        //    try
-        //    {
-        //        var currentEmail = _claimsService.GetCurrentUserEmail;
-        //        var result = await _orderService.CancelOrderAsync(confirmOrder, currentEmail);
-        //        if (result)
-        //        {
-        //            return Ok(new ResponseModel
-        //            {
-        //                HttpCode = StatusCodes.Status200OK,
-        //                Message = "Bạn đã hủy đơn hàng thành công"
-        //            });
-        //        }
-        //        return BadRequest(new ResponseModel
-        //        {
-        //            HttpCode = StatusCodes.Status400BadRequest,
-        //            Message = "Có lỗi trong quá trình hủy đơn hàng"
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        return BadRequest(new ResponseModel
-        //        {
-        //            HttpCode = StatusCodes.Status400BadRequest,
-        //            Message = ex.Message
-        //        });
-        //    }
-        //}
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetOrderById(int id)
         {
             try
@@ -121,6 +93,48 @@ namespace Fricks.Controllers
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
                 });
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllOrderPaging([FromQuery] PaginationParameter paginationParameter, [FromQuery] OrderFilter orderFilter)
+        {
+            try
+            {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _orderService.GetOrderPaging(currentEmail, paginationParameter, orderFilter);
+                if (result == null)
+                {
+                    return NotFound(new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Không có đơn hàng nào"
+                    });
+                }
+
+                var metadata = new
+                {
+                    result.TotalCount,
+                    result.PageSize,
+                    result.CurrentPage,
+                    result.TotalPages,
+                    result.HasNext,
+                    result.HasPrevious
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
             }
         }
     }
