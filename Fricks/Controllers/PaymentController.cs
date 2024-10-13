@@ -74,7 +74,6 @@ namespace Fricks.Controllers
         {
             try
             {
-                Console.WriteLine($"PayOs here {DateTime.Now}");
                 var uri = HttpContext.Request.Host.ToString();
                 var result = await _paymentService.ConfirmPayOSPayment(payOSResponseModel);
                 //if (result)
