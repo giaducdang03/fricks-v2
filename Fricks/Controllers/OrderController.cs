@@ -64,26 +64,53 @@ namespace Fricks.Controllers
             }
         }
 
-        [HttpPost("cancel")]
-        [Authorize(Roles = "CUSTOMER")]
-        public async Task<IActionResult> CancelOrderAsync(ConfirmOrderModel confirmOrder)
+        //[HttpPost("cancel")]
+        //[Authorize(Roles = "CUSTOMER")]
+        //public async Task<IActionResult> CancelOrderAsync(ConfirmOrderModel confirmOrder)
+        //{
+        //    try
+        //    {
+        //        var currentEmail = _claimsService.GetCurrentUserEmail;
+        //        var result = await _orderService.CancelOrderAsync(confirmOrder, currentEmail);
+        //        if (result)
+        //        {
+        //            return Ok(new ResponseModel
+        //            {
+        //                HttpCode = StatusCodes.Status200OK,
+        //                Message = "Bạn đã hủy đơn hàng thành công"
+        //            });
+        //        }
+        //        return BadRequest(new ResponseModel
+        //        {
+        //            HttpCode = StatusCodes.Status400BadRequest,
+        //            Message = "Có lỗi trong quá trình hủy đơn hàng"
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        return BadRequest(new ResponseModel
+        //        {
+        //            HttpCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message
+        //        });
+        //    }
+        //}
+        [HttpGet("{id}")]
+        //[Authorize]
+        public async Task<IActionResult> GetOrderById(int id)
         {
             try
             {
-                var currentEmail = _claimsService.GetCurrentUserEmail;
-                var result = await _orderService.CancelOrderAsync(confirmOrder, currentEmail);
-                if (result)
+                var result = await _orderService.GetOrderById(id);
+                if (result != null)
                 {
-                    return Ok(new ResponseModel
-                    {
-                        HttpCode = StatusCodes.Status200OK,
-                        Message = "Bạn đã hủy đơn hàng thành công"
-                    });
+                    return Ok(result);
                 }
-                return BadRequest(new ResponseModel
+                return NotFound(new ResponseModel
                 {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = "Có lỗi trong quá trình hủy đơn hàng"
+                    HttpCode = StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy đơn hàng"
                 });
             }
             catch (Exception ex)

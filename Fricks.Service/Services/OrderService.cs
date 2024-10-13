@@ -102,6 +102,11 @@ namespace Fricks.Service.Services
             throw new NotImplementedException();
         }
 
+        public async Task<OrderModel> GetOrderById(int id)
+        {
+            return _mapper.Map<OrderModel>(await _unitOfWork.OrderRepository.GetOrderById(id));
+        }
+
         public async Task<CreatePaymentResult> ConfirmOrderAsync(ConfirmOrderModel orderModel, string email)
         {
             var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);

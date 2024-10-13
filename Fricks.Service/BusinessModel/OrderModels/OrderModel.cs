@@ -26,6 +26,12 @@ namespace Fricks.Service.BusinessModel.OrderModels
 
         public string? PaymentMethod { get; set; }
 
+        public string? BankTranNo { get; set; }
+
+        public string? BankCode { get; set; }
+
+        public string? TransactionNo { get; set; }
+
         public int? UserId { get; set; }
 
         public string? CustomerName { get; set; }
@@ -37,6 +43,12 @@ namespace Fricks.Service.BusinessModel.OrderModels
         public string? CustomerPhone { get; set; }
 
         public int? StoreId { get; set; }
+
+        public string? StoreName { get; set; }
+
+        public string? StorePhone { get; set; }
+
+        public string? StoreAddress { get; set; }
 
         public int? VoucherId { get; set; }
         
