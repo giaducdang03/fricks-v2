@@ -47,7 +47,7 @@ namespace Fricks.Controllers
                     }
                     else
                     {
-                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
+                        return Redirect("https://frickshop.site/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
                     }
                 }
                 if (uri.Contains("localhost"))
@@ -56,7 +56,7 @@ namespace Fricks.Controllers
                 }
                 else
                 {
-                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
+                    return Redirect("https://frickshop.site/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
                 }
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace Fricks.Controllers
                     }
                     else
                     {
-                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + payOSResponseModel.id);
+                        return Redirect("https://frickshop.site/payment?status=paid&order=" + payOSResponseModel.id);
                     }
                 }
                 if (uri.Contains("localhost"))
@@ -109,7 +109,7 @@ namespace Fricks.Controllers
                 }
                 else
                 {
-                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + payOSResponseModel.id);
+                    return Redirect("https://frickshop.site/payment?status=failed&order=" + payOSResponseModel.id);
                 }
             }
             catch (Exception ex)
