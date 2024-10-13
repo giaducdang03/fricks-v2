@@ -178,8 +178,8 @@ namespace Fricks.Service.Services
                     totalPrice,
                     $"Thanh toán đơn hàng",
                     listProducts,
-                    _payOSSetting.ReturnUrl,
-                    _payOSSetting.CancelUrl
+                    _payOSSetting.CancelUrl,
+                    _payOSSetting.ReturnUrl
                 );
 
                 return await payOs.createPaymentLink(paymentData);

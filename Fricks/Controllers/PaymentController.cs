@@ -5,6 +5,7 @@ using Fricks.ViewModels.ResponseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Net.payOS.Types;
+using System;
 
 namespace Fricks.Controllers
 {
@@ -36,20 +37,27 @@ namespace Fricks.Controllers
         {
             try
             {
+                var uri = HttpContext.Request.Host.ToString();
                 var result = await _paymentService.ConfirmVnpayPayment(vnpayResponse);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    if (uri.Contains("localhost"))
                     {
-                        HttpCode = StatusCodes.Status200OK,
-                        Message = "Thanh toán đơn hàng thành công"
-                    });
+                        return Redirect("http://localhost:3000/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
+                    }
+                    else
+                    {
+                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
+                    }
                 }
-                return BadRequest(new ResponseModel
+                if (uri.Contains("localhost"))
                 {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = "Thanh toán đơn hàng thất bại"
-                });
+                    return Redirect("http://localhost:3000/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
+                }
+                else
+                {
+                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
+                }
             }
             catch (Exception ex)
             {
@@ -66,23 +74,44 @@ namespace Fricks.Controllers
         {
             try
             {
+                Console.WriteLine($"PayOs here {DateTime.Now}");
+                var uri = HttpContext.Request.Host.ToString();
                 var result = await _paymentService.ConfirmPayOSPayment(payOSResponseModel);
+                //if (result)
+                //{
+                //    var response =new ResponseModel
+                //    {
+                //        HttpCode = StatusCodes.Status200OK,
+                //        Message = "Thanh toán đơn hàng thành công"
+                //    };
+                //    return Ok(response);
+                //    //var urlPara = response.ToUrlParameters();
+                //    //return Redirect("https://feventopia.vercel.app/payment?" + urlPara);
+                //}
+                //return BadRequest(new ResponseModel
+                //{
+                //    HttpCode = StatusCodes.Status400BadRequest,
+                //    Message = "Thanh toán đơn hàng thất bại"
+                //});
                 if (result)
                 {
-                    var response =new ResponseModel
+                    if (uri.Contains("localhost"))
                     {
-                        HttpCode = StatusCodes.Status200OK,
-                        Message = "Thanh toán đơn hàng thành công"
-                    };
-                    return Ok(response);
-                    //var urlPara = response.ToUrlParameters();
-                    //return Redirect("https://feventopia.vercel.app/payment?" + urlPara);
+                        return Redirect("http://localhost:3000/payment?status=paid&order=" + payOSResponseModel.code);
+                    }
+                    else
+                    {
+                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + payOSResponseModel.code);
+                    }
                 }
-                return BadRequest(new ResponseModel
+                if (uri.Contains("localhost"))
                 {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = "Thanh toán đơn hàng thất bại"
-                });
+                    return Redirect("http://localhost:3000/payment?status=failed&order=" + payOSResponseModel.code);
+                }
+                else
+                {
+                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + payOSResponseModel.code);
+                }
             }
             catch (Exception ex)
             {
