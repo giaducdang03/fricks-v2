@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.BusinessModel.PaymentModels;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<CreatePaymentResult> AddOrder(OrderProcessModel orderProcessModel);
         public Task<CreatePaymentResult> RequestPaymentOrderAsync(PaymentOrderModel paymentOrderModel, HttpContext httpContext);
-        public Task<Pagination<OrderModel>> GetOrderByUserEmail(string email);
+        public Task<Pagination<OrderModel>> GetOrderPaging(string email, PaginationParameter paginationParameter, OrderFilter orderFilter);
         public Task<Pagination<OrderModel>> GetOrderByStoreId(int storeId);
         public Task<CreatePaymentResult> ConfirmOrderAsync(ConfirmOrderModel orderModel, string email);
         public Task<bool> CancelOrderAsync(ConfirmOrderModel orderModel, string email);
