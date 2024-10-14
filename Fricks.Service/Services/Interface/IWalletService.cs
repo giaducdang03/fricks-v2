@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.WalletModels;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<WalletModel> GetWalletStoreAsync(string email);
 
-        public Task<Pagination<TransactionModel>> GetTransationsWalletPaginationAsync(PaginationParameter paginationParameter, string email);
+        public Task<Pagination<TransactionModel>> GetTransationsWalletPaginationAsync(PaginationParameter paginationParameter, string email, TransactionFilter transactionFilter);
 
         public Task<WithdrawModel> RequestWithdrawStoreAsync(CreateWithdrawModel createWithdrawModel, string email);
 

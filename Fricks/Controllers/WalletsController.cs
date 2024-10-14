@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.WalletModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
@@ -54,12 +55,12 @@ namespace Fricks.Controllers
         }
         [HttpGet("store/transactions")]
         [Authorize(Roles = "STORE")]
-        public async Task<IActionResult> GetTransactionsWallet([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetTransactionsWallet([FromQuery] PaginationParameter paginationParameter, [FromQuery] TransactionFilter transactionFilter)
         {
             try
             {
                 var currentEmail = _claimsService.GetCurrentUserEmail;
-                var result = await _walletService.GetTransationsWalletPaginationAsync(paginationParameter, currentEmail);
+                var result = await _walletService.GetTransationsWalletPaginationAsync(paginationParameter, currentEmail, transactionFilter);
                 if (result == null)
                 {
                     return NotFound(new ResponseModel
