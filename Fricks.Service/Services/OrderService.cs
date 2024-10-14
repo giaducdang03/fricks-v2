@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
@@ -97,9 +98,39 @@ namespace Fricks.Service.Services
             throw new NotImplementedException();
         }
 
-        public Task<Pagination<OrderModel>> GetOrderByUserEmail(string email)
+        public async Task<Pagination<OrderModel>> GetOrderPaging(string email, PaginationParameter paginationParameter, OrderFilter orderFilter)
         {
-            throw new NotImplementedException();
+            var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (currentUser != null)
+            {
+                if (currentUser.Role == RoleEnums.CUSTOMER.ToString())
+                {
+                    return _mapper.Map<Pagination<OrderModel>>(await _unitOfWork.OrderRepository.GetOrderPaging(currentUser.Id, paginationParameter, orderFilter));
+                }
+                else if (currentUser.Role == RoleEnums.STORE.ToString())
+                {
+                    var store = await _unitOfWork.StoreRepository.GetStoreByManagerId(currentUser.Id);
+                    if (store != null)
+                    {
+                        orderFilter.StoreId = store.Id;
+                        return _mapper.Map<Pagination<OrderModel>>(await _unitOfWork.OrderRepository.GetOrderPaging(0, paginationParameter, orderFilter));
+                    }
+                    throw new Exception("Cửa hàng không tồn tại");
+                }
+                else
+                {
+                    return _mapper.Map<Pagination<OrderModel>>(await _unitOfWork.OrderRepository.GetOrderPaging(0, paginationParameter, orderFilter));
+                }
+            }
+            else
+            {
+                throw new Exception("Tài khoản không tồn tại");
+            }
+        }
+
+        public async Task<OrderModel> GetOrderById(int id)
+        {
+            return _mapper.Map<OrderModel>(await _unitOfWork.OrderRepository.GetOrderById(id));
         }
 
         public async Task<CreatePaymentResult> ConfirmOrderAsync(ConfirmOrderModel orderModel, string email)

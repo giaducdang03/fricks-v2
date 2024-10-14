@@ -114,13 +114,17 @@ namespace Fricks.Service.Settings
                 .ForMember(dest => dest.ProductName, opt => opt.Ignore());
             CreateMap<OrderDetailProcessModel, OrderDetail>();
 
-            CreateMap<Order, OrderModel>().ReverseMap();
+            CreateMap<Order, OrderModel>()
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
+                .ForMember(dest => dest.StoreAddress, opt => opt.MapFrom(src => src.Store.Address))
+                .ForMember(dest => dest.StorePhone, opt => opt.MapFrom(src => src.Store.PhoneNumber));
+            CreateMap<Pagination<Order>, Pagination<OrderModel>>().ConvertUsing<PaginationConverter<Order, OrderModel>>();
             CreateMap<Order, OrderProcessModel>().ReverseMap();
 
             CreateMap<OrderDetailProcessModel, ItemData>()
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.ProductName))
                 .ForMember(dest => dest.price, opt => opt.MapFrom(src => src.Price))
-                .ForMember(dest => dest.quantity, opt => opt.MapFrom(src => src.Quantity)); ;
+                .ForMember(dest => dest.quantity, opt => opt.MapFrom(src => src.Quantity));
         }
     }
 

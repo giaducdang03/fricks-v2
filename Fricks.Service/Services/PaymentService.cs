@@ -317,8 +317,9 @@ namespace Fricks.Service.Services
                         return false;
                     }
                 }
+                // payos call api two times
                 else if (order.Status == OrderStatus.SUCCESS.ToString()
-                    && order.PaymentStatus == PaymentStatus.PAID.ToString())
+                    && order.PaymentStatus == PaymentStatus.PAID.ToString() && confirmPayment.PaymentStatus == PaymentStatus.PAID)
                 {
                     return true;
                 }

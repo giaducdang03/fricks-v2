@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Fricks.Repository.Repositories.Interface
 {
     public interface IOrderRepository : IGenericRepository<Order>
     {
-        public Task<Pagination<Order>> GetByUserId(int userId, PaginationParameter paginationParameter);
+        public Task<Pagination<Order>> GetOrderPaging(int? userId, PaginationParameter paginationParameter, OrderFilter orderFilter);
 
         public Task<Order> GetOrderById(int id);
     }

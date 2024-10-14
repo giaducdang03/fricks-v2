@@ -47,7 +47,7 @@ namespace Fricks.Controllers
                     }
                     else
                     {
-                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
+                        return Redirect("https://frickshop.site/payment?status=paid&order=" + vnpayResponse.vnp_TxnRef);
                     }
                 }
                 if (uri.Contains("localhost"))
@@ -56,7 +56,7 @@ namespace Fricks.Controllers
                 }
                 else
                 {
-                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
+                    return Redirect("https://frickshop.site/payment?status=failed&order=" + vnpayResponse.vnp_TxnRef);
                 }
             }
             catch (Exception ex)
@@ -74,7 +74,6 @@ namespace Fricks.Controllers
         {
             try
             {
-                Console.WriteLine($"PayOs here {DateTime.Now}");
                 var uri = HttpContext.Request.Host.ToString();
                 var result = await _paymentService.ConfirmPayOSPayment(payOSResponseModel);
                 //if (result)
