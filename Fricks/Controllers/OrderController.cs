@@ -69,7 +69,6 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetOrderById(int id)
         {
             try
