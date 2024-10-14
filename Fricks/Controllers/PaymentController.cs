@@ -97,20 +97,20 @@ namespace Fricks.Controllers
                 {
                     if (uri.Contains("localhost"))
                     {
-                        return Redirect("http://localhost:3000/payment?status=paid&order=" + payOSResponseModel.id);
+                        return Redirect("http://localhost:3000/payment?status=paid&order=" + payOSResponseModel.orderCode);
                     }
                     else
                     {
-                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + payOSResponseModel.id);
+                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + payOSResponseModel.orderCode);
                     }
                 }
                 if (uri.Contains("localhost"))
                 {
-                    return Redirect("http://localhost:3000/payment?status=failed&order=" + payOSResponseModel.id);
+                    return Redirect("http://localhost:3000/payment?status=failed&order=" + payOSResponseModel.orderCode);
                 }
                 else
                 {
-                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + payOSResponseModel.id);
+                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + payOSResponseModel.orderCode);
                 }
             }
             catch (Exception ex)
