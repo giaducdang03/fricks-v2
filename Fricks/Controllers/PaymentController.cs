@@ -100,7 +100,7 @@ namespace Fricks.Controllers
                     }
                     else
                     {
-                        return Redirect("https://frickshop.site/payment/payment?status=paid&order=" + payOSResponseModel.orderCode);
+                        return Redirect("https://frickshop.site/payment?status=paid&order=" + payOSResponseModel.orderCode);
                     }
                 }
                 if (uri.Contains("localhost"))
@@ -109,7 +109,7 @@ namespace Fricks.Controllers
                 }
                 else
                 {
-                    return Redirect("https://frickshop.site/payment/payment?status=failed&order=" + payOSResponseModel.orderCode);
+                    return Redirect("https://frickshop.site/payment?status=failed&order=" + payOSResponseModel.orderCode);
                 }
             }
             catch (Exception ex)
