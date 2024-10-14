@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace Fricks.Repository.Repositories.Interface
 {
     public interface ITransactionRepository : IGenericRepository<Transaction>
     {
-        public Task<Pagination<Transaction>> GetTransactionsWalletPaging(int walletId, PaginationParameter paginationParameter);
+        public Task<Pagination<Transaction>> GetTransactionsWalletPaging(int walletId, PaginationParameter paginationParameter, TransactionFilter filter);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
@@ -96,7 +97,7 @@ namespace Fricks.Service.Services
             }
         }
 
-        public async Task<Pagination<TransactionModel>> GetTransationsWalletPaginationAsync(PaginationParameter paginationParameter, string email)
+        public async Task<Pagination<TransactionModel>> GetTransationsWalletPaginationAsync(PaginationParameter paginationParameter, string email, TransactionFilter transactionFilter)
         {
             var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
             if (currentUser != null)
@@ -107,7 +108,7 @@ namespace Fricks.Service.Services
                     var storeWallet = await _unitOfWork.WalletRepository.GetWalletStoreAsync(store.Id);
                     if (storeWallet != null)
                     {
-                        var transactions = await _unitOfWork.TransactionRepository.GetTransactionsWalletPaging(storeWallet.Id, paginationParameter);
+                        var transactions = await _unitOfWork.TransactionRepository.GetTransactionsWalletPaging(storeWallet.Id, paginationParameter, transactionFilter);
                         return _mapper.Map<Pagination<TransactionModel>>(transactions);
                     }
                     throw new Exception("Ví không tồn tại");
