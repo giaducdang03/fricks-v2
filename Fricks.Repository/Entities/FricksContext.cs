@@ -48,6 +48,7 @@ public partial class FricksContext : DbContext
     public virtual DbSet<Transaction> Transactions { get; set; }
 
     public virtual DbSet<Withdraw> Withdraws { get; set; }
+    public virtual DbSet<Banner> Banners { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -136,6 +137,8 @@ public partial class FricksContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__OrderDet__3214EC07BFF156B5");
 
             entity.ToTable("OrderDetail");
+
+            entity.Property(e => e.ProductUnit).HasMaxLength(20);
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
@@ -348,6 +351,19 @@ public partial class FricksContext : DbContext
             entity.HasOne(d => d.Wallet).WithMany(p => p.Withdraws)
                 .HasForeignKey(d => d.WalletId)
                 .HasConstraintName("FK__Withdraw__Wallet");
+        });
+
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Banner");
+
+            entity.ToTable("Banner");
+
+            entity.Property(e => e.CreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime2");
+
+            entity.Property(e => e.Name).HasMaxLength(150);
         });
 
         OnModelCreatingPartial(modelBuilder);
