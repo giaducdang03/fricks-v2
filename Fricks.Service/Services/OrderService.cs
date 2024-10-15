@@ -368,6 +368,7 @@ namespace Fricks.Service.Services
                                 ProductId = temp2.ProductId,
                                 Price = temp2.Price.Value,
                                 Quantity = temp.Quantity,
+                                ProductUnit = temp2.Unit.Name,
                                 CreateDate = CommonUtils.GetCurrentTime(),
                             };
                             orderdetails.Add(newOrderDetail);
