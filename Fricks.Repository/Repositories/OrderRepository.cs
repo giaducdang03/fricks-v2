@@ -27,7 +27,7 @@ namespace Fricks.Repository.Repositories
             // apply filter
             query = ApplyOrderFiltering(query, orderFilter, userId);
 
-            var itemCount = await _context.Orders.CountAsync();
+            var itemCount = await query.CountAsync();
             var items = await query.Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
                                     .AsNoTracking()
