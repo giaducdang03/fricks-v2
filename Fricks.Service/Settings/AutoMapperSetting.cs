@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Commons;
 using Fricks.Repository.Entities;
+using Fricks.Service.BusinessModel.BannerModels;
 using Fricks.Service.BusinessModel.BrandModels;
 using Fricks.Service.BusinessModel.CategoryModels;
 using Fricks.Service.BusinessModel.FavoriteProductModels;
@@ -125,6 +126,9 @@ namespace Fricks.Service.Settings
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.ProductName))
                 .ForMember(dest => dest.price, opt => opt.MapFrom(src => src.Price))
                 .ForMember(dest => dest.quantity, opt => opt.MapFrom(src => src.Quantity));
+
+            CreateMap<Banner, BannerModel>().ReverseMap();
+            CreateMap<Banner, BannerProcessModel>().ReverseMap();
         }
     }
 
