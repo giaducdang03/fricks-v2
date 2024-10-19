@@ -27,6 +27,8 @@ namespace Fricks.Service.BusinessModel.UserModels
 
         public DateTime? Dob { get; set; }
 
+        public string? Gender { get; set; }
+
         public string? Role { get; set; }
 
         public string? Status { get; set; }

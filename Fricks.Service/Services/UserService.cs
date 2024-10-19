@@ -583,6 +583,13 @@ namespace Fricks.Service.Services
 
         public async Task<UserModel> UpdateUserAsync(UpdateUserModel model)
         {
+            // check age
+            var userAge = CalculateAge(model.Dob);
+            if (userAge < 16)
+            {
+                throw new Exception("Để sử dụng hệ thống cần đủ 16 tuổi");
+            }
+
             var existUser = await _unitOfWork.UsersRepository.GetByIdAsync(model.UserId);
             if (existUser != null)
             {
@@ -590,6 +597,8 @@ namespace Fricks.Service.Services
                 existUser.UnsignFullName = StringUtils.ConvertToUnSign(model.FullName);
                 existUser.PhoneNumber = model.PhoneNumber;
                 existUser.Address = model.Address;
+                existUser.Dob = model.Dob;
+                existUser.Gender = model.Gender;
                 if (model.Avatar != null)
                 {
                     existUser.Avatar = model.Avatar;

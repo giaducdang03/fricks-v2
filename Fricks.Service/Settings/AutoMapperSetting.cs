@@ -29,7 +29,8 @@ namespace Fricks.Service.Settings
         public AutoMapperSetting() 
         {
             //Add Automapper
-            CreateMap<UserModel, User>().ReverseMap();
+            CreateMap<User, UserModel>()
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.ToString()));
             CreateMap<CreateUserModel, User>();
             
             CreateMap<BrandModel, Brand>().ReverseMap();
