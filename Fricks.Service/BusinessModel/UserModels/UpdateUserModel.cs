@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fricks.Repository.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Fricks.Service.BusinessModel.UserModels
 
         public DateTime Dob { get; set; }
 
-        public int? Gender { get; set; }
+        public Gender? Gender { get; set; }
 
         public string? Avatar { get; set; }
     }
