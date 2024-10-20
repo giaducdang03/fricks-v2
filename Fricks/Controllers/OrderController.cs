@@ -39,7 +39,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -60,7 +60,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -78,7 +78,7 @@ namespace Fricks.Controllers
                 {
                     return Ok(result);
                 }
-                return NotFound(new ResponseModel
+                return NotFound(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status404NotFound,
                     Message = "Không tìm thấy đơn hàng"
@@ -87,7 +87,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -105,7 +105,7 @@ namespace Fricks.Controllers
                 var result = await _orderService.GetOrderPaging(currentEmail, paginationParameter, orderFilter);
                 if (result == null)
                 {
-                    return NotFound(new ResponseModel()
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Không có đơn hàng nào"
@@ -128,7 +128,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
