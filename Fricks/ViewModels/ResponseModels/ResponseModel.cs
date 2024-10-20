@@ -3,10 +3,11 @@ using System.Web;
 
 namespace Fricks.ViewModels.ResponseModels
 {
-    public class ResponseModel
+    public class ResponseModel<T>
     {
         public int HttpCode { get; set; } = 200;
         public string Message { get; set; } = "";
+        public T Data { get; set; } = default(T);
 
         public string ToUrlParameters()
         {

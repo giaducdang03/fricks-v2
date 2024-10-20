@@ -33,7 +33,7 @@ namespace Fricks.Controllers
                 var result = await _feedbackService.GetFeedbackProductPaginationAsync(productId, paginationParameter, feedbackFilter);
                 if (result == null)
                 {
-                    return NotFound(new ResponseModel()
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Không có đánh giá"
@@ -56,7 +56,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -77,9 +77,14 @@ namespace Fricks.Controllers
                     var result = await _feedbackService.CreateFeedbackAsync(createFeedbackModel, currentEmail);
                     if (result != null)
                     {
-                        return Ok(result);
+                        return Ok(new ResponseModel<FeedbackModel>
+                        {
+                            Data = result,
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Cảm ơn bạn đã đánh giá sản phẩm này"
+                        });
                     }
-                    return BadRequest(new ResponseModel()
+                    return BadRequest(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = "Có lỗi trong quá trình gửi đánh giá. Thử lại sau."
@@ -90,7 +95,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -113,7 +118,7 @@ namespace Fricks.Controllers
                     {
                         return Ok(result);
                     }
-                    return BadRequest(new ResponseModel()
+                    return BadRequest(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = "Có lỗi trong quá trình gửi đánh giá. Thử lại sau."
@@ -124,7 +129,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -143,13 +148,13 @@ namespace Fricks.Controllers
                 var result = await _feedbackService.DeleteFeedbackAsync(id, currentEmail);
                 if (result != null)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = $"Xóa đánh giá thành công."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Có lỗi trong quá trình xóa đánh giá."
@@ -157,7 +162,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
