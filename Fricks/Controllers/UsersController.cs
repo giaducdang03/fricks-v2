@@ -134,11 +134,7 @@ namespace Fricks.Controllers
 
                     if (updateUser != null)
                     {
-                        return Ok(new ResponseModel
-                        {
-                            HttpCode = StatusCodes.Status200OK,
-                            Message = $"Cập nhật thông tin tài khoản {updateUser.Email} thành công."
-                        });
+                        return Ok(updateUser);
                     }
                     return NotFound(new ResponseModel
                     {
