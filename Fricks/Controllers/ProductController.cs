@@ -57,38 +57,6 @@ namespace Fricks.Controllers
             } catch { throw; }
         }
 
-        //[HttpGet("get-all-store-pagin")]
-        //public async Task<IActionResult> GetAllProductStore(int storeId, [FromQuery] PaginationParameter paginationParameter,
-        //                                                    int brandId, int categoryId)
-        //{
-        //    try
-        //    {
-        //        var result = await _productService.GetAllProductByStoreIdPagination(storeId, brandId, categoryId, paginationParameter);
-        //        var metadata = new
-        //        {
-        //            result.TotalCount,
-        //            result.PageSize,
-        //            result.CurrentPage,
-        //            result.TotalPages,
-        //            result.HasNext,
-        //            result.HasPrevious
-        //        };
-        //        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-        //        return Ok(result);
-        //    }
-        //    catch { throw; }
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Add(ProductRegisterModel model)
-        //{
-        //    try
-        //    {
-        //        var result = await _productService.AddProduct(model);
-        //        return Ok(result);
-        //    } catch { throw; }
-        //}
-
         [HttpPost]
         [Authorize(Roles = "ADMIN,STORE")]
         public async Task<IActionResult> CreateUserAsync(CreateProductModel model)
@@ -101,7 +69,12 @@ namespace Fricks.Controllers
                     var result = await _productService.AddProduct(model, currentEmail);
                     if (result != null)
                     {
-                        return Ok(result);
+                        return Ok(new ResponseModel<ProductModel>
+                        {
+                            Data = result,
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Tạo sản phẩm mới thành công"
+                        });
                     }
                     else
                     {
@@ -113,7 +86,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -124,16 +97,23 @@ namespace Fricks.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = "ADMIN,STORE")]
         public async Task<IActionResult> Update (int id, ProductProcessModel model) 
         {
             try
             {
                 var result = await _productService.UpdateProduct(id, model);
-                return Ok(result);
+                return Ok(new ResponseModel<ProductModel>
+                {
+                    Data = result,
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Cập nhật sản phẩm thành công"
+                });
             } catch { throw; }
         }
 
         [HttpDelete]
+        [Authorize(Roles = "ADMIN,STORE")]
         public async Task<IActionResult> Delete(int id)
         {
             try

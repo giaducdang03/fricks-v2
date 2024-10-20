@@ -1,4 +1,5 @@
 ﻿using Fricks.Service.BusinessModel.AuthenModels;
+using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
 using Fricks.ViewModels.RequestModels;
@@ -30,7 +31,7 @@ namespace Fricks.Controllers
                 if (ModelState.IsValid)
                 {
                     var result = await _userService.RegisterAsync(model);
-                    var resp = new ResponseModel
+                    var resp = new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Mã OTP đã được gửi về email của bạn. Vui lòng xác thực để đăng nhập."
@@ -42,7 +43,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -69,7 +70,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -92,7 +93,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -111,13 +112,13 @@ namespace Fricks.Controllers
                 var result = await _userService.ChangePasswordAsync(email, changePasswordModel);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Đổi mật khẩu thành công."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Không thể đổi mật khẩu."
@@ -125,7 +126,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -152,7 +153,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -169,13 +170,13 @@ namespace Fricks.Controllers
                 var result = await _userService.RequestResetPassword(email);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Mã OTP đặt lại mật khẩu đã được gửi qua email."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Đặt lại mật khẩu thất bại."
@@ -183,7 +184,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -200,13 +201,13 @@ namespace Fricks.Controllers
                 var result = await _userService.ConfirmResetPassword(confirmOtpModel);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Bạn có thể đặt lại mật khẩu ngay bây giờ."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "OTP không hợp lệ. Hãy thử lại."
@@ -214,7 +215,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -231,13 +232,13 @@ namespace Fricks.Controllers
                 var result = await _userService.ExecuteResetPassword(resetPasswordModel);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Đặt lại mật khẩu thành công."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Đặt lại mật khẩu thất bại."
@@ -245,7 +246,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -266,7 +267,7 @@ namespace Fricks.Controllers
                 {
                     return Ok(result);
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Không thể lấy thông tin tài khoản."
@@ -274,7 +275,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -297,7 +298,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -314,13 +315,13 @@ namespace Fricks.Controllers
                 var result = await _userService.ResendOtpConfirmAsync(email);
                 if (result != null)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = $"Mã OTP đã được gửi về email {result.Email}"
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Không thể gửi mã OTP"
@@ -328,7 +329,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -345,13 +346,13 @@ namespace Fricks.Controllers
                 var result = await _userService.CancelEmailConfrimAsync(email);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Đã hủy tạo tài khoản"
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Không thể hủy tạo tài khoản"
@@ -359,7 +360,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
