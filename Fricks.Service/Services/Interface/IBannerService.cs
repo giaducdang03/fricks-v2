@@ -11,7 +11,7 @@ namespace Fricks.Service.Services.Interface
     public interface IBannerService
     {
         public Task<BannerModel> AddBanner(BannerProcessModel banner);
-        public Task<BannerModel> UpdateBanner(int id, BannerProcessModel banner);
+        public Task<BannerModel> UpdateBanner(BannerUpdateModel bannerUpdateModel);
         public Task<BannerModel> DeleteBanner(int id);
         public Task<BannerModel> GetBannerById(int id);
         public Task<List<BannerModel>> GetAllBanner();

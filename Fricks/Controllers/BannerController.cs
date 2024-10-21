@@ -1,5 +1,6 @@
 ﻿using Fricks.Service.BusinessModel.BannerModels;
 using Fricks.Service.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Add(BannerProcessModel bannerProcess)
         {
             try
@@ -47,16 +49,18 @@ namespace Fricks.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int id, BannerProcessModel bannerProcess)
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> Update(BannerUpdateModel bannerUpdateModel)
         {
             try
             {
-                var result = await _bannerService.UpdateBanner(id, bannerProcess);
+                var result = await _bannerService.UpdateBanner(bannerUpdateModel);
                 return Ok(result);
             } catch { throw; }
         }
 
         [HttpDelete]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             try
