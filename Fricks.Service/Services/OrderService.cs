@@ -352,6 +352,18 @@ namespace Fricks.Service.Services
 
                 int totalPrice = 0;
 
+                // add fee ship
+
+                var buyStore = await _unitOfWork.StoreRepository.GetStoreByIdAsync(storeId);
+                if (buyStore == null)
+                {
+                    throw new Exception($"Cửa hàng không tồn tại");
+                }
+
+                int shipFree = buyStore.DefaultShip != null ? buyStore.DefaultShip.Value : 0;
+
+                totalPrice += shipFree;
+
                 List<OrderDetail> orderdetails = new List<OrderDetail>();
                 foreach (var order in orderedProducts)
                 {
@@ -389,6 +401,7 @@ namespace Fricks.Service.Services
                     Code = GenerateOrderCode(storeId),
                     StoreId = storeId,
                     Total = totalPrice,
+                    ShipFee = shipFree,
                     OrderDetails = orderdetails
                 };
 
