@@ -31,5 +31,7 @@ namespace Fricks.Service.BusinessModel.StoreModels
         public string? AccountNumber { get; set; }
 
         public string? AccountName { get; set; }
+
+        public int? DefaultShip { get; set; }
     }
 }

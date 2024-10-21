@@ -25,6 +25,8 @@ public partial class Store : BaseEntity
 
     public string? AccountName { get; set; }
 
+    public int? DefaultShip {  get; set; }
+
     public virtual User? Manager { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
