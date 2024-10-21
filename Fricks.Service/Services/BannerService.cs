@@ -61,9 +61,9 @@ namespace Fricks.Service.Services
             return _mapper.Map<BannerModel>(await _unitOfWork.BannerRepository.GetByIdAsync(id));
         }
 
-        public async Task<BannerModel> UpdateBanner(int id, BannerProcessModel bannerModel)
+        public async Task<BannerModel> UpdateBanner(BannerUpdateModel bannerModel)
         {
-            var banner = await _unitOfWork.BannerRepository.GetByIdAsync(id);
+            var banner = await _unitOfWork.BannerRepository.GetByIdAsync(bannerModel.Id);
             if (banner == null)
             {
                 throw new Exception("Banner không tồn tại");
@@ -71,7 +71,7 @@ namespace Fricks.Service.Services
             var allBanner = await _unitOfWork.BannerRepository.GetAllAsync();
             foreach (var bannerExist in allBanner)
             {
-                if (bannerExist.Index == banner.Index)
+                if (bannerExist.Index == bannerModel.Index)
                 {
                     throw new Exception("Index đã tồn tại");
                 }
