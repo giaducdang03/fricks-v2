@@ -12,6 +12,7 @@ namespace Fricks.Repository.Enum
         PAID,
         FAILED,
         PARTIAL,
+        PROCESSING,
         FULL
     }
 }
