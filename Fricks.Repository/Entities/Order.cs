@@ -41,6 +41,8 @@ public partial class Order : BaseEntity
 
     public int? VoucherId { get; set; }
 
+    public long PaymentCode { get; set; }
+
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual Store? Store { get; set; }

@@ -81,5 +81,10 @@ namespace Fricks.Repository.Repositories
 
             return query;
         }
+
+        public async Task<Order> GetOrderByPaymentCode(long paymentCode)
+        {
+            return await _context.Orders.Include(x => x.Store).Include(x => x.OrderDetails).ThenInclude(x => x.Product).FirstOrDefaultAsync(x => x.PaymentCode == paymentCode);
+        }
     }
 }
