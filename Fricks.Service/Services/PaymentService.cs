@@ -58,7 +58,7 @@ namespace Fricks.Service.Services
             var paymentConfirm = new ConfirmPaymentModel
             {
                 TransactionNo = payOSResponse.id,
-                PaymentStatus = payOSResponse.code == "00" ? PaymentStatus.PAID : PaymentStatus.FAILED,
+                PaymentStatus = !payOSResponse.cancel ? PaymentStatus.PAID : PaymentStatus.FAILED,
             };
             return await ConfirmPaymentOrderAsync(orderPaymentCode, paymentConfirm);
         }
