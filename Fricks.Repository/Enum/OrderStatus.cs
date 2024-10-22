@@ -9,6 +9,9 @@ namespace Fricks.Repository.Enum
     public enum OrderStatus
     {
         PENDING,
+        DELIVERY,
+        DONE,
+        CANCELED,
         SUCCESS,
         ERROR
     }

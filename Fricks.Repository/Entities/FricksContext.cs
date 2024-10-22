@@ -119,6 +119,8 @@ public partial class FricksContext : DbContext
             entity.Property(e => e.BankTranNo).HasMaxLength(100);
             entity.Property(e => e.TransactionNo).HasMaxLength(100);
 
+            entity.Property(e => e.DeliveryDate).HasColumnType("datetime2");
+
             entity.HasOne(d => d.Store).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.StoreId)
                 .HasConstraintName("FK__Order__StoreId__6D0D32F4");

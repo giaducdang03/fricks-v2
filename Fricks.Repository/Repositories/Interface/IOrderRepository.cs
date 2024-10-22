@@ -14,5 +14,7 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<Pagination<Order>> GetOrderPaging(int? userId, PaginationParameter paginationParameter, OrderFilter orderFilter);
 
         public Task<Order> GetOrderById(int id);
+
+        public Task<Order> GetOrderByPaymentCode(long paymentCode);
     }
 }

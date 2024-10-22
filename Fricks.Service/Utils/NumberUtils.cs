@@ -18,7 +18,9 @@ namespace Fricks.Service.Utils
         public static long GetRandomLong()
         {
             Random rand = new Random();
-            return rand.NextInt64((long)Math.Pow(2, 53) - 1);
+            long min = (long)Math.Pow(10, 13); // 10^13, minimum 14-digit number
+            long max = (long)Math.Pow(10, 14) - 1; // 10^14 - 1, maximum 14-digit number
+            return min + (long)(rand.NextDouble() * (max - min));
         }
     }
 }

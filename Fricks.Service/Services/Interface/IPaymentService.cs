@@ -19,7 +19,7 @@ namespace Fricks.Service.Services.Interface
         public Task<CreatePaymentResult> CreatePaymentLink(List<ItemData> listProduct, int totalPrice, Order order);
         public Task<CreatePaymentResult> CreatePayOsLinkOrder(int totalPrice, Order order);
         public CreatePaymentResult CreateVnpayLinkOrder(Order order, HttpContext httpContext);
-        public Task<bool> ConfirmVnpayPayment(VnPayModel vnPayResponse);
-        public Task<bool> ConfirmPayOSPayment(PayOSResponseModel payOSResponse);
+        public Task<Order> ConfirmVnpayPayment(VnPayModel vnPayResponse);
+        public Task<Order> ConfirmPayOSPayment(PayOSResponseModel payOSResponse);
     }
 }

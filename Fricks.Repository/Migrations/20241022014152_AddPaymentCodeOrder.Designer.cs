@@ -4,6 +4,7 @@ using Fricks.Repository.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fricks.Repository.Migrations
 {
     [DbContext(typeof(FricksContext))]
-    partial class FricksContextModelSnapshot : ModelSnapshot
+    [Migration("20241022014152_AddPaymentCodeOrder")]
+    partial class AddPaymentCodeOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,12 +255,6 @@ namespace Fricks.Repository.Migrations
                     b.Property<string>("CustomerPhone")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("DeliveryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeliveryImage")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Discount")
                         .HasColumnType("int");
