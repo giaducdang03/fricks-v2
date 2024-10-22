@@ -51,7 +51,11 @@ namespace Fricks.Service.BusinessModel.OrderModels
         public string? StoreAddress { get; set; }
 
         public int? VoucherId { get; set; }
-        
+
+        public DateTime? DeliveryDate { get; set; }
+
+        public string? DeliveryImage { get; set; }
+
         public List<OrderDetailModel>? OrderDetails { get; set; }
     }
 }

@@ -288,7 +288,7 @@ namespace Fricks.Service.Services
                         }
 
                         // update order
-                        order.Status = OrderStatus.SUCCESS.ToString();
+                        order.Status = OrderStatus.DELIVERY.ToString();
                         order.PaymentStatus = PaymentStatus.PAID.ToString();
                         order.TransactionNo = confirmPayment.TransactionNo;
                         order.BankTranNo = confirmPayment.BankTranNo;
@@ -304,7 +304,7 @@ namespace Fricks.Service.Services
                     else
                     {
                         // update order
-                        order.Status = OrderStatus.ERROR.ToString();
+                        order.Status = OrderStatus.CANCELED.ToString();
                         order.PaymentStatus = PaymentStatus.FAILED.ToString();
                         order.PaymentDate = CommonUtils.GetCurrentTime();
 
@@ -315,7 +315,7 @@ namespace Fricks.Service.Services
                     }
                 }
                 // payos call api two times
-                else if (order.Status == OrderStatus.SUCCESS.ToString()
+                else if (order.Status == OrderStatus.DELIVERY.ToString()
                     && order.PaymentStatus == PaymentStatus.PAID.ToString() && confirmPayment.PaymentStatus == PaymentStatus.PAID)
                 {
                     return order;

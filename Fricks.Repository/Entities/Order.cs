@@ -43,6 +43,10 @@ public partial class Order : BaseEntity
 
     public long PaymentCode { get; set; }
 
+    public DateTime? DeliveryDate { get; set; }
+
+    public string? DeliveryImage { get; set; }
+
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual Store? Store { get; set; }
