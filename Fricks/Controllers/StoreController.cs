@@ -41,7 +41,7 @@ namespace Fricks.Controllers
                 {
                     return Ok(result);
                 }
-                return NotFound(new ResponseModel()
+                return NotFound(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status404NotFound,
                     Message = "Tài khoản này chưa quản lí cửa hàng nào"
@@ -50,7 +50,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -80,7 +80,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -101,7 +101,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -117,7 +117,7 @@ namespace Fricks.Controllers
             try
             {
                 var result = await _storeService.UpdateStore(id, model);
-                return Ok(new ResponseModel
+                return Ok(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status200OK,
                     Message = $"Cập nhật cửa hàng {result.Name} thành công."
@@ -126,7 +126,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -142,7 +142,7 @@ namespace Fricks.Controllers
             try
             {
                 var result = await _storeService.DeleteStore(id);
-                return Ok(new ResponseModel
+                return Ok(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status200OK,
                     Message = $"Xóa cừa hàng {result.Name} thành công."
@@ -151,7 +151,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()

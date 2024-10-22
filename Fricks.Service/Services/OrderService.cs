@@ -352,6 +352,18 @@ namespace Fricks.Service.Services
 
                 int totalPrice = 0;
 
+                // add fee ship
+
+                var buyStore = await _unitOfWork.StoreRepository.GetStoreByIdAsync(storeId);
+                if (buyStore == null)
+                {
+                    throw new Exception($"Cửa hàng không tồn tại");
+                }
+
+                int shipFree = buyStore.DefaultShip != null ? buyStore.DefaultShip.Value : 0;
+
+                totalPrice += shipFree;
+
                 List<OrderDetail> orderdetails = new List<OrderDetail>();
                 foreach (var order in orderedProducts)
                 {
@@ -368,12 +380,16 @@ namespace Fricks.Service.Services
                                 ProductId = temp2.ProductId,
                                 Price = temp2.Price.Value,
                                 Quantity = temp.Quantity,
+                                ProductUnit = temp2.Unit.Name,
                                 CreateDate = CommonUtils.GetCurrentTime(),
                             };
                             orderdetails.Add(newOrderDetail);
                         }
                     }
                 }
+
+                // add payment code
+                long paymentCode = NumberUtils.GetRandomLong();
 
                 var newOrder = new Order
                 {
@@ -385,9 +401,11 @@ namespace Fricks.Service.Services
                     Status = OrderStatus.PENDING.ToString(),
                     PaymentMethod = orderModel.PaymentMethod.ToString(),
                     PaymentStatus = PaymentStatus.PENDING.ToString(),
-                    Code = GenerateOrderCode(storeId),
+                    Code = GenerateOrderCode(storeId, paymentCode),
                     StoreId = storeId,
                     Total = totalPrice,
+                    ShipFee = shipFree,
+                    PaymentCode = paymentCode,
                     OrderDetails = orderdetails
                 };
 
@@ -396,11 +414,11 @@ namespace Fricks.Service.Services
             throw new Exception("Không có sản phẩm nào trong đơn hàng");
         }
 
-        private static string GenerateOrderCode(int storeId)
+        private static string GenerateOrderCode(int storeId, long paymentCode)
         {
-            string formattedStoreId = storeId.ToString("D2");
-            string timestamp = CommonUtils.GetCurrentTime().ToString("yyyyMMddHHmmss");
-            return $"ST{formattedStoreId}_OD_{timestamp}";
+            string formattedStoreId = storeId.ToString("D3");
+            //string timestamp = CommonUtils.GetCurrentTime().ToString("yyyyMMddHHmmss");
+            return $"ST{formattedStoreId}_OD_{paymentCode}";
         }
     }
 }

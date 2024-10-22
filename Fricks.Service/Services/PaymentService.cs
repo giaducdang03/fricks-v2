@@ -42,31 +42,28 @@ namespace Fricks.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<bool> ConfirmPayOSPayment(PayOSResponseModel payOSResponse)
+        public async Task<Order> ConfirmPayOSPayment(PayOSResponseModel payOSResponse)
         {
             if(payOSResponse == null)
             {
                 throw new Exception("Có lỗi trong quá trình thanh toán");
             }
-            // get order id
-            int orderId = 0;
-            _ = int.TryParse(payOSResponse.orderCode, out orderId);
+
+            // get order payment code
+            long orderPaymentCode = 0;
+            _ = long.TryParse(payOSResponse.orderCode, out orderPaymentCode);
             PayOS payOs = new PayOS(_payOSSetting.ClientId, _payOSSetting.ApiKey, _payOSSetting.ChecksumKey);
-            PaymentLinkInformation paymentLinkInformation = await payOs.getPaymentLinkInformation(orderId);
-            //Cái payOS có vụ thanh toán thiếu ::)))))))
-            //Lý do nó đéo gửi hết data về 1 lượt là vậy á
-            bool flag = false;
-            //Do là giao dịch chuyển khoản nên PayOS ko có track ngân hàng đầu vào, ko lấy đc bank
+            PaymentLinkInformation paymentLinkInformation = await payOs.getPaymentLinkInformation(orderPaymentCode);
+
             var paymentConfirm = new ConfirmPaymentModel
             {
                 TransactionNo = payOSResponse.id,
                 PaymentStatus = !payOSResponse.cancel ? PaymentStatus.PAID : PaymentStatus.FAILED,
             };
-            flag = await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
-            return flag;
+            return await ConfirmPaymentOrderAsync(orderPaymentCode, paymentConfirm);
         }
 
-        public async Task<bool> ConfirmVnpayPayment(VnPayModel vnPayResponse)
+        public async Task<Order> ConfirmVnpayPayment(VnPayModel vnPayResponse)
         {
             // get info transaction
             if (vnPayResponse != null)
@@ -83,9 +80,9 @@ namespace Fricks.Service.Services
                     vnpay.AddResponseData(name, valueStr);
                 }
 
-                // get order id
-                int orderId = 0;
-                _ = int.TryParse(vnPayResponse.vnp_TxnRef, out orderId);
+                // get order payment code
+                long orderPaymentCode = 0;
+                _ = long.TryParse(vnPayResponse.vnp_TxnRef, out orderPaymentCode);
 
                 var vnpayHashSecret = _vnpaySetting.HashSecret;
                 bool validateSignature = vnpay.ValidateSignature(vnPayResponse.vnp_SecureHash, vnpayHashSecret);
@@ -101,7 +98,7 @@ namespace Fricks.Service.Services
                             PaymentStatus = PaymentStatus.PAID
                         };
 
-                        return await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                        return await ConfirmPaymentOrderAsync(orderPaymentCode, paymentConfirm);
                     }
                     else
                     {
@@ -113,7 +110,7 @@ namespace Fricks.Service.Services
                             PaymentStatus = PaymentStatus.FAILED
                         };
 
-                        return await ConfirmPaymentOrderAsync(orderId, paymentConfirm);
+                        return await ConfirmPaymentOrderAsync(orderPaymentCode, paymentConfirm);
                     }
                 }
                 throw new Exception("Chữ ký không hợp lệ");
@@ -170,7 +167,7 @@ namespace Fricks.Service.Services
                 }
 
                 PaymentData paymentData = new PaymentData(
-                    order.Id,
+                    order.PaymentCode,
                     totalPrice,
                     $"Thanh toán đơn hàng",
                     listProducts,
@@ -213,7 +210,7 @@ namespace Fricks.Service.Services
             pay.AddRequestData("vnp_Locale", _vnpaySetting.Locale);
             pay.AddRequestData("vnp_OrderInfo", $"Thanh toan cho don hang {order.Code}");
             pay.AddRequestData("vnp_OrderType", "250000");
-            pay.AddRequestData("vnp_TxnRef", order.Id.ToString());
+            pay.AddRequestData("vnp_TxnRef", order.PaymentCode.ToString());
 
             // check server running
             if (ipAddress == "::1")
@@ -232,9 +229,9 @@ namespace Fricks.Service.Services
             return createPaymentResult;
         }
 
-        private async Task<bool> ConfirmPaymentOrderAsync(int orderId, ConfirmPaymentModel confirmPayment)
+        private async Task<Order> ConfirmPaymentOrderAsync(long orderPaymentCode, ConfirmPaymentModel confirmPayment)
         {
-            var order = await _unitOfWork.OrderRepository.GetOrderById(orderId);
+            var order = await _unitOfWork.OrderRepository.GetOrderByPaymentCode(orderPaymentCode);
             if (order != null)
             {
                 if (order.Status == OrderStatus.PENDING.ToString()
@@ -302,7 +299,7 @@ namespace Fricks.Service.Services
                         _unitOfWork.OrderRepository.UpdateAsync(order);
                         _unitOfWork.Save();
 
-                        return true;
+                        return order;
                     }
                     else
                     {
@@ -314,14 +311,14 @@ namespace Fricks.Service.Services
                         _unitOfWork.OrderRepository.UpdateAsync(order);
                         _unitOfWork.Save();
 
-                        return false;
+                        return order;
                     }
                 }
                 // payos call api two times
                 else if (order.Status == OrderStatus.SUCCESS.ToString()
                     && order.PaymentStatus == PaymentStatus.PAID.ToString() && confirmPayment.PaymentStatus == PaymentStatus.PAID)
                 {
-                    return true;
+                    return order;
                 }
                 throw new Exception("Không thể cập nhật trạng thái đơn hàng");
             }

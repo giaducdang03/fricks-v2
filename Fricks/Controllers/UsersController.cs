@@ -32,7 +32,7 @@ namespace Fricks.Controllers
                 var result = await _userService.GetUserPaginationAsync(paginationParameter);
                 if (result == null)
                 {
-                    return NotFound(new ResponseModel()
+                    return NotFound(new ResponseModel<UserModel>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Account is empty"
@@ -55,7 +55,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<UserModel>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -73,7 +73,7 @@ namespace Fricks.Controllers
                 var data = await _userService.GetUserByIdAsync(id);
                 if (data == null)
                 {
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<UserModel>
                     {
                         HttpCode = 404,
                         Message = "Tài khoản không tồn tại."
@@ -84,7 +84,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<UserModel>
                 {
                     HttpCode = 400,
                     Message = ex.Message
@@ -101,7 +101,7 @@ namespace Fricks.Controllers
                 if (ModelState.IsValid)
                 {
                     var result = await _userService.CreateUserAsync(model);
-                    var resp = new ResponseModel()
+                    var resp = new ResponseModel<UserModel>()
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Tạo tài khoản thành công. Vui lòng kiểm tra email để đăng nhập vào Fricks."
@@ -113,7 +113,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<UserModel>()
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -134,13 +134,14 @@ namespace Fricks.Controllers
 
                     if (updateUser != null)
                     {
-                        return Ok(new ResponseModel
+                        return Ok(new ResponseModel<UserModel>
                         {
+                            Data = updateUser,
                             HttpCode = StatusCodes.Status200OK,
-                            Message = $"Cập nhật thông tin tài khoản {updateUser.Email} thành công."
+                            Message = "Cập nhật thông tin tài khoản thành công"
                         });
                     }
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<UserModel>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Có lỗi trong quá trình cập nhật thông tin tài khoản."
@@ -152,7 +153,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<UserModel>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -170,13 +171,13 @@ namespace Fricks.Controllers
                 var result = await _userService.DeleteUserAsync(id, currentEmail);
                 if (result != null)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<UserModel>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = $"Xóa người dùng {result.Email} thành công."
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<UserModel>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Có lỗi trong quá trình xóa người dùng."
@@ -184,7 +185,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<UserModel>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()

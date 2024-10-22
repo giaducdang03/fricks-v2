@@ -34,7 +34,7 @@ namespace Fricks.Controllers
                 var result = await _postService.GetPostPaginationAsync(paginationParameter, postFilter, currentEmail);
                 if (result == null)
                 {
-                    return NotFound(new ResponseModel()
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Không có bài viết nào"
@@ -57,7 +57,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
                 return BadRequest(
-                    new ResponseModel()
+                    new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status400BadRequest,
                         Message = ex.Message.ToString()
@@ -74,7 +74,7 @@ namespace Fricks.Controllers
                 var data = await _postService.GetPostByIdAsync(id);
                 if (data == null)
                 {
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = 404,
                         Message = "Bài viết không tồn tại"
@@ -85,7 +85,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = 400,
                     Message = ex.Message
@@ -102,13 +102,13 @@ namespace Fricks.Controllers
                 var result = await _postService.DeletePostAsync(id);
                 if (result != null)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = $"Xóa bài viết '{result.Title}' thành công"
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = "Có lỗi trong quá trình xóa bài viết"
@@ -116,7 +116,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -134,7 +134,7 @@ namespace Fricks.Controllers
                 if (ModelState.IsValid)
                 {
                     var result = await _postService.AddPostAsync(createPostModel);
-                    var resp = new ResponseModel()
+                    var resp = new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Tạo bài viết thành công"
@@ -146,7 +146,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -167,13 +167,13 @@ namespace Fricks.Controllers
 
                     if (updatePost != null)
                     {
-                        return Ok(new ResponseModel
+                        return Ok(new ResponseModel<string>
                         {
                             HttpCode = StatusCodes.Status200OK,
                             Message = $"Cập nhật thông tin bài viết thành công."
                         });
                     }
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Có lỗi trong quá trình cập nhật thông tin bài viết."
@@ -185,7 +185,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message

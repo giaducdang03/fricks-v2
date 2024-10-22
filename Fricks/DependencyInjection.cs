@@ -36,6 +36,7 @@ namespace Fricks
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IOrderDetailService, OrderDetailService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IBannerService, BannerService>();
 
             // add Middleware
             services.AddExceptionHandler<ExceptionHandlerMiddleware>();

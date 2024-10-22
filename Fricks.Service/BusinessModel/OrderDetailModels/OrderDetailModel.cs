@@ -21,6 +21,8 @@ namespace Fricks.Service.BusinessModel.OrderDetailModels
 
         public int? Quantity { get; set; }
 
+        public string? ProductUnit { get; set; }
+
         public ProductModel? Product { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace Fricks.Repository.Repositories
             // apply filter
             query = ApplyOrderFiltering(query, orderFilter, userId);
 
-            var itemCount = await _context.Orders.CountAsync();
+            var itemCount = await query.CountAsync();
             var items = await query.Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
                                     .AsNoTracking()
@@ -80,6 +80,11 @@ namespace Fricks.Repository.Repositories
             }
 
             return query;
+        }
+
+        public async Task<Order> GetOrderByPaymentCode(long paymentCode)
+        {
+            return await _context.Orders.Include(x => x.Store).Include(x => x.OrderDetails).ThenInclude(x => x.Product).FirstOrDefaultAsync(x => x.PaymentCode == paymentCode);
         }
     }
 }

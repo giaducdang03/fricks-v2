@@ -45,7 +45,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -65,7 +65,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -84,7 +84,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -102,13 +102,13 @@ namespace Fricks.Controllers
                 var result = await _favoriteProductService.DeleteAllUserFavoriteProduct(currentEmail);
                 if (result)
                 {
-                    return Ok(new ResponseModel
+                    return Ok(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status200OK,
                         Message = "Đã xóa danh sách sản phẩm yêu thích"
                     });
                 }
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status200OK,
                     Message = "Có lỗi trong quá trình xóa"
@@ -116,7 +116,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message

@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Commons;
+using Fricks.Repository.Commons.Filters;
 using Fricks.Service.BusinessModel.WalletModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
@@ -34,7 +35,7 @@ namespace Fricks.Controllers
                 var data = await _walletService.GetWalletStoreAsync(currentEmail);
                 if (data == null)
                 {
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = 404,
                         Message = "Không tìm thấy ví của cửa hàng này"
@@ -45,7 +46,7 @@ namespace Fricks.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -54,15 +55,15 @@ namespace Fricks.Controllers
         }
         [HttpGet("store/transactions")]
         [Authorize(Roles = "STORE")]
-        public async Task<IActionResult> GetTransactionsWallet([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetTransactionsWallet([FromQuery] PaginationParameter paginationParameter, [FromQuery] TransactionFilter transactionFilter)
         {
             try
             {
                 var currentEmail = _claimsService.GetCurrentUserEmail;
-                var result = await _walletService.GetTransationsWalletPaginationAsync(paginationParameter, currentEmail);
+                var result = await _walletService.GetTransationsWalletPaginationAsync(paginationParameter, currentEmail, transactionFilter);
                 if (result == null)
                 {
-                    return NotFound(new ResponseModel
+                    return NotFound(new ResponseModel<string>
                     {
                         HttpCode = StatusCodes.Status404NotFound,
                         Message = "Không có giao dịch"
@@ -84,7 +85,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseModel
+                return BadRequest(new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message
@@ -109,7 +110,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -135,7 +136,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
@@ -160,7 +161,7 @@ namespace Fricks.Controllers
             }
             catch (Exception ex)
             {
-                var resp = new ResponseModel()
+                var resp = new ResponseModel<string>
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()

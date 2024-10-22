@@ -1,4 +1,5 @@
 ﻿using Fricks.Repository.Entities;
+using Fricks.Repository.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace Fricks.Service.BusinessModel.UserModels
         public string? PhoneNumber { get; set; }
 
         public DateTime? Dob { get; set; }
+
+        public Gender? Gender { get; set; }
 
         public string? Role { get; set; }
 

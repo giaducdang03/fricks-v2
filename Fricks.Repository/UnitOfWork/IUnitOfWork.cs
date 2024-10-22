@@ -26,7 +26,8 @@ namespace Fricks.Repository.UnitOfWork
 
         IFeedbackRepository FeedbackRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
-        IOrderRepository OrderRepository { get; }   
+        IOrderRepository OrderRepository { get; }
+        IBannerRepository BannerRepository { get; }
         int Save();
         void Commit();
         void Rollback();
