@@ -58,8 +58,22 @@ namespace Fricks.Service.Services
             var paymentConfirm = new ConfirmPaymentModel
             {
                 TransactionNo = payOSResponse.id,
-                PaymentStatus = !payOSResponse.cancel ? PaymentStatus.PAID : PaymentStatus.FAILED,
             };
+            switch (payOSResponse.status)
+            {
+                case "PAID":
+                    paymentConfirm.PaymentStatus = PaymentStatus.PAID;
+                    break;
+                case "PENDING":
+                    paymentConfirm.PaymentStatus = PaymentStatus.PENDING;
+                    break;
+                case "PROCESSING":
+                    paymentConfirm.PaymentStatus = PaymentStatus.PROCESSING;
+                    break;
+                case "CANCELLED":
+                    paymentConfirm.PaymentStatus = PaymentStatus.FAILED;
+                    break;
+            }
             return await ConfirmPaymentOrderAsync(orderPaymentCode, paymentConfirm);
         }
 
