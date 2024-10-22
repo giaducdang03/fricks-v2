@@ -388,6 +388,9 @@ namespace Fricks.Service.Services
                     }
                 }
 
+                // add payment code
+                long paymentCode = NumberUtils.GetRandomLong();
+
                 var newOrder = new Order
                 {
                     UserId = orderUser.Id,
@@ -398,10 +401,11 @@ namespace Fricks.Service.Services
                     Status = OrderStatus.PENDING.ToString(),
                     PaymentMethod = orderModel.PaymentMethod.ToString(),
                     PaymentStatus = PaymentStatus.PENDING.ToString(),
-                    Code = GenerateOrderCode(storeId),
+                    Code = GenerateOrderCode(storeId, paymentCode),
                     StoreId = storeId,
                     Total = totalPrice,
                     ShipFee = shipFree,
+                    PaymentCode = paymentCode,
                     OrderDetails = orderdetails
                 };
 
@@ -410,11 +414,11 @@ namespace Fricks.Service.Services
             throw new Exception("Không có sản phẩm nào trong đơn hàng");
         }
 
-        private static string GenerateOrderCode(int storeId)
+        private static string GenerateOrderCode(int storeId, long paymentCode)
         {
-            string formattedStoreId = storeId.ToString("D2");
-            string timestamp = CommonUtils.GetCurrentTime().ToString("yyyyMMddHHmmss");
-            return $"ST{formattedStoreId}_OD_{timestamp}";
+            string formattedStoreId = storeId.ToString("D3");
+            //string timestamp = CommonUtils.GetCurrentTime().ToString("yyyyMMddHHmmss");
+            return $"ST{formattedStoreId}_OD_{paymentCode}";
         }
     }
 }
