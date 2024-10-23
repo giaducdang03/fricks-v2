@@ -5,6 +5,7 @@ using Fricks.Repository.Entities;
 using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Repository.Utils;
+using Fricks.Service.BusinessModel.ProductModels;
 using Fricks.Service.BusinessModel.WalletModels;
 using Fricks.Service.Services.Interface;
 using System;
@@ -222,7 +223,8 @@ namespace Fricks.Service.Services
                     {
                         WalletId = storeWallet.Id,
                         Amount = createWithdrawModel.Amount,
-                        Requester = currentUser.Email
+                        Requester = currentUser.Email,
+                        Status = WithdrawStatus.PENDING.ToString(),
                     };
 
                     await _unitOfWork.WithdrawRepository.AddAsync(newWithdraw);
@@ -243,6 +245,49 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Cửa hàng không tồn tại");
             }
+        }
+
+        public async Task<Pagination<WithdrawModel>> GetWithdrawsWalletAsync(PaginationParameter paginationParameter, string email, WithdrawFilter withdrawFilter)
+        {
+            var userLogin = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (userLogin == null)
+            {
+                throw new Exception("Tải khoản không tồn tại");
+            }
+
+            // check store
+
+            Store store;
+
+            if (userLogin.Role.ToUpper() == RoleEnums.ADMIN.ToString())
+            {
+                var withdraws = await _unitOfWork.WithdrawRepository.GetWithdrawsPaging(paginationParameter, withdrawFilter);
+                return _mapper.Map<Pagination<WithdrawModel>>(withdraws);
+            }
+            else
+            {
+                store = await _unitOfWork.StoreRepository.GetStoreByManagerId(userLogin.Id);
+                if (store == null)
+                {
+                    throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                }
+
+                var storeWallet = await _unitOfWork.WalletRepository.GetWalletStoreAsync(store.Id);
+                if (storeWallet == null)
+                {
+                    throw new Exception("Cửa hàng không có ví");
+                }
+
+                withdrawFilter.WalletId = storeWallet.Id;
+                var withdraws = await _unitOfWork.WithdrawRepository.GetWithdrawsPaging(paginationParameter, withdrawFilter);
+                return _mapper.Map<Pagination<WithdrawModel>>(withdraws);
+
+            }
+        }
+
+        public async Task<WithdrawModel> GetWithdrawByIdAsync(int withdrawId)
+        {
+            return _mapper.Map<WithdrawModel>(await _unitOfWork.WithdrawRepository.GetWithdrawsById(withdrawId));
         }
     }
 }
