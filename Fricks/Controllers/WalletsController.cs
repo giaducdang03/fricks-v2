@@ -27,7 +27,7 @@ namespace Fricks.Controllers
 
         [HttpGet("store")]
         [Authorize(Roles = "STORE")]
-        public async Task<IActionResult> GetAccountById()
+        public async Task<IActionResult> GetWalletById()
         {
             try
             {
@@ -53,6 +53,7 @@ namespace Fricks.Controllers
                 });
             }
         }
+
         [HttpGet("store/transactions")]
         [Authorize(Roles = "STORE")]
         public async Task<IActionResult> GetTransactionsWallet([FromQuery] PaginationParameter paginationParameter, [FromQuery] TransactionFilter transactionFilter)
@@ -167,6 +168,74 @@ namespace Fricks.Controllers
                     Message = ex.Message.ToString()
                 };
                 return BadRequest(resp);
+            }
+        }
+
+        [HttpGet("withdraw")]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> GetWithdrawWallet([FromQuery] PaginationParameter paginationParameter, [FromQuery] WithdrawFilter withdrawFilter)
+        {
+            try
+            {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _walletService.GetWithdrawsWalletAsync(paginationParameter, currentEmail, withdrawFilter);
+                if (result == null)
+                {
+                    return NotFound(new ResponseModel<string>
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Không có giao dịch"
+                    });
+                }
+                var metadata = new
+                {
+                    result.TotalCount,
+                    result.PageSize,
+                    result.CurrentPage,
+                    result.TotalPages,
+                    result.HasNext,
+                    result.HasPrevious
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("withdraw/{id}")]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> GetWithdrawById(int id)
+        {
+            try
+            {
+                var data = await _walletService.GetWithdrawByIdAsync(id);
+                if (data == null)
+                {
+                    return NotFound(new ResponseModel<string>
+                    {
+                        HttpCode = 404,
+                        Message = "Yêu cầu rút tiền không tồn tại"
+                    });
+                }
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
             }
         }
 
