@@ -31,6 +31,7 @@ namespace Fricks.Repository.UnitOfWork
         private ITransactionRepository _transactionRepository;
         private IWithdrawRepository _withdrawRepository;
         private IBannerRepository _bannerRepository;
+        private IVoucherRepository _voucherRepository;
         public UnitOfWork(FricksContext context) 
         { 
             _context = context;
@@ -170,6 +171,14 @@ namespace Fricks.Repository.UnitOfWork
             get
             {
                 return _bannerRepository ??= new BannerRepository(_context);
+            }
+        }
+
+        public IVoucherRepository VoucherRepository
+        {
+            get
+            {
+                return _voucherRepository ??= new VoucherRepository(_context);
             }
         }
 
