@@ -21,7 +21,7 @@ namespace Fricks.Service.BusinessModel.VoucherModels
 
         public DateTime? StartDate { get; set; }
 
-        [DateRange("StartDate", ErrorMessage = "Ngày bắt đầu phải lớn hơn ngày kết thúc")]
+        [DateRange("StartDate", ErrorMessage = "Ngày bắt đầu phải lớn hơn ngày kết thúc.")]
         public DateTime? ExpireDate { get; set; }
     }
 
@@ -52,7 +52,7 @@ namespace Fricks.Service.BusinessModel.VoucherModels
 
             if (endDateValue < startDateValue)
             {
-                return new ValidationResult("The ExpireDate must be after the StartDate.");
+                return new ValidationResult("Ngày bắt đầu phải lớn hơn ngày kết thúc.");
             }
 
             return ValidationResult.Success;
