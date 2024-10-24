@@ -9,5 +9,6 @@ namespace Fricks.Repository.Repositories.Interface
 {
     public interface IOrderDetailRepository : IGenericRepository<OrderDetail>
     {
+        public Task<List<OrderDetail>> GetAllOrderDetails();
     }
 }
