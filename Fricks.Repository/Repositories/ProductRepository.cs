@@ -149,6 +149,9 @@ namespace Fricks.Repository.Repositories
                     case "sku":
                         query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.Sku) : query.OrderBy(s => s.Sku);
                         break;
+                    case "sold":
+                        query = filter.Dir?.ToLower() == "desc" ? query.OrderByDescending(s => s.SoldQuantity) : query.OrderBy(s => s.SoldQuantity);
+                        break;
                     default:
                         query = query.OrderBy(s => s.Id);
                         break;

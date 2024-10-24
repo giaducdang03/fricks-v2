@@ -86,5 +86,10 @@ namespace Fricks.Repository.Repositories
         {
             return await _context.Orders.Include(x => x.Store).Include(x => x.OrderDetails).ThenInclude(x => x.Product).FirstOrDefaultAsync(x => x.PaymentCode == paymentCode);
         }
+
+        public async Task<List<Order>> GetAllOrderAsync()
+        {
+            return await _context.Orders.Include(x => x.Store).Include(x => x.OrderDetails).ThenInclude(x => x.Product).ToListAsync();
+        }
     }
 }

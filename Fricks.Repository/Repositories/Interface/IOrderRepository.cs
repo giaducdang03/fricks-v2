@@ -16,5 +16,7 @@ namespace Fricks.Repository.Repositories.Interface
         public Task<Order> GetOrderById(int id);
 
         public Task<Order> GetOrderByPaymentCode(long paymentCode);
+
+        public Task<List<Order>> GetAllOrderAsync();
     }
 }
