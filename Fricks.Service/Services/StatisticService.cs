@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fricks.Repository.Entities;
+using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Repository.Utils;
 using Fricks.Service.BusinessModel.DashboardModels;
@@ -35,7 +36,7 @@ namespace Fricks.Service.Services
                 CategoryId = category.Id,
                 CategoryName = category.Name,
                 Revenue = orderDetails
-                .Where(order => order.CreateDate.Year == year && order.CreateDate.Month == month && order.Product.CategoryId == category.Id)
+                .Where(order => order.Order.PaymentStatus == PaymentStatus.PAID.ToString() && order.CreateDate.Year == year && order.CreateDate.Month == month && order.Product.CategoryId == category.Id)
                 .Sum(order => order.Price.Value * order.Quantity.Value),
                         LastUpdated = CommonUtils.GetCurrentTime()
             }).ToList();
@@ -46,7 +47,7 @@ namespace Fricks.Service.Services
         public async Task<CommonAdminInfoModel> GetCommonInfoAdminAsync()
         {
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
-            decimal totalRevenue = orders.Sum(order => order.Total.Value);
+            decimal totalRevenue = orders.Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString()).Sum(order => order.Total.Value);
 
             var stores = await _unitOfWork.StoreRepository.GetAllAsync();
             int numOfStores = stores.Count();
@@ -77,7 +78,7 @@ namespace Fricks.Service.Services
         {
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
             var result = orders
-                .Where(order => order.CreateDate.Month == month && order.CreateDate.Year == year)
+                .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() && order.CreateDate.Month == month && order.CreateDate.Year == year)
                 .GroupBy(order => order.CreateDate.Date)
                 .Select(group => new MainChartAdminModel
                 {
@@ -99,7 +100,7 @@ namespace Fricks.Service.Services
                 StoreId = store.Id,
                 StoreName = store.Name,
                 Revenue = orders
-                    .Where(order => order.CreateDate.Year == year && order.CreateDate.Month == month && order.StoreId == store.Id)
+                    .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() && order.CreateDate.Year == year && order.CreateDate.Month == month && order.StoreId == store.Id)
                     .Sum(order => order.Total.Value),
                 LastUpdated = CommonUtils.GetCurrentTime()
             }).ToList();
@@ -122,7 +123,7 @@ namespace Fricks.Service.Services
             }
 
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
-            orders = orders.Where(x => x.StoreId == currentStore.Id).ToList();
+            orders = orders.Where(x => x.StoreId == currentStore.Id && x.PaymentStatus == PaymentStatus.PAID.ToString()).ToList();
             decimal totalRevenue = orders.Sum(order => order.Total.Value);
 
             var products = await _unitOfWork.ProductRepository.GetAllAsync();
