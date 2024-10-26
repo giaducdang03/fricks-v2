@@ -89,7 +89,7 @@ namespace Fricks.Service.Services
             {
                 throw;
             }
-            
+
 
         }
 
@@ -412,6 +412,59 @@ namespace Fricks.Service.Services
                 return newOrder;
             }
             throw new Exception("Không có sản phẩm nào trong đơn hàng");
+        }
+
+        public async Task<OrderModel> UpdateOrderStatus(UpdateOrderModel orderModel)
+        {
+            var updateOrder = await _unitOfWork.OrderRepository.GetOrderById(orderModel.Id);
+            if (updateOrder != null)
+            {
+                if (orderModel.Status == OrderStatus.DONE)
+                {
+                    if (updateOrder.Status == OrderStatus.DELIVERY.ToString() && updateOrder.PaymentStatus == PaymentStatus.PAID.ToString())
+                    {
+                        updateOrder.Status = orderModel.Status.ToString();
+                        updateOrder.DeliveryDate = CommonUtils.GetCurrentTime();
+                        if (orderModel.Image != null)
+                        {
+                            updateOrder.DeliveryImage = orderModel.Image;
+                        }
+
+                        _unitOfWork.OrderRepository.UpdateAsync(updateOrder);
+                        _unitOfWork.Save();
+
+                        return _mapper.Map<OrderModel>(updateOrder);
+                    }
+                    throw new Exception("Trạng thái đơn hàng không hợp lệ");
+                }
+                else if (orderModel.Status == OrderStatus.CANCELED)
+                {
+                    if (updateOrder.Status == OrderStatus.PENDING.ToString()
+                        && updateOrder.PaymentStatus == PaymentStatus.PENDING.ToString())
+                    {
+                        if (updateOrder.CreateDate.AddMinutes(15) <= CommonUtils.GetCurrentTime())
+                        {
+                            updateOrder.Status = orderModel.Status.ToString();
+
+                            _unitOfWork.OrderRepository.UpdateAsync(updateOrder);
+                            _unitOfWork.Save();
+
+                            return _mapper.Map<OrderModel>(updateOrder);
+                        }
+                        else
+                        {
+                            throw new Exception("Bạn chỉ có thể chuyển đơn hàng sang trạng thái hủy khi chưa được thanh toán trong vòng 15 phút");
+                        }
+                    }
+                    throw new Exception("Không thể hủy đơn hàng này");
+
+                }
+                else
+                {
+                    throw new Exception($"Không thể cập nhật trạng thái {orderModel.Status.ToString()} cho đơn hàng này");
+                }
+            }
+            throw new Exception("Đơn hàng không hợp lệ");
         }
 
         private static string GenerateOrderCode(int storeId, long paymentCode)
