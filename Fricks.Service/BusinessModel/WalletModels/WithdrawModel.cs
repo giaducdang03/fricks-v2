@@ -21,10 +21,14 @@ namespace Fricks.Service.BusinessModel.WalletModels
 
         public string? Note { get; set; }
 
-        public DateTime ConfirmDate { get; set; }
+        public DateTime? ConfirmDate { get; set; }
 
-        public DateTime TransferDate { get; set; }
+        public DateTime? TransferDate { get; set; }
 
         public string? ImageTransfer { get; set; }
+
+        public int? StoreId { get; set; }
+
+        public string? StoreName { get; set; }
     }
 }

@@ -108,8 +108,11 @@ namespace Fricks.Service.Settings
             CreateMap<Pagination<Repository.Entities.Transaction>, Pagination<TransactionModel>>()
                 .ConvertUsing<PaginationConverter<Repository.Entities.Transaction, TransactionModel>>();
 
-            CreateMap<Withdraw, WithdrawModel>();
-            
+            CreateMap<Withdraw, WithdrawModel>()
+                .ForMember(dest => dest.StoreId, otp => otp.MapFrom(src => src.Wallet.StoreId))
+                .ForMember(dest => dest.StoreName, otp => otp.MapFrom(src => src.Wallet.Store.Name));
+            CreateMap<Pagination<Withdraw>, Pagination<WithdrawModel>>().ConvertUsing<PaginationConverter<Withdraw, WithdrawModel>>();
+
             CreateMap<OrderDetail, OrderDetailModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailProcessModel>()
                 .ForMember(dest => dest.ProductName, opt => opt.Ignore());
