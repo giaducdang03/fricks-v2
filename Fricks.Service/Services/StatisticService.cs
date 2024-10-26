@@ -74,11 +74,17 @@ namespace Fricks.Service.Services
             return _mapper.Map<List<ProductListModel>>(products.OrderByDescending(x => x.SoldQuantity).Take(10));
         }
 
-        public async Task<List<MainChartAdminModel>> GetMainChartAdminInfoAsync(int month, int year)
+        public async Task<List<MainChartAdminModel>> GetMainChartAdminInfoAsync()
         {
+            // Get the current date and the start of the week
+            var dateNow = CommonUtils.GetCurrentTime();
+            var startOfWeek = dateNow.AddDays(-(int)dateNow.DayOfWeek);
+
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
+
             var result = orders
-                .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() && order.CreateDate.Month == month && order.CreateDate.Year == year)
+                .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() &&
+                                order.CreateDate >= startOfWeek && order.CreateDate <= dateNow)
                 .GroupBy(order => order.CreateDate.Date)
                 .Select(group => new MainChartAdminModel
                 {
