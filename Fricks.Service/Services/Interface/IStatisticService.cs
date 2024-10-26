@@ -12,7 +12,7 @@ namespace Fricks.Service.Services.Interface
     {
         public Task<CommonAdminInfoModel> GetCommonInfoAdminAsync();
 
-        public Task<List<MainChartAdminModel>> GetMainChartAdminInfoAsync(int month, int year);
+        public Task<List<MainChartAdminModel>> GetMainChartAdminInfoAsync();
 
         public Task<List<CategoryRevenueModel>> GetCategoryRevenueAdminAsync(int month, int year);
 
