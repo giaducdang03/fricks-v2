@@ -50,12 +50,12 @@ namespace Fricks.Controllers
         }
 
         [HttpGet("admin/main-chart")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> GetMainChartInfoAdmin([FromQuery] DateRequestModel dateRequestModel)
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetMainChartInfoAdmin()
         {
             try
             {
-                var result = await _statisticService.GetMainChartAdminInfoAsync(dateRequestModel.Month, dateRequestModel.Year);
+                var result = await _statisticService.GetMainChartAdminInfoAsync();
                 if (result == null)
                 {
                     throw new Exception("Có lỗi trong quá trình lấy dữ liệu");
