@@ -1,5 +1,6 @@
 ﻿using Fricks.Repository.Commons;
 using Fricks.Repository.Commons.Filters;
+using Fricks.Repository.Enum;
 using Fricks.Service.BusinessModel.OrderModels;
 using Fricks.Service.Services;
 using Fricks.Service.Services.Interface;
@@ -134,6 +135,51 @@ namespace Fricks.Controllers
                         Message = ex.Message.ToString()
                     }
                );
+            }
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> UpdateOrderStatus(UpdateOrderModel updateOrderModel)
+        {
+            try
+            {
+                var result = await _orderService.UpdateOrderStatus(updateOrderModel);
+                if (result != null)
+                {
+                    if (result.Status == OrderStatus.DONE.ToString())
+                    {
+                        return Ok(new ResponseModel<OrderModel>
+                        {
+                            Data = result,
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Cập nhật đơn hàng thành công"
+                        });
+                    }
+                    else if (result.Status == OrderStatus.CANCELED.ToString())
+                    {
+                        return Ok(new ResponseModel<OrderModel>
+                        {
+                            Data = result,
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Hủy đơn hàng thành công"
+                        });
+                    }
+                }
+                return NotFound(new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy đơn hàng"
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
             }
         }
     }

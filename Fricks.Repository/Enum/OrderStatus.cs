@@ -11,8 +11,6 @@ namespace Fricks.Repository.Enum
         PENDING,
         DELIVERY,
         DONE,
-        CANCELED,
-        SUCCESS,
-        ERROR
+        CANCELED
     }
 }
