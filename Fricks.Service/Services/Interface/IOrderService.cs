@@ -22,5 +22,8 @@ namespace Fricks.Service.Services.Interface
         public Task<bool> CancelOrderAsync(ConfirmOrderModel orderModel, string email);
         public Task<CalculateOrderModel> CalculateOrderAsync(CreateOrderModel orderModel);
         public Task<OrderModel> GetOrderById(int id);
+
+        // update order
+        public Task<OrderModel> UpdateOrderStatus(UpdateOrderModel orderModel);
     }
 }
