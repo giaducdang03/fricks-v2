@@ -1,5 +1,6 @@
 ﻿using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.Services.Interface;
+using Fricks.ViewModels.ResponseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,13 +57,22 @@ namespace Fricks.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int id, ProductPriceProcessModel model) 
+        public async Task<IActionResult> Update(ProductPriceProcessModel model) 
         {
             try
             {
-                var result = await _productPriceService.UpdateProductPrice(id, model);
+                var result = await _productPriceService.UpdateProductPrice(model);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
         }
 
         [HttpDelete]
