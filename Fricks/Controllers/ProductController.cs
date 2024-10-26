@@ -133,20 +133,29 @@ namespace Fricks.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPut("info")]
         [Authorize(Roles = "ADMIN,STORE")]
-        public async Task<IActionResult> Update (int id, ProductProcessModel model) 
+        public async Task<IActionResult> UpdateProductInfo(UpdateProductModel model) 
         {
             try
             {
-                var result = await _productService.UpdateProduct(id, model);
+                var result = await _productService.UpdateProductInfo(model);
                 return Ok(new ResponseModel<ProductModel>
                 {
                     Data = result,
                     HttpCode = StatusCodes.Status200OK,
                     Message = "Cập nhật sản phẩm thành công"
                 });
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
         }
 
         [HttpDelete]

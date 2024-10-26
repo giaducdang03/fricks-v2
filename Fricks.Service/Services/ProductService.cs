@@ -242,9 +242,9 @@ namespace Fricks.Service.Services
             return _mapper.Map<ProductModel>(result);
         }
 
-        public async Task<ProductModel> UpdateProduct(int id, ProductProcessModel productModel)
+        public async Task<ProductModel> UpdateProductInfo(UpdateProductModel productModel)
         {
-            var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+            var product = await _unitOfWork.ProductRepository.GetByIdAsync(productModel.Id);
             if (product == null)
             {
                 throw new Exception("Sản phẩm không tồn tại");
@@ -259,10 +259,18 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy danh mục sản phẩm");
             }
-            var updateProduct = _mapper.Map(productModel, product);
-            _unitOfWork.ProductRepository.UpdateProductAsync(updateProduct);
+
+            // update info
+            product.Name = productModel.Name;
+            product.UnsignName = StringUtils.ConvertToUnSign(productModel.Name);
+            product.BrandId = brand.Id;
+            product.CategoryId = category.Id;
+            product.Image = productModel.Image;
+            product.Quantity = productModel.Quantity;
+
+            _unitOfWork.ProductRepository.UpdateProductAsync(product);
             _unitOfWork.Save();
-            return _mapper.Map<ProductModel>(updateProduct);
+            return _mapper.Map<ProductModel>(product);
         }
 
         public async Task<bool> AddListProduct(List<CreateProductModel> productModels, string email)

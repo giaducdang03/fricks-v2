@@ -15,7 +15,7 @@ namespace Fricks.Service.Services.Interface
     {
         //public Task<ProductModel> AddProduct(ProductRegisterModel product);
         public Task<ProductModel> AddProduct(CreateProductModel product, string email);
-        public Task<ProductModel> UpdateProduct(int id, ProductProcessModel product);
+        public Task<ProductModel> UpdateProductInfo(UpdateProductModel productModel);
         public Task<ProductModel> DeleteProduct(int id);
         public Task<ProductModel> GetProductById(int id);
         public Task<Pagination<ProductModel>> GetAllProductByStoreIdPagination(int storeId, int brandId, int categoryId, PaginationParameter paginationParameter);

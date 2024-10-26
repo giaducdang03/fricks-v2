@@ -53,7 +53,16 @@ namespace Fricks.Controllers
             {
                 var result = await _productPriceService.AddProductPrice(model);
                 return Ok(result);
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
         }
 
         [HttpPut]
