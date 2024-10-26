@@ -267,6 +267,7 @@ namespace Fricks.Service.Services
             product.CategoryId = category.Id;
             product.Image = productModel.Image;
             product.Quantity = productModel.Quantity;
+            product.Description = productModel.Description;
 
             _unitOfWork.ProductRepository.UpdateProductAsync(product);
             _unitOfWork.Save();
