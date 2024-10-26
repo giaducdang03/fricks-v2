@@ -95,6 +95,43 @@ namespace Fricks.Controllers
             }
         }
 
+        [HttpPost("list")]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> CreateListProductAsync(List<CreateProductModel> models)
+        {
+            try
+            {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                if (ModelState.IsValid)
+                {
+                    var result = await _productService.AddListProduct(models, currentEmail);
+                    if (result)
+                    {
+                        return Ok(new ResponseModel<string>
+                        {
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Tạo sản phẩm mới thành công"
+                        });
+                    }
+                    else
+                    {
+                        throw new Exception("Có lỗi trong quá trình tạo sản phẩm mới");
+                    }
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
 
         [HttpPut]
         [Authorize(Roles = "ADMIN,STORE")]
