@@ -306,6 +306,18 @@ namespace Fricks.Service.Services
             var allBrands = await _unitOfWork.BrandRepository.GetAllAsync();
             var allCategories = await _unitOfWork.CategoryRepository.GetAllAsync();
 
+            // gen sku
+            string storeIdString = store.Id.ToString("D2");
+            var productSku = $"ST{storeIdString}_0001";
+
+            var lastStoreProduct = await _unitOfWork.ProductRepository.GetLastStoreProductAsync(store.Id);
+            if (lastStoreProduct != null)
+            {
+                var skuParts = lastStoreProduct.Sku.Split('_');
+                var skuNumber = int.Parse(skuParts[1]) + 1;
+                productSku = $"{skuParts[0]}_{skuNumber:D4}";
+            }
+
             var listAddProducts = new List<Product>();
 
             foreach (var productModel in productModels)
@@ -318,18 +330,6 @@ namespace Fricks.Service.Services
                 if (!allCategories.Any(x => x.Id == productModel.CategoryId))
                 {
                     throw new Exception("Không tìm thấy danh mục sản phẩm");
-                }
-
-                // gen sku
-                string storeIdString = store.Id.ToString("D2");
-                var productSku = $"ST{storeIdString}_0001";
-
-                var lastStoreProduct = await _unitOfWork.ProductRepository.GetLastStoreProductAsync(store.Id);
-                if (lastStoreProduct != null)
-                {
-                    var skuParts = lastStoreProduct.Sku.Split('_');
-                    var skuNumber = int.Parse(skuParts[1]) + 1;
-                    productSku = $"{skuParts[0]}_{skuNumber:D4}";
                 }
 
                 var newProduct = new Product
@@ -396,6 +396,11 @@ namespace Fricks.Service.Services
                 {
                     throw new Exception("Đơn vị tính (ĐVT) sản phẩm không hợp lệ");
                 }
+
+                // Increment the SKU for the next product
+                var skuParts = productSku.Split('_');
+                var skuNumber = int.Parse(skuParts[1]) + 1;
+                productSku = $"{skuParts[0]}_{skuNumber:D4}";
             }
 
             await _unitOfWork.ProductRepository.AddRangeAsync(listAddProducts);
