@@ -1,6 +1,4 @@
-﻿using Fricks.Repository.Entities;
-using Fricks.Service.BusinessModel.ProductPriceModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace Fricks.Service.BusinessModel.ProductModels
 {
-    public class CreateProductModel
+    public class UpdateProductModel
     {
+        public int Id { get; set; }
+
         [Required]
         public string Name { get; set; } = "";
 
@@ -30,17 +30,5 @@ namespace Fricks.Service.BusinessModel.ProductModels
 
         [Required]
         public int StoreId { get; set; }
-
-        [Required]
-        public virtual ICollection<CreateProductPriceModel> ProductPrices { get; set; } = new List<CreateProductPriceModel>();
-    }
-
-    public class CreateProductPriceModel
-    {
-        [Required]
-        public string UnitCode { get; set; } = "";
-        
-        [Required]
-        public int Price { get; set; }
     }
 }

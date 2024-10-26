@@ -60,9 +60,9 @@ namespace Fricks.Service.Services
             return _mapper.Map<List<ProductPriceModel>>(result);
         }
 
-        public async Task<ProductPriceModel> UpdateProductPrice(int id, ProductPriceProcessModel model)
+        public async Task<ProductPriceModel> UpdateProductPrice(ProductPriceProcessModel model)
         {
-            var productPrice = await _unitOfWork.ProductPriceRepository.GetByIdAsync(id);
+            var productPrice = await _unitOfWork.ProductPriceRepository.GetByIdAsync(model.Id);
             if (productPrice == null)
             {
                 throw new Exception("Không tìm thấy giá - Không thể cập nhật");
