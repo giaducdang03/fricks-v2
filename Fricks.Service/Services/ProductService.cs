@@ -264,5 +264,135 @@ namespace Fricks.Service.Services
             _unitOfWork.Save();
             return _mapper.Map<ProductModel>(updateProduct);
         }
+
+        public async Task<bool> AddListProduct(List<CreateProductModel> productModels, string email)
+        {
+            var userLogin = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (userLogin == null)
+            {
+                throw new Exception("Tải khoản không tồn tại");
+            }
+
+            // check store
+
+            Store store;
+
+            if (userLogin.Role.ToUpper() == RoleEnums.ADMIN.ToString())
+            {
+                store = await _unitOfWork.StoreRepository.GetByIdAsync(productModels[0].StoreId);
+                if (store == null)
+                {
+                    throw new Exception("Cửa hàng không tồn tại");
+                }
+            }
+            else
+            {
+                store = await _unitOfWork.StoreRepository.GetStoreByManagerId(userLogin.Id);
+                if (store == null)
+                {
+                    throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                }
+            }
+
+            var allBrands = await _unitOfWork.BrandRepository.GetAllAsync();
+            var allCategories = await _unitOfWork.CategoryRepository.GetAllAsync();
+
+            var listAddProducts = new List<Product>();
+
+            foreach (var productModel in productModels)
+            {
+                if (!allBrands.Any(brand => brand.Id == productModel.BrandId))
+                {
+                    throw new Exception("Không tìm thấy thương hiệu");
+                }
+
+                if (!allCategories.Any(x => x.Id == productModel.CategoryId))
+                {
+                    throw new Exception("Không tìm thấy danh mục sản phẩm");
+                }
+
+                // gen sku
+                string storeIdString = store.Id.ToString("D2");
+                var productSku = $"ST{storeIdString}_0001";
+
+                var lastStoreProduct = await _unitOfWork.ProductRepository.GetLastStoreProductAsync(store.Id);
+                if (lastStoreProduct != null)
+                {
+                    var skuParts = lastStoreProduct.Sku.Split('_');
+                    var skuNumber = int.Parse(skuParts[1]) + 1;
+                    productSku = $"{skuParts[0]}_{skuNumber:D4}";
+                }
+
+                var newProduct = new Product
+                {
+                    Sku = productSku,
+                    BrandId = productModel.BrandId,
+                    CategoryId = productModel.CategoryId,
+                    Description = productModel.Description,
+                    Image = productModel.Image,
+                    Quantity = productModel.Quantity,
+                    SoldQuantity = 0,
+                    Name = productModel.Name,
+                    UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
+                    StoreId = store.Id,
+                    IsAvailable = true,
+                };
+
+                var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
+
+                // check valid product unit
+                bool checkValidProductUnit = true;
+
+                var listAddPrice = new List<ProductPrice>();
+                foreach (var item in productModel.ProductPrices)
+                {
+                    var productUnit = validProductUnits.FirstOrDefault(x => x.Code == item.UnitCode);
+                    if (productUnit == null)
+                    {
+                        checkValidProductUnit = false;
+                        break;
+                    }
+                }
+
+                if (checkValidProductUnit)
+                {
+                    var productPrice = new List<ProductPrice>();
+                    if (productModel.ProductPrices.Count > 0)
+                    {
+                        foreach (var price in productModel.ProductPrices)
+                        {
+                            var unitId = validProductUnits.FirstOrDefault(x => x.Code == price.UnitCode).Id;
+                            if (unitId != null)
+                            {
+                                var newPrice = new ProductPrice
+                                {
+                                    UnitId = unitId,
+                                    Price = price.Price,
+                                    CreateDate = CommonUtils.GetCurrentTime()
+                                };
+                                productPrice.Add(newPrice);
+                            }
+                        }
+
+                        newProduct.ProductPrices = productPrice;
+
+                        listAddProducts.Add(newProduct);
+                    }
+                    else
+                    {
+                        throw new Exception("Giá không được để trống");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Đơn vị tính (ĐVT) sản phẩm không hợp lệ");
+                }
+            }
+
+            await _unitOfWork.ProductRepository.AddRangeAsync(listAddProducts);
+            _unitOfWork.Save();
+
+            return true;
+        }
     }
 }
