@@ -24,8 +24,19 @@ namespace Fricks.Service.Services
 
         public async Task<ProductPriceModel> AddProductPrice(ProductPriceRegisterModel model)
         {
-            var addProductPrice = _mapper.Map<ProductPrice>(model);
-            var result = await _unitOfWork.ProductPriceRepository.AddAsync(addProductPrice);
+            // get product unit
+            var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
+            var addProductPriceUnit = validProductUnits.FirstOrDefault(x => x.Code == model.UnitCode);
+            if (addProductPriceUnit == null)
+            {
+                throw new Exception("Đơn vị tính không hợp lệ");
+            }
+            var newProductPrice = new ProductPrice
+            {
+                UnitId = addProductPriceUnit.Id,
+                Price = model.Price,
+            };
+            var result = await _unitOfWork.ProductPriceRepository.AddAsync(newProductPrice);
             _unitOfWork.Save();
             return _mapper.Map<ProductPriceModel>(result);
         }

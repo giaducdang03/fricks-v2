@@ -28,7 +28,6 @@ namespace Fricks.Service.BusinessModel.ProductModels
         [Required]
         public int Quantity { get; set; }
 
-        [Required]
-        public int StoreId { get; set; }
+        public int? StoreId { get; set; }
     }
 }
