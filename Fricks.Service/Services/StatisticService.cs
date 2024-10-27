@@ -78,7 +78,7 @@ namespace Fricks.Service.Services
         {
             // Get the current date and the start of the week
             var dateNow = CommonUtils.GetCurrentTime();
-            var startOfWeek = dateNow.AddDays(-(int)dateNow.DayOfWeek);
+            var startOfWeek = dateNow.AddDays(dateNow.DayOfWeek == DayOfWeek.Sunday ? -6 : -(int)dateNow.DayOfWeek + 1);
 
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
 
@@ -106,7 +106,8 @@ namespace Fricks.Service.Services
                 StoreId = store.Id,
                 StoreName = store.Name,
                 Revenue = orders
-                    .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() && order.CreateDate.Year == year && order.CreateDate.Month == month && order.StoreId == store.Id)
+                    .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() 
+                        && order.CreateDate.Year == year && order.CreateDate.Month == month && order.StoreId == store.Id)
                     .Sum(order => order.Total.Value),
                 LastUpdated = CommonUtils.GetCurrentTime()
             }).ToList();
