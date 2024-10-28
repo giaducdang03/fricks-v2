@@ -84,7 +84,7 @@ namespace Fricks.Service.Services
 
             var result = orders
                 .Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString() &&
-                                order.CreateDate >= startOfWeek && order.CreateDate <= dateNow)
+                                order.CreateDate.Date >= startOfWeek.Date && order.CreateDate.Date <= dateNow.Date)
                 .GroupBy(order => order.CreateDate.Date)
                 .Select(group => new MainChartAdminModel
                 {
