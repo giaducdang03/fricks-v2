@@ -8,8 +8,8 @@ namespace Fricks.Repository.Enum
 {
     public enum VoucherStatus
     {
-        Enable,
-        Disable,
-        Expired
+        ENABLE,
+        DISABLE,
+        EXPRIED
     }
 }

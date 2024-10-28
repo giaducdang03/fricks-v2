@@ -33,7 +33,7 @@ namespace Fricks.Service.Services
             var dupVoucher = await _unitOfWork.VoucherRepository.GetVoucherByCode(addVoucher.Code, store.Id);
             if (dupVoucher != null) { throw new Exception("Mã đã tồn tại trong cửa hàng của bạn."); }
             addVoucher.StoreId = store.Id;
-            addVoucher.Status = VoucherStatus.Enable.ToString();
+            addVoucher.Status = VoucherStatus.ENABLE.ToString();
             var result = await _unitOfWork.VoucherRepository.AddAsync(addVoucher);
             _unitOfWork.Save();
             return _mapper.Map<VoucherModel>(result);
@@ -68,7 +68,7 @@ namespace Fricks.Service.Services
             var store = await _unitOfWork.StoreRepository.GetStoreByManagerId(user.Id);
             if (store == null) { throw new Exception($"Tài khoản {user.Id} không sở hữu cửa hàng."); }
             if (voucher.StoreId != store.Id) { throw new Exception("Voucher không thuộc sở hữu của cửa hàng."); }
-            voucher.Status = VoucherStatus.Disable.ToString();
+            voucher.Status = VoucherStatus.DISABLE.ToString();
             _unitOfWork.VoucherRepository.UpdateAsync(voucher);
             _unitOfWork.Save();
             return _mapper.Map<VoucherModel>(voucher);
