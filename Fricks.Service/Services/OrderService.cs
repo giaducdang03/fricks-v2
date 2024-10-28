@@ -16,6 +16,7 @@ using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -216,6 +217,17 @@ namespace Fricks.Service.Services
             var dbProduct = await _unitOfWork.ProductRepository.GetAllProductsAsync();
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
 
+            // calculate discount
+            var discount = 0;
+            var voucher = await _unitOfWork.VoucherRepository.GetVoucherByCode(createOrderModel.VoucherCode, 5); // hard code
+            if (voucher != null)
+            {
+                if (voucher.Code.StartsWith("FS"))
+                {
+                    discount = createOrderModel.ShipFee.Value * voucher.DiscountPercent.Value / 100;
+                }
+            }
+
             if (createOrderModel.ProductOrders.Count > 0)
             {
                 // check list product
@@ -248,6 +260,18 @@ namespace Fricks.Service.Services
                 int storeId = orderedProducts.First().StoreId.Value;
 
                 int totalPrice = 0;
+
+                // add fee ship
+
+                var buyStore = await _unitOfWork.StoreRepository.GetStoreByIdAsync(storeId);
+                if (buyStore == null)
+                {
+                    throw new Exception($"Cửa hàng không tồn tại");
+                }
+
+                int shipFree = buyStore.DefaultShip != null ? buyStore.DefaultShip.Value : 0;
+
+                totalPrice += shipFree;
 
                 List<CalculateOrderDetailModel> orderdetails = new List<CalculateOrderDetailModel>();
                 foreach (var order in orderedProducts)
@@ -287,7 +311,9 @@ namespace Fricks.Service.Services
                     CustomerName = currentUser.FullName,
                     CustomerAddress = currentUser.Address,
                     StoreId = storeId,
-                    Total = totalPrice,
+                    Total = totalPrice - discount,
+                    ShipFee = shipFree,
+                    Discount = discount,
                     OrderDetails = orderdetails
                 };
 
@@ -301,6 +327,17 @@ namespace Fricks.Service.Services
         {
             var dbProduct = await _unitOfWork.ProductRepository.GetAllProductsAsync();
             var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
+
+            // calculate discount
+            var discount = 0;
+            var voucher = await _unitOfWork.VoucherRepository.GetVoucherByCode(orderModel.VoucherCode, 5); // hard code
+            if (voucher != null)
+            {
+                if (voucher.Code.StartsWith("FS"))
+                {
+                    discount = orderModel.ShipFee.Value * voucher.DiscountPercent.Value / 100;
+                }
+            }
 
             if (orderModel.ProductOrders.Count > 0)
             {
@@ -403,9 +440,10 @@ namespace Fricks.Service.Services
                     PaymentStatus = PaymentStatus.PENDING.ToString(),
                     Code = GenerateOrderCode(storeId, paymentCode),
                     StoreId = storeId,
-                    Total = totalPrice,
+                    Total = totalPrice - discount,
                     ShipFee = shipFree,
                     PaymentCode = paymentCode,
+                    Discount = discount,
                     OrderDetails = orderdetails
                 };
 
