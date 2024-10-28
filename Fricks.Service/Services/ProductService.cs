@@ -242,9 +242,9 @@ namespace Fricks.Service.Services
             return _mapper.Map<ProductModel>(result);
         }
 
-        public async Task<ProductModel> UpdateProduct(int id, ProductProcessModel productModel)
+        public async Task<ProductModel> UpdateProductInfo(UpdateProductModel productModel)
         {
-            var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+            var product = await _unitOfWork.ProductRepository.GetByIdAsync(productModel.Id);
             if (product == null)
             {
                 throw new Exception("Sản phẩm không tồn tại");
@@ -259,10 +259,154 @@ namespace Fricks.Service.Services
             {
                 throw new Exception("Không tìm thấy danh mục sản phẩm");
             }
-            var updateProduct = _mapper.Map(productModel, product);
-            _unitOfWork.ProductRepository.UpdateProductAsync(updateProduct);
+
+            // update info
+            product.Name = productModel.Name;
+            product.UnsignName = StringUtils.ConvertToUnSign(productModel.Name);
+            product.BrandId = brand.Id;
+            product.CategoryId = category.Id;
+            product.Image = productModel.Image;
+            product.Quantity = productModel.Quantity;
+            product.Description = productModel.Description;
+
+            _unitOfWork.ProductRepository.UpdateProductAsync(product);
             _unitOfWork.Save();
-            return _mapper.Map<ProductModel>(updateProduct);
+            return _mapper.Map<ProductModel>(product);
+        }
+
+        public async Task<bool> AddListProduct(List<CreateProductModel> productModels, string email)
+        {
+            var userLogin = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (userLogin == null)
+            {
+                throw new Exception("Tải khoản không tồn tại");
+            }
+
+            // check store
+
+            Store store;
+
+            if (userLogin.Role.ToUpper() == RoleEnums.ADMIN.ToString())
+            {
+                store = await _unitOfWork.StoreRepository.GetByIdAsync(productModels[0].StoreId);
+                if (store == null)
+                {
+                    throw new Exception("Cửa hàng không tồn tại");
+                }
+            }
+            else
+            {
+                store = await _unitOfWork.StoreRepository.GetStoreByManagerId(userLogin.Id);
+                if (store == null)
+                {
+                    throw new Exception("Tài khoản chưa quản lí cửa hàng nào");
+                }
+            }
+
+            var allBrands = await _unitOfWork.BrandRepository.GetAllAsync();
+            var allCategories = await _unitOfWork.CategoryRepository.GetAllAsync();
+
+            // gen sku
+            string storeIdString = store.Id.ToString("D2");
+            var productSku = $"ST{storeIdString}_0001";
+
+            var lastStoreProduct = await _unitOfWork.ProductRepository.GetLastStoreProductAsync(store.Id);
+            if (lastStoreProduct != null)
+            {
+                var skuParts = lastStoreProduct.Sku.Split('_');
+                var skuNumber = int.Parse(skuParts[1]) + 1;
+                productSku = $"{skuParts[0]}_{skuNumber:D4}";
+            }
+
+            var listAddProducts = new List<Product>();
+
+            foreach (var productModel in productModels)
+            {
+                if (!allBrands.Any(brand => brand.Id == productModel.BrandId))
+                {
+                    throw new Exception("Không tìm thấy thương hiệu");
+                }
+
+                if (!allCategories.Any(x => x.Id == productModel.CategoryId))
+                {
+                    throw new Exception("Không tìm thấy danh mục sản phẩm");
+                }
+
+                var newProduct = new Product
+                {
+                    Sku = productSku,
+                    BrandId = productModel.BrandId,
+                    CategoryId = productModel.CategoryId,
+                    Description = productModel.Description,
+                    Image = productModel.Image,
+                    Quantity = productModel.Quantity,
+                    SoldQuantity = 0,
+                    Name = productModel.Name,
+                    UnsignName = StringUtils.ConvertToUnSign(productModel.Name),
+                    StoreId = store.Id,
+                    IsAvailable = true,
+                };
+
+                var validProductUnits = await _unitOfWork.ProductUnitRepository.GetAllAsync();
+
+                // check valid product unit
+                bool checkValidProductUnit = true;
+
+                var listAddPrice = new List<ProductPrice>();
+                foreach (var item in productModel.ProductPrices)
+                {
+                    var productUnit = validProductUnits.FirstOrDefault(x => x.Code == item.UnitCode);
+                    if (productUnit == null)
+                    {
+                        checkValidProductUnit = false;
+                        break;
+                    }
+                }
+
+                if (checkValidProductUnit)
+                {
+                    var productPrice = new List<ProductPrice>();
+                    if (productModel.ProductPrices.Count > 0)
+                    {
+                        foreach (var price in productModel.ProductPrices)
+                        {
+                            var unitId = validProductUnits.FirstOrDefault(x => x.Code == price.UnitCode).Id;
+                            if (unitId != null)
+                            {
+                                var newPrice = new ProductPrice
+                                {
+                                    UnitId = unitId,
+                                    Price = price.Price,
+                                    CreateDate = CommonUtils.GetCurrentTime()
+                                };
+                                productPrice.Add(newPrice);
+                            }
+                        }
+
+                        newProduct.ProductPrices = productPrice;
+
+                        listAddProducts.Add(newProduct);
+                    }
+                    else
+                    {
+                        throw new Exception("Giá không được để trống");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Đơn vị tính (ĐVT) sản phẩm không hợp lệ");
+                }
+
+                // Increment the SKU for the next product
+                var skuParts = productSku.Split('_');
+                var skuNumber = int.Parse(skuParts[1]) + 1;
+                productSku = $"{skuParts[0]}_{skuNumber:D4}";
+            }
+
+            await _unitOfWork.ProductRepository.AddRangeAsync(listAddProducts);
+            _unitOfWork.Save();
+
+            return true;
         }
     }
 }

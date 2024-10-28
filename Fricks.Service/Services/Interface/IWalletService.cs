@@ -20,5 +20,9 @@ namespace Fricks.Service.Services.Interface
         public Task<WithdrawModel> ConfirmWithdrawStoreAsync(UpdateWithdrawModel updateWithdrawModel, string email);
 
         public Task<WithdrawModel> ProcessWithdrawStoreAsync(UpdateWithdrawModel updateWithdrawModel);
+
+        public Task<Pagination<WithdrawModel>> GetWithdrawsWalletAsync(PaginationParameter paginationParameter, string email, WithdrawFilter withdrawFilter);
+
+        public Task<WithdrawModel> GetWithdrawByIdAsync(int withdrawId);
     }
 }

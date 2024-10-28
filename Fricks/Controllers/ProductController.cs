@@ -95,21 +95,67 @@ namespace Fricks.Controllers
             }
         }
 
-
-        [HttpPut]
+        [HttpPost("list")]
         [Authorize(Roles = "ADMIN,STORE")]
-        public async Task<IActionResult> Update (int id, ProductProcessModel model) 
+        public async Task<IActionResult> CreateListProductAsync(List<CreateProductModel> models)
         {
             try
             {
-                var result = await _productService.UpdateProduct(id, model);
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                if (ModelState.IsValid)
+                {
+                    var result = await _productService.AddListProduct(models, currentEmail);
+                    if (result)
+                    {
+                        return Ok(new ResponseModel<string>
+                        {
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Tạo sản phẩm mới thành công"
+                        });
+                    }
+                    else
+                    {
+                        throw new Exception("Có lỗi trong quá trình tạo sản phẩm mới");
+                    }
+                }
+                return ValidationProblem(ModelState);
+
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
+
+
+        [HttpPut("info")]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> UpdateProductInfo(UpdateProductModel model) 
+        {
+            try
+            {
+                var result = await _productService.UpdateProductInfo(model);
                 return Ok(new ResponseModel<ProductModel>
                 {
                     Data = result,
                     HttpCode = StatusCodes.Status200OK,
                     Message = "Cập nhật sản phẩm thành công"
                 });
-            } catch { throw; }
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModel<string>
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
         }
 
         [HttpDelete]
