@@ -25,5 +25,7 @@ namespace Fricks.Service.Services.Interface
 
         // update order
         public Task<OrderModel> UpdateOrderStatus(UpdateOrderModel orderModel);
+
+        public Task<List<OrderModel>> GetAllOrdersAsync(string email);
     }
 }
