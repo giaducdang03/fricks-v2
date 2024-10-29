@@ -182,5 +182,35 @@ namespace Fricks.Controllers
                 });
             }
         }
+
+        [HttpGet("all")]
+        [Authorize(Roles = "ADMIN,STORE")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            try
+            {
+                var currentEmail = _claimsService.GetCurrentUserEmail;
+                var result = await _orderService.GetAllOrdersAsync(currentEmail);
+                if (result == null)
+                {
+                    return NotFound(new ResponseModel<string>
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Không có đơn hàng nào"
+                    });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new ResponseModel<string>
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = ex.Message.ToString()
+                    }
+               );
+            }
+        }
     }
 }
