@@ -314,6 +314,7 @@ namespace Fricks.Service.Services
                     Total = totalPrice - discount,
                     ShipFee = shipFree,
                     Discount = discount,
+                    VoucherId = voucher != null ? voucher.Id : null,
                     OrderDetails = orderdetails
                 };
 
@@ -444,6 +445,7 @@ namespace Fricks.Service.Services
                     ShipFee = shipFree,
                     PaymentCode = paymentCode,
                     Discount = discount,
+                    VoucherId = voucher != null ? voucher.Id : null,
                     OrderDetails = orderdetails
                 };
 
@@ -510,6 +512,31 @@ namespace Fricks.Service.Services
             string formattedStoreId = storeId.ToString("D3");
             //string timestamp = CommonUtils.GetCurrentTime().ToString("yyyyMMddHHmmss");
             return $"ST{formattedStoreId}_OD_{paymentCode}";
+        }
+
+        public async Task<List<OrderModel>> GetAllOrdersAsync(string email)
+        {
+            var currentUser = await _unitOfWork.UsersRepository.GetUserByEmail(email);
+            if (currentUser == null)
+            {
+                throw new Exception("Người dùng không tồn tại");
+            }
+
+            if (currentUser.Role == RoleEnums.ADMIN.ToString())
+            {
+                return _mapper.Map<List<OrderModel>>(await _unitOfWork.OrderRepository.GetAllOrderAsync());
+            }
+            else
+            {
+                var currentStore = await _unitOfWork.StoreRepository.GetStoreByManagerId(currentUser.Id);
+                if (currentStore == null)
+                {
+                    throw new Exception("Cửa hàng không tồn tại");
+                }
+
+                var allOrders = await _unitOfWork.OrderRepository.GetAllOrderAsync();
+                return _mapper.Map<List<OrderModel>>(allOrders.Where(x => x.StoreId == currentStore.Id));
+            }
         }
     }
 }
