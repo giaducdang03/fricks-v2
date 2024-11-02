@@ -12,7 +12,7 @@ namespace Fricks.Service.BusinessModel.DashboardModels
 
         public int NumOfStores { get; set; } = 0;
 
-        public int NumOfProducts { get; set; } = 0;
+        public int NumOfOrders { get; set; } = 0;
 
         public int NumOfUsers { get; set; } = 0;
 
