@@ -47,7 +47,9 @@ namespace Fricks.Service.Services
         public async Task<CommonAdminInfoModel> GetCommonInfoAdminAsync()
         {
             var orders = await _unitOfWork.OrderRepository.GetAllAsync();
-            decimal totalRevenue = orders.Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString()).Sum(order => order.Total.Value);
+            var ordersSuccess = orders.Where(order => order.PaymentStatus == PaymentStatus.PAID.ToString());
+            decimal totalRevenue = ordersSuccess.Sum(order => order.Total.Value);
+
 
             var stores = await _unitOfWork.StoreRepository.GetAllAsync();
             int numOfStores = stores.Count();
@@ -55,13 +57,10 @@ namespace Fricks.Service.Services
             var users = await _unitOfWork.UsersRepository.GetAllAsync();
             int numOfUsers = users.Count();
 
-            var products = await _unitOfWork.ProductRepository.GetAllAsync();
-            int numOfProducts = products.Count();
-
             return new CommonAdminInfoModel
             {
                 LastUpdated = CommonUtils.GetCurrentTime(),
-                NumOfProducts = numOfProducts,
+                NumOfOrders = ordersSuccess.Count(),
                 NumOfStores = numOfStores,
                 NumOfUsers = numOfUsers,
                 Revenue = totalRevenue,
