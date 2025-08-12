@@ -6,6 +6,7 @@ using Fricks.Repository.Enum;
 using Fricks.Repository.UnitOfWork;
 using Fricks.Service.BusinessModel.FeedbackModels;
 using Fricks.Service.BusinessModel.ProductModels;
+using Fricks.Service.BusinessModel.UserModels;
 using Fricks.Service.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace Fricks.Service.Services
             }
 
             var checkUserFeedback = await _unitOfWork.FeedbackRepository.CheckUserFeedbackProductAsync(createFeedbackModel.ProductId, currentUser.Id);
-            if (!checkUserFeedback)
+            if (checkUserFeedback)
             {
                 var newFeedback = _mapper.Map<Feedback>(createFeedbackModel);
                 newFeedback.UserId = currentUser.Id;
@@ -50,8 +51,10 @@ namespace Fricks.Service.Services
 
                 return _mapper.Map<FeedbackModel>(newFeedback);
             }
-
-            return null;
+            else
+            {
+                throw new Exception("Bạn đã đánh giá sản phẩm này rồi");
+            }
         }
 
         public async Task<FeedbackModel> DeleteFeedbackAsync(int feedbackId, string email)
@@ -91,7 +94,17 @@ namespace Fricks.Service.Services
         public async Task<Pagination<FeedbackModel>> GetFeedbackProductPaginationAsync(int productId, PaginationParameter paginationParameter, FeedbackFilter feedbackFilter)
         {
             var feedbacks = await _unitOfWork.FeedbackRepository.GetFeedBackByProductAsync(productId, paginationParameter, feedbackFilter);
-            return _mapper.Map<Pagination<FeedbackModel>>(feedbacks);
+            var feedbackModels = _mapper.Map<Pagination<FeedbackModel>>(feedbacks);
+            // search and map user for feedbacks
+            foreach (var feedback in feedbackModels)
+            {
+                var user = await _unitOfWork.UsersRepository.GetByIdAsync(feedback.UserId.Value);
+                if (user != null)
+                {
+                    feedback.User = _mapper.Map<UserModel>(user);
+                }
+            }
+            return feedbackModels;
         }
 
         public async Task<FeedbackModel> UpdateFeedbackAsync(UpdateFeedbackModel updateFeedbackModel, string email)

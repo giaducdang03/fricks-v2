@@ -22,7 +22,7 @@ namespace Fricks.Repository.Repositories
 
         public async Task<bool> CheckUserFeedbackProductAsync(int productId, int userId)
         {
-            var userFeedback = await _context.Feedbacks.FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
+            var userFeedback = await _context.Feedbacks.FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId && x.IsDeleted == false);
             if (userFeedback == null)
             {
                 return true;
