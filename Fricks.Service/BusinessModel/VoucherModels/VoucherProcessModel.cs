@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fricks.Repository.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,20 +10,23 @@ namespace Fricks.Service.BusinessModel.VoucherModels
 {
     public class VoucherProcessModel
     {
-        public string? Code { get; set; }
+        public required string Code { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
-        public int? DiscountPercent { get; set; }
+        public int DiscountPercent { get; set; } = 0;
 
-        public int? MaxDiscount { get; set; }
+        public int MaxDiscount { get; set; } = 0;
 
-        public int? MinOrderValue { get; set; }
+        public int MinOrderValue { get; set; } = 0;
 
-        public DateTime? StartDate { get; set; }
+        [Required(ErrorMessage = "Vui lòng chọn ngày bắt đầu.")]
+        public DateTime StartDate { get; set; }
 
         [DateRange("StartDate", ErrorMessage = "Ngày bắt đầu phải lớn hơn ngày kết thúc.")]
-        public DateTime? ExpireDate { get; set; }
+        public DateTime ExpireDate { get; set; }
+
+        public AvailabilityVoucher Availability { get; set; } = AvailabilityVoucher.STORE;
     }
 
     public class DateRangeAttribute : ValidationAttribute

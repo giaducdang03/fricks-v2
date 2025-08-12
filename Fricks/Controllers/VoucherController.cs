@@ -20,7 +20,17 @@ namespace Fricks.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(int storeId, [FromQuery] PaginationParameter paginationParameter) 
+        public async Task<IActionResult> GetAll([FromQuery] PaginationParameter paginationParameter)
+        {
+            try
+            {
+                var result = await _voucherService.GetVouchersPaging(paginationParameter);
+                return Ok(result);
+            } catch { throw; }
+        }
+
+        [HttpGet("store/{storeId}")]
+        public async Task<IActionResult> GetVoucherByStore(int storeId, [FromQuery] PaginationParameter paginationParameter) 
         {
             try
             { 
@@ -40,7 +50,7 @@ namespace Fricks.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "STORE")]
+        [Authorize]
         public async Task<IActionResult> Add(VoucherProcessModel voucherProcessModel)
         {
             try

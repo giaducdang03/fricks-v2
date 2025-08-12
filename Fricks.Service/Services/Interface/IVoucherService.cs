@@ -11,6 +11,7 @@ namespace Fricks.Service.Services.Interface
     public interface IVoucherService
     {
         public Task<Pagination<VoucherModel>> GetAllVoucherByStoreId(int storeId, PaginationParameter paginationParameter);
+        public Task<Pagination<VoucherModel>> GetVouchersPaging(PaginationParameter paginationParameter);
         public Task<VoucherModel> GetById(int id);
         public Task<VoucherModel> AddVoucher(VoucherProcessModel voucherProcessModel, string username);
         public Task<VoucherModel> UpdateVoucher(int id, VoucherProcessModel voucherProcessModel, string email);

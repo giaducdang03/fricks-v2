@@ -219,14 +219,6 @@ namespace Fricks.Service.Services
 
             // calculate discount
             var discount = 0;
-            var voucher = await _unitOfWork.VoucherRepository.GetVoucherByCode(createOrderModel.VoucherCode, 5); // hard code
-            if (voucher != null)
-            {
-                if (voucher.Code.StartsWith("FS"))
-                {
-                    discount = createOrderModel.ShipFee.Value * voucher.DiscountPercent.Value / 100;
-                }
-            }
 
             if (createOrderModel.ProductOrders.Count > 0)
             {
@@ -304,6 +296,47 @@ namespace Fricks.Service.Services
                     }
                 }
 
+                // appled voucher
+
+                // Tìm cả hai loại voucher
+                var globalVoucher = await _unitOfWork.VoucherRepository.GetGlobalVoucherByCode(createOrderModel.VoucherCode);
+                var storeVoucher = await _unitOfWork.VoucherRepository.GetVoucherByCode(createOrderModel.VoucherCode, storeId);
+
+                Voucher? appliedVoucher = null;
+
+                // Kiểm tra điều kiện hợp lệ cho từng voucher
+                bool isGlobalValid = globalVoucher != null
+                    && globalVoucher.MinOrderValue <= totalPrice
+                    && (globalVoucher.Availability == null || globalVoucher.Availability == AvailabilityVoucher.GLOBAL.ToString());
+
+                bool isStoreValid = storeVoucher != null
+                    && storeVoucher.MinOrderValue <= totalPrice
+                    && (storeVoucher.Availability == null || storeVoucher.Availability == AvailabilityVoucher.STORE.ToString());
+
+                // Chọn voucher phù hợp (ưu tiên store voucher nếu cả hai đều hợp lệ)
+                if (isStoreValid)
+                {
+                    appliedVoucher = storeVoucher;
+                }
+                else if (isGlobalValid)
+                {
+                    appliedVoucher = globalVoucher;
+                }
+
+                // Áp dụng discount nếu có voucher hợp lệ
+                if (appliedVoucher != null)
+                {
+                    // voucher free ship (FS)
+                    if (appliedVoucher.Code.StartsWith("FS") && createOrderModel.ShipFee.HasValue)
+                    {
+                        discount = createOrderModel.ShipFee.Value * appliedVoucher.DiscountPercent.Value / 100;
+                    }
+                    else
+                    {
+                        discount = totalPrice * appliedVoucher.DiscountPercent.Value / 100;
+                    }
+                }
+
                 var newOrder = new CalculateOrderModel
                 {
                     UserId = currentUser.Id,
@@ -314,7 +347,7 @@ namespace Fricks.Service.Services
                     Total = totalPrice - discount,
                     ShipFee = shipFree,
                     Discount = discount,
-                    VoucherId = voucher != null ? voucher.Id : null,
+                    VoucherId = appliedVoucher != null ? appliedVoucher.Id : null,
                     OrderDetails = orderdetails
                 };
 

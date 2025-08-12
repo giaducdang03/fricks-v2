@@ -11,6 +11,7 @@ namespace Fricks.Service.BusinessModel.VoucherModels
         public int Id { get; set; }
 
         public int? StoreId { get; set; }
+        public string? StoreName { get; set; }
 
         public string? Code { get; set; }
 
@@ -25,6 +26,8 @@ namespace Fricks.Service.BusinessModel.VoucherModels
         public DateTime? StartDate { get; set; }
 
         public DateTime? ExpireDate { get; set; }
+
+        public string? Availability { get; set; }
 
         public string? Status { get; set; }
     }

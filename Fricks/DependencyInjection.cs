@@ -38,6 +38,7 @@ namespace Fricks
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IBannerService, BannerService>();
             services.AddScoped<IStatisticService, StatisticService>();
+            services.AddScoped<IVoucherService, VoucherService>();
 
             // add Middleware
             services.AddExceptionHandler<ExceptionHandlerMiddleware>();

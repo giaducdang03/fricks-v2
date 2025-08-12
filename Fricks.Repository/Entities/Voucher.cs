@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fricks.Repository.Enum;
+using System;
 using System.Collections.Generic;
 
 namespace Fricks.Repository.Entities;
@@ -22,6 +23,8 @@ public partial class Voucher : BaseEntity
     public DateTime? ExpireDate { get; set; }
 
     public string? Status { get; set; }
+
+    public string? Availability { get; set; } = AvailabilityVoucher.STORE.ToString();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

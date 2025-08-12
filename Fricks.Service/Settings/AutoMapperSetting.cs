@@ -14,6 +14,7 @@ using Fricks.Service.BusinessModel.ProductPriceModels;
 using Fricks.Service.BusinessModel.ProductUnitModels;
 using Fricks.Service.BusinessModel.StoreModels;
 using Fricks.Service.BusinessModel.UserModels;
+using Fricks.Service.BusinessModel.VoucherModels;
 using Fricks.Service.BusinessModel.WalletModels;
 using Net.payOS.Types;
 using System;
@@ -69,7 +70,7 @@ namespace Fricks.Service.Settings
             CreateMap<Product, ProductModel>().ReverseMap();
             CreateMap<Product, ProductModel>()
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()))
-                                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Feedbacks.Count > 0 ?
+                                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Feedbacks.Count > 0 ?
                     (int)(src.Feedbacks.Where(f => f.IsDeleted == false).Average(f => f.Rate) ?? 0) : 0))
                 .ForMember(dest => dest.FeedbackCount, opt => opt.MapFrom(src => src.Feedbacks.Count(f => f.IsDeleted == false)));
             CreateMap<Product, ProductProcessModel>().ReverseMap();
@@ -101,7 +102,7 @@ namespace Fricks.Service.Settings
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
                 .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ProductPrices.ToList()))
-                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Feedbacks.Count > 0 ? 
+                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Feedbacks.Count > 0 ? 
                     (int)(src.Feedbacks.Where(f => f.IsDeleted == false).Average(f => f.Rate) ?? 0) : 0))
                 .ForMember(dest => dest.FeedbackCount, opt => opt.MapFrom(src => src.Feedbacks.Count(f => f.IsDeleted == false)));
             CreateMap<Pagination<Product>, Pagination<ProductListModel>>().ConvertUsing<PaginationConverter<Product, ProductListModel>>();
@@ -138,6 +139,13 @@ namespace Fricks.Service.Settings
 
             CreateMap<Banner, BannerModel>().ReverseMap();
             CreateMap<Banner, BannerProcessModel>().ReverseMap();
+
+            // voucher
+            CreateMap<Voucher, VoucherModel>()
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store.Name))
+                .ForMember(dest => dest.StoreId, opt => opt.MapFrom(src => src.Store.Id));
+
+            CreateMap<VoucherProcessModel, Voucher>();
         }
     }
 
