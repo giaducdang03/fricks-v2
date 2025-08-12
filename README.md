@@ -55,6 +55,6 @@ Fricks is an online marketplace that enables retailers to set up their stores an
 - Front-end: https://github.com/duongbao0803/fricks-admin
 - Back-end: https://github.com/giaducdang03/fricks-api
 
-##### Contact me via: tonbao0803@gmail.com
+##### Contact me via: giaducdang@gmail.com
 
 ##### Copyright &#169; 2024 Fricks

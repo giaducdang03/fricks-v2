@@ -27,6 +27,7 @@ namespace Fricks.Repository.Repositories
         {
             return await _context.Products.Include(x => x.Brand).Include(x => x.Category)
                                           .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                          .Include(x => x.Feedbacks)
                                           .Where(x => x.Id == id).FirstOrDefaultAsync();
         }
 
@@ -42,6 +43,7 @@ namespace Fricks.Repository.Repositories
             var itemCount = await _context.Products.CountAsync();
             var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category)
                                     .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                    .Include(x => x.Feedbacks)
                                     .Where(x => x.StoreId.Equals(id))
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                     .Take(paginationParameter.PageSize)
@@ -56,6 +58,7 @@ namespace Fricks.Repository.Repositories
             var itemCount = await _context.Products.CountAsync();
             var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category)
                                     .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                    .Include(x => x.Feedbacks)
                                     .Where(x => x.StoreId.Equals(id))
                                     .Where(x => brand != null ? brand.Equals(x.Brand) : x.Brand != null 
                                              && category != null ? category.Equals(x.Category) : x.Category != null)
@@ -70,7 +73,8 @@ namespace Fricks.Repository.Repositories
         public async Task<List<Product>> GetAllProductsAsync()
         {
             return await _context.Products.Include(x => x.Brand).Include(x => x.Category).Include(x => x.Store)
-                                          .Include(x => x.ProductPrices).ThenInclude(x => x.Unit).ToListAsync();
+                                          .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                          .Include(x => x.Feedbacks).ToListAsync();
         }
 
         public async Task<Pagination<Product>> GetProductPagingAsync(PaginationParameter paginationParameter, ProductFilter productFilter)
@@ -79,6 +83,7 @@ namespace Fricks.Repository.Repositories
                                     .Include(x => x.Brand)
                                     .Include(x => x.Category)
                                     .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                    .Include(x => x.Feedbacks)
                                     .Where(x => x.IsDeleted == false).AsQueryable();
 
             // apply filter
@@ -98,6 +103,7 @@ namespace Fricks.Repository.Repositories
             var itemCount = await _context.Products.CountAsync();
             var items = await _context.Products.Include(x => x.Brand).Include(x => x.Category)
                                     .Include(x => x.ProductPrices).ThenInclude(x => x.Unit)
+                                    .Include(x => x.Feedbacks)
                                     .Where(x => brand != null ? brand.Equals(x.Brand) : x.Brand != null
                                              && category != null ? category.Equals(x.Category) : x.Category != null)
                                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
